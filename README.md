@@ -1,7 +1,7 @@
 # AI Coding Agent Orchestration
 
 > [!TIP]
-> Why you should use an AI Coding Agent CLI plus a complete guide for setting up an OpenCode AI coding environment with plugins, skills, and integrations. (Orchestration)
+> This document is meant for software engineers with various levels of experience with using AI while coding. This document explains why you should use an AI Coding Agent CLI followed by a complete guide for setting up an OpenCode AI coding environment with plugins, skills, and integrations. (Orchestration)
 
 > [!IMPORTANT]
 > Parts 1 and 2 are accessible to anyone interested in AI-assisted work.
