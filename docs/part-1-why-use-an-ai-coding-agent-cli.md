@@ -182,3 +182,8 @@ Here is my top list of tools I would like to investigate and which are not (yet)
 
 **Cost, routing, observability**
 - [ccusage](https://github.com/ryoppippi/ccusage) — token / cost dashboards for Claude-style CLIs; the same pattern is useful for monitoring OpenCode spend.
+
+---
+
+> [!NOTE]
+> Continue with [Part 2: A default setup](part-2-default-setup.md).

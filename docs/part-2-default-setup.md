@@ -38,8 +38,11 @@ Download and install the Windows application (or macOS version) from: https://op
 
 **Verify**: Launch OpenCode Desktop. It should detect your CLI installation and show available repositories.
 
-**Tip**: Turn off the panel that shows git diffs and file changes — you already have that in Visual Studio / VS Code, and it can cause performance issues on large repositories or changes.
+> [!TIP]
+> Turn off the panel that shows git diffs and file changes — you already have that in Visual Studio / VS Code, and it can cause performance issues on large repositories or changes.
 
+> [!NOTE]
+> OpenCode Desktop is still in beta. I have had issues with it that it would not continue a session and appeared to got stuck in a loop and also it did not recognized a done making it repeat the last step over and over again.
 
 > [!WARNING]
 > The install prompts below often create and execute scripts. Your antivirus might block these, especially when using the Desktop app. You can add an exception for `opencode-cli.exe` if needed. If this happens, restart OpenCode, use `/session` to reconnect to the aborted session, and type `continue`.
@@ -347,5 +350,7 @@ Source: https://github.com/garrytan/gstack
 - **Planning** — Create one or more markdown files with functional specs and ask OpenCode to build a plan from them using `planning-with-files`, then ask it to execute the plan step-by-step.
 - **Worktrees for parallel agents** — Use `git worktree` (see the `branch-review` skill) so multiple agents can work on different branches simultaneously without stepping on each other.
 
-
 ---
+
+> [!NOTE]
+> Continue with [Part 3: Advanced Use](part-3-advanced-use.md) for optional skills, custom workflows, and integrations.
