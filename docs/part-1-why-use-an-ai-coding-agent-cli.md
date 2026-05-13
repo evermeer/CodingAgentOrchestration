@@ -14,6 +14,8 @@ When getting familiar with AI-assisted coding you will probably go through the f
 5. **AI Agent in IDE** — A Goal → Plan → Act → Reflect loop. Good at multi-file changes while continuously reflecting on what it's doing.
 6. **AI Agent CLI / Desktop** — Same loop, but unconstrained by an IDE: can run terminal commands, drive multiple repos, work in parallel, and run long autonomous tasks. This is what the rest of this guide focuses on.
 
+Depending on your task you may want to use one or more of these in combination. For example, you can use Copilot for tight inline suggestions, but then switch to an agent CLI for a large refactor that requires planning, testing, and multiple steps and you can ask in an only chat why a specific choice made by the agent would be valid.
+
 ## The Agent Loop
 
 An AI coding agent doesn't just answer questions — it operates in a continuous loop:
@@ -35,7 +37,7 @@ This loop is what separates an agent from a simple chat — it can plan work, ex
 
 ## Context Is Everything
 
-The more relevant context you give to LLM models, the better the outcome will be. But giving them everything you have can create long wait times and unnecessary costs. You have to solve this by optimizing what you send to the LLM:
+The more relevant context you give to LLM models, the better the outcome will be. But giving them everything you have can create long wait times and unnecessary costs. Besides that current models also have a maximum context size (Currently less than 1MB) You have to solve this by optimizing what you send to the LLM:
 
 - **Behavior context** — Let your agent select skills, or instruct it directly, to give it a behavior and work-mode context.
 - **Content context** — Construct an agents.md or use a tool that creates a graph of your data to give it a content context.
@@ -149,10 +151,11 @@ Here's what you can tune at each layer:
 
 - **Prompt** — Ask the right question. For example, when starting from a Jira ticket, paste the ticket text and ask the agent to *refine* it before doing anything. The more context you give, the better the result. Before instructing your agent to implement something, first ask it to restate the task and list its assumptions — then correct it. You just need to practice and experiment.
 - **LSP** — Many Language Server Protocols are bundled by default (C#, TypeScript, etc.). The instructions below add one for MS SQL.
-- **Agent / Plugin** — `oh-my-opencode` and `planning-with-files` give you more control and a better agent loop. Similar functionality is slowly being absorbed into the CLI itself, but for now these still add real value.
+- **Agent / Plugin** — Plugins use agent event hooks to execute scripts / code. These could be activated by default or with a skill or by adding a selectable agent. The `oh-my-opencode` and `planning-with-files` which are mentioned below give you more control and a better agent loop. Similar functionality is slowly being absorbed into the CLI itself, but for now these still add real value.
 - **MCP** — Use the Model Context Protocol to let your agent talk to external systems: SQL Server, Azure, Azure DevOps, Jira, etc. (see instructions below). See [Awesome MCP](https://github.com/wong2/awesome-mcp-servers) for inspiration.
 - **Repo settings** — Run `/init` and customize the generated `Agents.md` with info about your repo. It acts as a knowledge base for skills and general context. Tell OpenCode to also link Visual Studio's GitHub Copilot to this `Agents.md` so the same knowledge is reused inside the IDE. Commit it so the whole team shares one source of truth. A richer alternative is a tool like Graphify (see Step 4.2).
 - **Skills** — Use a wide collection of standard skills (which you can fine-tune via repo settings) or create custom skills for recurring workflows. Beyond the skills installed below, more are catalogued at [skills.sh](https://skills.sh). Skills can start other skills (even in parallel) and can ask the user questions. They are great for specifying *intent*.
+- **Tools** - You can add CLI tools which could be called to automate tasks. Usually they have companion skills or MCP to give your agent knowledge about these tools. As an example see the Markitdown, PPT-Master or CLI-Anything tools packs below.
 - **LLM** — Use the latest model. As of writing, Anthropic's *Claude Opus / Sonnet* family tends to lead on reasoning and OpenAI's *GPT-5* family tends to lead on coding throughput, but this changes monthly.  Follow benchmarks (e.g. [LLM Stats](https://llm-stats.com/), [SWE-bench](https://www.swebench.com/), [benchlm.ai](https://benchlm.ai/), [lm-arena](https://huggingface.co/spaces/lmarena-ai/arena-leaderboard), [livebench](https://livebench.ai/#/?highunseenbias=true), [Artificial Analysis](https://artificialanalysis.ai/leaderboards/models)) to see when something better lands.
 
 ## Other Options to Investigate
@@ -179,6 +182,10 @@ Here is my top list of tools I would like to investigate and which are not (yet)
 - [slack-mcp](https://github.com/korotovsky/slack-mcp-server) — read and send messages to Slack channels from your agent.
 - [filesystem / desktop-commander MCPs](https://github.com/wonderwhy-er/DesktopCommanderMCP) — give the agent controlled shell + filesystem access outside the repo (e.g. for ops scripts).
 - [sequential-thinking MCP](https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking) — gives the model an explicit scratchpad for multi-step reasoning; helps on hard refactors.
+
+**Tools**
+- [PPT-Master](https://github.com/hugohe3/ppt-master) — Let your agent generate a natively editable PPTX from any document — real PowerPoint shapes with native animations, not images. 
+- [CLI-Anything](https://github.com/HKUDS/CLI-Anything) — Bridging the Gap Between AI Agents and the World's Software.
 
 **Cost, routing, observability**
 - [ccusage](https://github.com/ryoppippi/ccusage) — token / cost dashboards for Claude-style CLIs; the same pattern is useful for monitoring OpenCode spend.

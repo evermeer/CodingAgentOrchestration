@@ -14,7 +14,7 @@ When asking OpenCode something, your prompt will be analyzed to select the right
 These skills add code review, planning, branching workflows, and development guidelines tailored for software engineers.
 
 ### Planning with Files
-A plugin that transforms your workflow to use persistent markdown files for planning, progress tracking, and knowledge storage.
+A plugin that transforms your workflow to use persistent markdown files for planning, progress tracking, and knowledge storage. The Oh-my-OpenAgent also has a planning skill that uses markdown files for plan execution. It might be okay to stick to that one for medium size projects. I know the Planning with files also work for creating larger (60K lines of code) projects
 
 **Prompt for OpenCode:**
 

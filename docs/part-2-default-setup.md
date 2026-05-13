@@ -3,7 +3,7 @@
 > [!NOTE]
 > This part turns the concepts from [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md) into a practical setup. After finishing this default setup, use [Part 3: Advanced Use](part-3-advanced-use.md) for optional skills, custom workflows, and integrations.
 
-This section gets you up and running with a working OpenCode environment.
+This section gets you up and running with a working OpenCode environment. For each prompt first evaluate if you realy need it. If for instance you don't use Jira you also don't have to install the Atlassian MCP.
 
 > [!NOTE]
 > Be aware that some prompts below can take 10 minutes. Prompts that create custom skills can take half an hour or longer to complete.
@@ -100,9 +100,9 @@ Instructions:
 ### Step 4.2 Advanced knowledge tool for your repository or documents (partially alternative for Agents.md):
 Graphify is a tool that can create a knowledge graph of your repository and/or documentation. This can give your agent a much richer context to work with. You can install it and use it to generate a graph of your repo, then point your agent to that graph for enhanced understanding.
 
-**Warning**: First close all applications because this step could easily use 6GB+ of memory during processing.
+**Warning**: First close all applications because this step could easily use 6GB+ of memory during processing if you execute it on a folder with a lot of data.
 
-**Warning 2**: If you run this on a OneDrive folder then a lot of generated cache files will be synced to the cloud.
+**Warning 2**: If you run this in the root of a OneDrive folder then a lot of generated cache files will be synced to the cloud.
 
 **Prompt for OpenCode:**
 
