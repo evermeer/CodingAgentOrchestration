@@ -96,14 +96,20 @@
 </g>
 
 <!-- ================= MEMORY (above agent) ================= -->
-<rect x="660" y="110" width="120" height="42" rx="6" stroke="#a78bfa" fill="none" stroke-width="1.2"/>
-<text x="720" y="135" fill="#a78bfa" text-anchor="middle" font-family="monospace" font-size="11">Memory / State</text>
+<rect x="620" y="110" width="120" height="42" rx="6" stroke="#a78bfa" fill="none" stroke-width="1.2"/>
+<text x="680" y="135" fill="#a78bfa" text-anchor="middle" font-family="monospace" font-size="11">Memory / State</text>
 
-<rect x="660" y="60" width="120" height="42" rx="6" stroke="#a78bfa" fill="none" stroke-width="1.2"/>
-<text x="720" y="85" fill="#a78bfa" text-anchor="middle" font-family="monospace" font-size="11">Vector Store</text>
+<rect x="620" y="60" width="120" height="42" rx="6" stroke="#a78bfa" fill="none" stroke-width="1.2"/>
+<text x="680" y="85" fill="#a78bfa" text-anchor="middle" font-family="monospace" font-size="11">Vector Store</text>
 
-<line x1="720" y1="230" x2="720" y2="152" stroke="#a78bfa" stroke-width="1.2" stroke-dasharray="4 3"/>
-<line x1="720" y1="110" x2="720" y2="102" stroke="#a78bfa" stroke-width="1"/>
+<line x1="680" y1="230" x2="680" y2="152" stroke="#a78bfa" stroke-width="1.2" stroke-dasharray="4 3"/>
+<line x1="680" y1="110" x2="680" y2="102" stroke="#a78bfa" stroke-width="1"/>
+
+<!-- Workspace FS (top, next to memory) -->
+<rect x="760" y="110" width="120" height="42" rx="6" stroke="#ff00c8" fill="none" stroke-width="1.2"/>
+<text x="820" y="135" fill="#ff00c8" text-anchor="middle" font-family="monospace" font-size="11">Workspace FS</text>
+
+<line x1="760" y1="230" x2="820" y2="152" stroke="#ff00c8" stroke-width="1.2" stroke-dasharray="4 3"/>
 
 <!-- ================= RIGHT SIDE: LLM ================= -->
 <rect x="920" y="314" width="110" height="42" rx="8" stroke="#00f5ff" fill="none" stroke-width="2"/>
@@ -123,35 +129,30 @@
 <rect x="660" y="530" width="90" height="38" rx="6" stroke="#00f5ff" fill="none" stroke-width="1.2"/>
 <text x="705" y="553" fill="#00f5ff" text-anchor="middle" font-family="monospace" font-size="11">Plugins</text>
 
-<!-- Workspace FS -->
-<rect x="770" y="530" width="100" height="38" rx="6" stroke="#ff00c8" fill="none" stroke-width="1.2"/>
-<text x="820" y="553" fill="#ff00c8" text-anchor="middle" font-family="monospace" font-size="11">Workspace FS</text>
+<!-- MCP Bridge -->
+<rect x="770" y="530" width="110" height="38" rx="6" stroke="#22d3ee" fill="none" stroke-width="1.2"/>
+<text x="825" y="553" fill="#22d3ee" text-anchor="middle" font-family="monospace" font-size="11">MCP Bridge</text>
 
 <!-- Build/Test Runner -->
 <rect x="890" y="530" width="110" height="38" rx="6" stroke="#f59e0b" fill="none" stroke-width="1.2"/>
 <text x="945" y="553" fill="#f59e0b" text-anchor="middle" font-family="monospace" font-size="11">Build / Test</text>
 
-<!-- MCP Bridge -->
-<rect x="660" y="610" width="110" height="38" rx="6" stroke="#22d3ee" fill="none" stroke-width="1.2"/>
-<text x="715" y="633" fill="#22d3ee" text-anchor="middle" font-family="monospace" font-size="11">MCP Bridge</text>
+<!-- MCP Servers (below MCP Bridge) -->
+<rect x="720" y="600" width="100" height="34" rx="5" stroke="#22d3ee" fill="none" stroke-width="1"/>
+<text x="770" y="621" fill="#22d3ee" text-anchor="middle" font-family="monospace" font-size="10">MCP Server A</text>
 
-<!-- MCP Servers -->
-<rect x="560" y="660" width="100" height="34" rx="5" stroke="#22d3ee" fill="none" stroke-width="1"/>
-<text x="610" y="681" fill="#22d3ee" text-anchor="middle" font-family="monospace" font-size="10">MCP Server A</text>
-
-<rect x="680" y="660" width="100" height="34" rx="5" stroke="#22d3ee" fill="none" stroke-width="1"/>
-<text x="730" y="681" fill="#22d3ee" text-anchor="middle" font-family="monospace" font-size="10">MCP Server B</text>
+<rect x="840" y="600" width="100" height="34" rx="5" stroke="#22d3ee" fill="none" stroke-width="1"/>
+<text x="890" y="621" fill="#22d3ee" text-anchor="middle" font-family="monospace" font-size="10">MCP Server B</text>
 
 <!-- Lines from Agent to tools -->
 <line x1="670" y1="430" x2="595" y2="530" stroke="#00f5ff" stroke-width="1" stroke-dasharray="4 3"/>
 <line x1="700" y1="440" x2="705" y2="530" stroke="#00f5ff" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="740" y1="440" x2="820" y2="530" stroke="#ff00c8" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="740" y1="440" x2="825" y2="530" stroke="#22d3ee" stroke-width="1" stroke-dasharray="4 3"/>
 <line x1="770" y1="430" x2="945" y2="530" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="715" y1="440" x2="715" y2="610" stroke="#22d3ee" stroke-width="1" stroke-dasharray="4 3"/>
 
 <!-- Lines MCP Bridge to servers -->
-<line x1="690" y1="648" x2="640" y2="660" stroke="#22d3ee" stroke-width="1"/>
-<line x1="740" y1="648" x2="740" y2="660" stroke="#22d3ee" stroke-width="1"/>
+<line x1="800" y1="568" x2="780" y2="600" stroke="#22d3ee" stroke-width="1"/>
+<line x1="850" y1="568" x2="880" y2="600" stroke="#22d3ee" stroke-width="1"/>
 
 <!-- ================= ANIMATED PARTICLES ================= -->
 
