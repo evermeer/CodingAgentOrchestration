@@ -45,8 +45,7 @@
 
 <!-- Orchestrator -->
 <rect x="360" y="295" width="150" height="80" rx="10" stroke="#ff00c8" fill="none" stroke-width="2"/>
-<text x="435" y="330" fill="#ff00c8" text-anchor="middle" font-family="monospace" font-size="12">OpenCode</text>
-<text x="435" y="350" fill="#ff00c8" text-anchor="middle" font-family="monospace" font-size="12">Orchestrator</text>
+<text x="435" y="340" fill="#ff00c8" text-anchor="middle" font-family="monospace" font-size="12">Orchestrator</text>
 
 <!-- ================= CONTEXT (top-left) ================= -->
 <rect x="185" y="120" width="130" height="45" rx="6" stroke="#f59e0b" fill="none" stroke-width="1.2"/>
