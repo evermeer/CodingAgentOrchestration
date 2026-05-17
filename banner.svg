@@ -1,0 +1,189 @@
+<svg width="1500" height="700" viewBox="0 0 1500 700" xmlns="http://www.w3.org/2000/svg">
+
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#050510"/>
+    <stop offset="100%" stop-color="#0a0f2a"/>
+  </linearGradient>
+
+  <filter id="glow">
+    <feGaussianBlur stdDeviation="3" result="b"/>
+    <feMerge>
+      <feMergeNode in="b"/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+
+  <linearGradient id="flow" x1="0" x2="1">
+    <stop offset="0%" stop-color="#00f5ff"/>
+    <stop offset="100%" stop-color="#ff00c8"/>
+  </linearGradient>
+
+  <linearGradient id="flowBack" x1="1" x2="0">
+    <stop offset="0%" stop-color="#00f5ff"/>
+    <stop offset="100%" stop-color="#ff00c8"/>
+  </linearGradient>
+</defs>
+
+<rect width="100%" height="100%" fill="url(#bg)" />
+
+<!-- ================= LEFT COLUMN: USER INPUT ================= -->
+
+<!-- User -->
+<rect x="40" y="310" width="100" height="50" rx="8" stroke="#00f5ff" fill="none" stroke-width="1.5"/>
+<text x="90" y="340" fill="#00f5ff" text-anchor="middle" font-family="monospace" font-size="13">User</text>
+
+<!-- Arrow User → Prompt Builder -->
+<line x1="140" y1="335" x2="180" y2="335" stroke="#00f5ff" stroke-width="1.5" marker-end="url(#arrowCyan)"/>
+
+<!-- Prompt Builder -->
+<rect x="185" y="310" width="130" height="50" rx="8" stroke="#00f5ff" fill="none" stroke-width="1.5"/>
+<text x="250" y="340" fill="#00f5ff" text-anchor="middle" font-family="monospace" font-size="12">Prompt Builder</text>
+
+<!-- Arrow Prompt Builder → Orchestrator -->
+<line x1="315" y1="335" x2="355" y2="335" stroke="#00f5ff" stroke-width="1.5" marker-end="url(#arrowCyan)"/>
+
+<!-- Orchestrator -->
+<rect x="360" y="295" width="150" height="80" rx="10" stroke="#ff00c8" fill="none" stroke-width="2"/>
+<text x="435" y="330" fill="#ff00c8" text-anchor="middle" font-family="monospace" font-size="12">OpenCode</text>
+<text x="435" y="350" fill="#ff00c8" text-anchor="middle" font-family="monospace" font-size="12">Orchestrator</text>
+
+<!-- ================= CONTEXT (top-left) ================= -->
+<rect x="185" y="120" width="130" height="45" rx="6" stroke="#f59e0b" fill="none" stroke-width="1.2"/>
+<text x="250" y="147" fill="#f59e0b" text-anchor="middle" font-family="monospace" font-size="11">Repo Settings</text>
+
+<rect x="185" y="180" width="130" height="45" rx="6" stroke="#f59e0b" fill="none" stroke-width="1.2"/>
+<text x="250" y="207" fill="#f59e0b" text-anchor="middle" font-family="monospace" font-size="11">Policies</text>
+
+<line x1="315" y1="145" x2="400" y2="295" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="315" y1="200" x2="410" y2="295" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 3"/>
+
+<!-- ================= LSP (from orchestrator) ================= -->
+<rect x="360" y="440" width="110" height="42" rx="6" stroke="#66BB6A" fill="none" stroke-width="1.2"/>
+<text x="415" y="465" fill="#66BB6A" text-anchor="middle" font-family="monospace" font-size="11">LSP Client</text>
+
+<rect x="360" y="510" width="110" height="42" rx="6" stroke="#66BB6A" fill="none" stroke-width="1.2"/>
+<text x="415" y="535" fill="#66BB6A" text-anchor="middle" font-family="monospace" font-size="11">Lang Servers</text>
+
+<line x1="435" y1="375" x2="415" y2="440" stroke="#66BB6A" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="415" y1="482" x2="415" y2="510" stroke="#66BB6A" stroke-width="1"/>
+
+<!-- ================= AGENT LOOP (center) ================= -->
+
+<!-- Arrow Orchestrator → Agent -->
+<line x1="510" y1="335" x2="580" y2="335" stroke="url(#flow)" stroke-width="2" marker-end="url(#arrowPink)"/>
+
+<g transform="translate(720,335)">
+  <!-- Loop circle -->
+  <circle r="105" stroke="url(#flow)" stroke-width="2" fill="none" filter="url(#glow)" />
+
+  <!-- Rotating dashes -->
+  <circle r="95" stroke="#00f5ff" stroke-dasharray="8 16" fill="none" opacity="0.5">
+    <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="10s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Loop labels -->
+  <text x="0" y="-115" text-anchor="middle" fill="#FFF176" font-family="monospace" font-size="12" font-weight="bold">GOAL</text>
+  <text x="120" y="5" text-anchor="middle" fill="#EF5350" font-family="monospace" font-size="12" font-weight="bold">PLAN</text>
+  <text x="0" y="125" text-anchor="middle" fill="#42A5F5" font-family="monospace" font-size="12" font-weight="bold">ACT</text>
+  <text x="-120" y="5" text-anchor="middle" fill="#66BB6A" font-family="monospace" font-size="12" font-weight="bold">REFLECT</text>
+
+  <!-- Agent core -->
+  <circle r="40" stroke="#00f5ff" fill="none" stroke-width="1.5" filter="url(#glow)">
+    <animate attributeName="r" values="40;44;40" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+  <text text-anchor="middle" y="-5" fill="#00f5ff" font-family="monospace" font-size="13" font-weight="bold">Agent</text>
+  <text text-anchor="middle" y="12" fill="#00f5ff" font-family="monospace" font-size="10">Runtime</text>
+</g>
+
+<!-- ================= MEMORY (above agent) ================= -->
+<rect x="660" y="110" width="120" height="42" rx="6" stroke="#a78bfa" fill="none" stroke-width="1.2"/>
+<text x="720" y="135" fill="#a78bfa" text-anchor="middle" font-family="monospace" font-size="11">Memory / State</text>
+
+<rect x="660" y="60" width="120" height="42" rx="6" stroke="#a78bfa" fill="none" stroke-width="1.2"/>
+<text x="720" y="85" fill="#a78bfa" text-anchor="middle" font-family="monospace" font-size="11">Vector Store</text>
+
+<line x1="720" y1="230" x2="720" y2="152" stroke="#a78bfa" stroke-width="1.2" stroke-dasharray="4 3"/>
+<line x1="720" y1="110" x2="720" y2="102" stroke="#a78bfa" stroke-width="1"/>
+
+<!-- ================= RIGHT SIDE: LLM ================= -->
+<rect x="920" y="314" width="110" height="42" rx="8" stroke="#00f5ff" fill="none" stroke-width="2"/>
+<text x="975" y="340" fill="#00f5ff" text-anchor="middle" font-family="monospace" font-size="13" font-weight="bold">LLM</text>
+
+<!-- Bidirectional arrows Agent ↔ LLM -->
+<line x1="825" y1="325" x2="920" y2="325" stroke="#00f5ff" stroke-width="1.5" marker-end="url(#arrowCyan)"/>
+<line x1="920" y1="345" x2="825" y2="345" stroke="#ff00c8" stroke-width="1.5" marker-end="url(#arrowPink2)"/>
+
+<!-- ================= BOTTOM: TOOLS & EXTENSIONS ================= -->
+
+<!-- Skills -->
+<rect x="550" y="530" width="90" height="38" rx="6" stroke="#00f5ff" fill="none" stroke-width="1.2"/>
+<text x="595" y="553" fill="#00f5ff" text-anchor="middle" font-family="monospace" font-size="11">Skills</text>
+
+<!-- Plugins -->
+<rect x="660" y="530" width="90" height="38" rx="6" stroke="#00f5ff" fill="none" stroke-width="1.2"/>
+<text x="705" y="553" fill="#00f5ff" text-anchor="middle" font-family="monospace" font-size="11">Plugins</text>
+
+<!-- Workspace FS -->
+<rect x="770" y="530" width="100" height="38" rx="6" stroke="#ff00c8" fill="none" stroke-width="1.2"/>
+<text x="820" y="553" fill="#ff00c8" text-anchor="middle" font-family="monospace" font-size="11">Workspace FS</text>
+
+<!-- Build/Test Runner -->
+<rect x="890" y="530" width="110" height="38" rx="6" stroke="#f59e0b" fill="none" stroke-width="1.2"/>
+<text x="945" y="553" fill="#f59e0b" text-anchor="middle" font-family="monospace" font-size="11">Build / Test</text>
+
+<!-- MCP Bridge -->
+<rect x="660" y="610" width="110" height="38" rx="6" stroke="#22d3ee" fill="none" stroke-width="1.2"/>
+<text x="715" y="633" fill="#22d3ee" text-anchor="middle" font-family="monospace" font-size="11">MCP Bridge</text>
+
+<!-- MCP Servers -->
+<rect x="560" y="660" width="100" height="34" rx="5" stroke="#22d3ee" fill="none" stroke-width="1"/>
+<text x="610" y="681" fill="#22d3ee" text-anchor="middle" font-family="monospace" font-size="10">MCP Server A</text>
+
+<rect x="680" y="660" width="100" height="34" rx="5" stroke="#22d3ee" fill="none" stroke-width="1"/>
+<text x="730" y="681" fill="#22d3ee" text-anchor="middle" font-family="monospace" font-size="10">MCP Server B</text>
+
+<!-- Lines from Agent to tools -->
+<line x1="670" y1="430" x2="595" y2="530" stroke="#00f5ff" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="700" y1="440" x2="705" y2="530" stroke="#00f5ff" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="740" y1="440" x2="820" y2="530" stroke="#ff00c8" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="770" y1="430" x2="945" y2="530" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="715" y1="440" x2="715" y2="610" stroke="#22d3ee" stroke-width="1" stroke-dasharray="4 3"/>
+
+<!-- Lines MCP Bridge to servers -->
+<line x1="690" y1="648" x2="640" y2="660" stroke="#22d3ee" stroke-width="1"/>
+<line x1="740" y1="648" x2="740" y2="660" stroke="#22d3ee" stroke-width="1"/>
+
+<!-- ================= RETURN PATH ================= -->
+<path d="M945,568 Q1050,600 1050,335 Q1050,200 435,200 Q200,200 90,310"
+      stroke="#66BB6A" stroke-width="1.2" fill="none" stroke-dasharray="6 4" opacity="0.6"/>
+<text x="1080" y="340" fill="#66BB6A" font-family="monospace" font-size="10" opacity="0.7">results</text>
+
+<!-- ================= ANIMATED PARTICLES ================= -->
+
+<!-- Main flow particle -->
+<path id="mainFlow" d="M90,335 L185,335 L360,335 L580,335 L720,335" fill="none" stroke="none"/>
+<circle r="4" fill="#00f5ff">
+  <animateMotion dur="3s" repeatCount="indefinite"><mpath href="#mainFlow"/></animateMotion>
+</circle>
+
+<!-- Loop particle -->
+<path id="loopPath" d="M720,230 A105,105 0 1 1 719,230" fill="none" stroke="none"/>
+<circle r="4" fill="#ff00c8">
+  <animateMotion dur="4s" repeatCount="indefinite"><mpath href="#loopPath"/></animateMotion>
+</circle>
+
+<!-- ================= ARROW MARKERS ================= -->
+<defs>
+  <marker id="arrowCyan" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+    <polygon points="0,0 8,3 0,6" fill="#00f5ff"/>
+  </marker>
+  <marker id="arrowPink" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+    <polygon points="0,0 8,3 0,6" fill="#ff00c8"/>
+  </marker>
+  <marker id="arrowPink2" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+    <polygon points="8,0 0,3 8,6" fill="#ff00c8"/>
+  </marker>
+</defs>
+
+</svg>

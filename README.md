@@ -1,5 +1,10 @@
 # AI Coding Agent Orchestration
 
+![AI Agent Orchestration](./banner.svg)
+
+
+
+
 > [!TIP]
 > This guide is for software engineers with different levels of AI-assisted coding experience. It explains why an AI coding agent CLI can be useful, then walks through a practical OpenCode setup with plugins, skills, and integrations.
 

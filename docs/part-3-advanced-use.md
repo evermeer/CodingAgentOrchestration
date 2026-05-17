@@ -243,12 +243,25 @@ Instructions:
 6. On any step failure, print the exact error and proposed fix before retrying.
 ```
 
-### Azure DevOps MCP
-Install the Azure DevOps MCP server GLOBALLY and create a companion skill for diagnosing pipeline/build
+### Bicep LSP
+Install and configure the official Microsoft Bicep language service GLOBALLY for OpenCode
+ **Prompt for OpenCode:**
+```
+Goal: Install and configure the Azure DevOps MCP server GLOBALLY so any `.bicep` file in any repository gets hover, completion, and diagnostics.
+
+Instructions:
+1. Check availability of the bicep lsp. If not available, install the latest Bicep CLI per https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install.
+2. Add the LSP entry to the OpenCode GLOBAL config (not per-repo) so every project benefits. Show the final config snippet verbatim.
+5. Verification:
+   - Open a `.bicep` file with a deliberately invalid statement.
+   - Confirm hover info appears on a known keyword.
+   - Confirm at least one diagnostic is reported.
+   - Print the expected vs actual result.
+6. On any step failure, print the exact error and proposed fix before retrying.
+```
 
 **Prompt for OpenCode:**
 
-```
 Goal: Install the Azure DevOps MCP server GLOBALLY and create a companion skill for diagnosing pipeline / build failures.
 
 Instructions:
