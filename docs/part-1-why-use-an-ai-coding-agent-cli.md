@@ -82,70 +82,7 @@ They run continuously with persistent memory across sessions and integrations fo
 
 Using an LLM Coding Agent CLI is still not perfect but you can improve the outcome by tweaking all steps that these coding agents make:
 
-
-```mermaid
-flowchart LR
-    U[User / CLI / UI] --> PB[Prompt Builder]
-    PB --> OC["OpenCode Orchestrator"]
-
-    %% Configuration & Policies
-    RS["Repo Settings<br/>(Project Config)"] --> OC
-    POL["Policies & Guardrails"] --> OC
-
-    %% Core Agent Loop
-    OC -->|selects agent & tools| AG[Agent Runtime]
-    AG --> PLAN[Planner / Reasoner]
-    PLAN -->|task plan| AG
-
-    %% Memory & State
-    AG <--> MEM["Agent Memory<br/>(State / History)"]
-    MEM <--> VEC["Vector Store<br/>(Embeddings)"]
-
-    %% Tools & Extensions
-    AG -->|dynamic registry| SK[Skills]
-    AG -->|loads| PL[Plugins]
-
-    %% Repo & Execution
-    AG --> FS["Workspace / Repo FS"]
-    AG --> RUN["Build / Test Runner"]
-    RUN -->|results| AG
-
-    %% Language Intelligence
-    OC -->|code intel| LSP[LSP Client]
-    LSP --> IDE["Language Server(s)"]
-
-    %% Model Interaction
-    AG -->|reasoning + tool plans| LLM["LLM Provider"]
-    LLM -->|responses| AG
-
-    %% External Tools via MCP
-    AG -->|tool calls| MCP[MCP Bridge]
-    MCP --> S1[MCP Server A]
-    MCP --> S2[MCP Server B]
-
-    %% Logical Grouping
-    subgraph Context & Data
-      RS
-      POL
-      MEM
-      VEC
-    end
-
-    subgraph Agent Execution Loop
-      OC
-      AG
-      PLAN
-      SK
-      PL
-      FS
-      RUN
-      LSP
-      LLM
-      MCP
-    end
-```
-
-
+![AI Agent Orchestration](../banner.svg)
 
 Here's what you can tune at each layer:
 
