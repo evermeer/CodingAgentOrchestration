@@ -43,9 +43,9 @@
 <!-- Arrow Prompt Builder → Orchestrator -->
 <line x1="315" y1="335" x2="355" y2="335" stroke="#00f5ff" stroke-width="1.5" marker-end="url(#arrowCyan)"/>
 
-<!-- Orchestrator -->
-<rect x="360" y="295" width="150" height="80" rx="10" stroke="#ff00c8" fill="none" stroke-width="2"/>
-<text x="435" y="340" fill="#ff00c8" text-anchor="middle" font-family="monospace" font-size="12">Orchestrator</text>
+<!-- Orchestrator (expanded to encapsulate agent) -->
+<rect x="360" y="190" width="510" height="290" rx="24" stroke="#ff00c8" fill="none" stroke-width="2.5"/>
+<text x="435" y="230" fill="#ff00c8" text-anchor="middle" font-family="monospace" font-size="15">Orchestrator</text>
 
 <!-- ================= CONTEXT (top-left) ================= -->
 <rect x="185" y="120" width="130" height="45" rx="6" stroke="#f59e0b" fill="none" stroke-width="1.2"/>
@@ -54,18 +54,19 @@
 <rect x="185" y="180" width="130" height="45" rx="6" stroke="#f59e0b" fill="none" stroke-width="1.2"/>
 <text x="250" y="207" fill="#f59e0b" text-anchor="middle" font-family="monospace" font-size="11">Policies</text>
 
-<line x1="315" y1="145" x2="400" y2="295" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="315" y1="200" x2="410" y2="295" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 3"/>
+<!-- Dotted lines from context to orchestrator border -->
+<line x1="315" y1="145" x2="360" y2="210" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="315" y1="200" x2="360" y2="250" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 3"/>
 
 <!-- ================= LSP (from orchestrator) ================= -->
-<rect x="360" y="440" width="110" height="42" rx="6" stroke="#66BB6A" fill="none" stroke-width="1.2"/>
-<text x="415" y="465" fill="#66BB6A" text-anchor="middle" font-family="monospace" font-size="11">LSP Client</text>
+<rect x="360" y="540" width="110" height="42" rx="6" stroke="#66BB6A" fill="none" stroke-width="1.2"/>
+<text x="415" y="565" fill="#66BB6A" text-anchor="middle" font-family="monospace" font-size="11">LSP Client</text>
 
-<rect x="360" y="510" width="110" height="42" rx="6" stroke="#66BB6A" fill="none" stroke-width="1.2"/>
-<text x="415" y="535" fill="#66BB6A" text-anchor="middle" font-family="monospace" font-size="11">Lang Servers</text>
+<rect x="360" y="610" width="110" height="42" rx="6" stroke="#66BB6A" fill="none" stroke-width="1.2"/>
+<text x="415" y="635" fill="#66BB6A" text-anchor="middle" font-family="monospace" font-size="11">Lang Servers</text>
 
-<line x1="435" y1="375" x2="415" y2="440" stroke="#66BB6A" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="415" y1="482" x2="415" y2="510" stroke="#66BB6A" stroke-width="1"/>
+<line x1="435" y1="510" x2="415" y2="540" stroke="#66BB6A" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="415" y1="582" x2="415" y2="610" stroke="#66BB6A" stroke-width="1"/>
 
 <!-- ================= AGENT LOOP (center) ================= -->
 
