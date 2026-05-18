@@ -66,7 +66,7 @@
 <text x="410" y="621" fill="#66BB6A" text-anchor="middle" font-family="monospace" font-size="11">Lang Servers</text>
 
 <!-- Dotted line from LSP Client to agent loop border (from top of box) -->
-<line x1="405" y1="530" x2="650" y2="420" stroke="#66BB6A" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="405" y1="530" x2="631" y2="390" stroke="#66BB6A" stroke-width="1" stroke-dasharray="4 3"/>
 <line x1="405" y1="568" x2="405" y2="600" stroke="#66BB6A" stroke-width="1"/>
 
 <!-- ================= AGENT LOOP (center) ================= -->
@@ -104,20 +104,20 @@
 <rect x="620" y="60" width="120" height="42" rx="6" stroke="#a78bfa" fill="none" stroke-width="1.2"/>
 <text x="680" y="85" fill="#a78bfa" text-anchor="middle" font-family="monospace" font-size="11">Vector Store</text>
 
-<line x1="680" y1="230" x2="680" y2="152" stroke="#a78bfa" stroke-width="1.2" stroke-dasharray="4 3"/>
+<line x1="680" y1="152" x2="698" y2="233" stroke="#a78bfa" stroke-width="1.2" stroke-dasharray="4 3"/>
 <line x1="680" y1="110" x2="680" y2="102" stroke="#a78bfa" stroke-width="1"/>
 
 <!-- Workspace FS (top, next to memory) -->
 <rect x="760" y="110" width="120" height="42" rx="6" stroke="#ff00c8" fill="none" stroke-width="1.2"/>
 <text x="820" y="135" fill="#ff00c8" text-anchor="middle" font-family="monospace" font-size="11">Workspace FS</text>
 
-<line x1="760" y1="230" x2="820" y2="152" stroke="#ff00c8" stroke-width="1.2" stroke-dasharray="4 3"/>
+<line x1="820" y1="152" x2="770" y2="243" stroke="#ff00c8" stroke-width="1.2" stroke-dasharray="4 3"/>
 
 <!-- Build / Test (top, next to Workspace FS) -->
 <rect x="900" y="110" width="120" height="42" rx="6" stroke="#f59e0b" fill="none" stroke-width="1.2"/>
 <text x="960" y="135" fill="#f59e0b" text-anchor="middle" font-family="monospace" font-size="11">Build / Test</text>
 
-<line x1="790" y1="240" x2="960" y2="152" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="4 3"/>
+<line x1="960" y1="152" x2="803" y2="271" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="4 3"/>
 
 <!-- ================= RIGHT SIDE: LLM ================= -->
 <rect x="920" y="314" width="110" height="42" rx="8" stroke="#00f5ff" fill="none" stroke-width="2"/>
@@ -153,10 +153,10 @@
 <text x="890" y="621" fill="#22d3ee" text-anchor="middle" font-family="monospace" font-size="10">MCP Server B</text>
 
 <!-- Lines from Agent to tools -->
-<line x1="670" y1="430" x2="595" y2="530" stroke="#00f5ff" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="700" y1="440" x2="705" y2="530" stroke="#00f5ff" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="740" y1="440" x2="825" y2="530" stroke="#22d3ee" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="770" y1="430" x2="935" y2="530" stroke="#00f5ff" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="595" y1="530" x2="663" y2="423" stroke="#00f5ff" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="705" y1="530" x2="712" y2="440" stroke="#00f5ff" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="825" y1="530" x2="770" y2="427" stroke="#22d3ee" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="935" y1="530" x2="798" y2="406" stroke="#00f5ff" stroke-width="1" stroke-dasharray="4 3"/>
 
 <!-- Lines MCP Bridge to servers -->
 <line x1="800" y1="568" x2="780" y2="600" stroke="#22d3ee" stroke-width="1"/>
