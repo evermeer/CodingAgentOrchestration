@@ -86,18 +86,56 @@ Using an LLM Coding Agent CLI is still not perfect but you can improve the outco
 
 Here's what you can tune at each layer:
 
-- **Prompt** — Ask the right question. For example, when starting from a Jira ticket, paste the ticket text and ask the agent to *refine* it before doing anything. The more context you give, the better the result. Before instructing your agent to implement something, first ask it to restate the task and list its assumptions — then correct it. You just need to practice and experiment.
-- **LSP** — Many Language Server Protocols are bundled by default (C#, TypeScript, etc.). The instructions below add one for MS SQL.
-- **Agent / Plugin** — Plugins use agent event hooks to execute scripts / code. These could be activated by default or with a skill or by adding a selectable agent. The `oh-my-opencode` and `planning-with-files` which are mentioned below give you more control and a better agent loop. Similar functionality is slowly being absorbed into the CLI itself, but for now these still add real value.
-- **MCP** — Use the Model Context Protocol to let your agent talk to external systems: SQL Server, Azure, Azure DevOps, Jira, etc. (see instructions below). See [Awesome MCP](https://github.com/wong2/awesome-mcp-servers) for inspiration.
-- **Repo settings** — Run `/init` and customize the generated `Agents.md` with info about your repo. It acts as a knowledge base for skills and general context. Tell OpenCode to also link Visual Studio's GitHub Copilot to this `Agents.md` so the same knowledge is reused inside the IDE. Commit it so the whole team shares one source of truth. A richer alternative is a tool like Graphify (see Step 4.2).
-- **Skills** — Use a wide collection of standard skills (which you can fine-tune via repo settings) or create custom skills for recurring workflows. Beyond the skills installed below, more are catalogued at [skills.sh](https://skills.sh). Skills can start other skills (even in parallel) and can ask the user questions. They are great for specifying *intent*.
-- **Tools** - You can add CLI tools which could be called to automate tasks. Usually they have companion skills or MCP to give your agent knowledge about these tools. As an example see the Markitdown, PPT-Master or CLI-Anything tools packs below.
-- **LLM** — Use the latest model. As of writing, Anthropic's *Claude Opus / Sonnet* family tends to lead on reasoning and OpenAI's *GPT-5* family tends to lead on coding throughput, but this changes monthly.  Follow benchmarks (e.g. [LLM Stats](https://llm-stats.com/), [SWE-bench](https://www.swebench.com/), [benchlm.ai](https://benchlm.ai/), [lm-arena](https://huggingface.co/spaces/lmarena-ai/arena-leaderboard), [livebench](https://livebench.ai/#/?highunseenbias=true), [Artificial Analysis](https://artificialanalysis.ai/leaderboards/models)) to see when something better lands.
+### Prompt
 
-## Other Options to Investigate
+The prompt is where everything starts. If you ask a vague question, the agent will often make assumptions, choose the wrong scope, or move too quickly into implementation. A much better pattern is to begin with problem framing: paste the Jira ticket, issue, or rough requirement and ask the agent to restate the task, list assumptions, identify unknowns, and suggest a plan before it writes code.
 
-On GitHub I maintain a list of interesting AI tools: [My list of AI tools](https://github.com/stars/evermeer/lists/ai)
+This works because prompt quality is not just about wording, but about giving the model the right level of direction. Good prompts define the goal, the constraints, the expected output, and the level of autonomy you want. In practice, this is a skill you improve over time by experimenting with different prompt styles and noticing which ones produce the best planning and the fewest corrections.
+
+### LSP
+
+Language Server Protocol support improves how well the agent understands your codebase. LSPs provide structural information such as symbols, definitions, references, diagnostics, and type information, which is much more useful than plain text search. That means the agent can navigate code more accurately and make changes with better awareness of how pieces fit together.
+
+Many LSPs are bundled by default for common languages such as C# and TypeScript. The instructions below add one for MS SQL as well. In general, the more complete your LSP support is, the better your agent can inspect the code, follow dependencies, and avoid low-confidence edits.
+
+### Agent / Plugin
+
+Plugins and agent extensions shape how the agent behaves during its Goal → Plan → Act → Reflect loop. They use event hooks to run scripts or code at specific moments, and they can be enabled by default, triggered through a skill, or exposed as a selectable agent profile. This gives you a way to steer not only what the agent knows, but also how it works.
+
+The `oh-my-opencode` and `planning-with-files` add-ons mentioned below are good examples. They make the workflow more explicit and give you more control over planning and execution. Similar features are gradually being absorbed into the CLI itself, but these extensions still add real value today.
+
+### MCP
+
+Model Context Protocol is how you connect the agent to systems outside the repository. Instead of limiting the agent to local files, MCP lets it retrieve or update information in tools such as SQL Server, Azure, Azure DevOps, Jira, and many others. That makes the agent much more useful for real work, because most engineering tasks depend on context that lives outside the codebase.
+
+Used well, MCP turns the agent from a code editor into a workflow participant. It can inspect tickets, read docs, query data, or interact with operational systems while staying inside one task flow. See [Awesome MCP](https://github.com/wong2/awesome-mcp-servers) for inspiration and examples.
+
+### Repo settings
+
+Repository-level settings give the agent durable context about how your project works. Running `/init` generates an `Agents.md` file that you can customize with architecture notes, conventions, workflows, and other repo-specific knowledge. This helps the agent make better decisions without needing you to repeat the same instructions in every session.
+
+It is also worth linking Visual Studio's GitHub Copilot to the same `Agents.md`, so the knowledge is reused both inside the IDE and in your CLI agent. If you commit that file, the whole team shares one source of truth. A richer alternative is a graph-based context tool such as Graphify (see Step 4.2).
+
+### Skills
+
+Skills are reusable, higher-level instructions for recurring workflows. You can use a large catalog of standard skills, fine-tune them through repo settings, or create custom ones for tasks that come up often in your team. They are especially useful when the challenge is not only understanding code, but also understanding intent and following a repeatable process.
+
+Unlike a one-off prompt, a skill can encode a workflow pattern. Some skills can even call other skills in sequence or in parallel, and they may ask the user clarifying questions when needed. Beyond the skills installed below, many more are catalogued at [skills.sh](https://skills.sh).
+
+### Tools
+
+Tools extend what the agent can actually do. A tool might automate documentation conversion, generate a PowerPoint deck, run a specialized command-line workflow, or perform another concrete task that is awkward to express through prompting alone. In other words, tools give the agent execution capabilities instead of just reasoning capabilities.
+
+These tools often work best when paired with a companion skill or MCP server, so the agent not only has access to the capability but also understands when and how to use it. Examples in the instructions below include MarkItDown, PPT-Master, and CLI-Anything.
+
+### LLM
+
+The underlying model still matters. Different LLMs vary in reasoning depth, coding speed, tool use, context handling, and reliability, so it is worth choosing the right model for the task instead of treating them as interchangeable. As of writing, Anthropic's *Claude Opus / Sonnet* family tends to lead on reasoning and OpenAI's *GPT-5* family tends to lead on coding throughput, but this changes quickly.
+
+Because the landscape moves so fast, model choice should be revisited regularly. Follow benchmarks such as [LLM Stats](https://llm-stats.com/), [SWE-bench](https://www.swebench.com/), [benchlm.ai](https://benchlm.ai/), [lm-arena](https://huggingface.co/spaces/lmarena-ai/arena-leaderboard), [livebench](https://livebench.ai/#/?highunseenbias=true), and [Artificial Analysis](https://artificialanalysis.ai/leaderboards/models) to see when something better lands.
+
+## TODO
+In part 2 and 3 we will cover the practical setup of OpenCode with a selection of add-ons, but the landscape is evolving quickly. Here are some tools that I haven't included in the instructions below but are on my radar for future investigation:
 
 Here is my top list of tools I would like to investigate and which are not (yet) in the instructions below:
 
@@ -126,6 +164,8 @@ Here is my top list of tools I would like to investigate and which are not (yet)
 
 **Cost, routing, observability**
 - [ccusage](https://github.com/ryoppippi/ccusage) — token / cost dashboards for Claude-style CLIs; the same pattern is useful for monitoring OpenCode spend.
+
+And there are many more. On GitHub I maintain a list of interesting AI tools: [My list of AI tools](https://github.com/stars/evermeer/lists/ai)
 
 ---
 
