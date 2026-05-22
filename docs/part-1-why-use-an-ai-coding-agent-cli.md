@@ -148,6 +148,7 @@ Here is my top list of tools I would like to investigate and which are not (yet)
 **Context & memory**
 - [repomix](https://github.com/yamadashy/repomix) — packs an entire repo (or a filtered subset) into a single LLM-friendly file; handy for one-shot "explain this codebase" prompts.
 - [Pieces](https://pieces.app) — long-term developer memory across IDEs, browsers and terminals; alternative angle on what MemPalace does.
+- [CodeGraph](https://github.com/colbymchenry/codegraph) — graph-based code context tool; more structured than Agents.md and more flexible than LSP for giving the agent a rich understanding of your codebase.
 
 **External system MCPs**
 - [github-mcp-server](https://github.com/github/github-mcp-server) — official GitHub MCP for issues, PRs, code search and reviews from the agent.
@@ -157,6 +158,7 @@ Here is my top list of tools I would like to investigate and which are not (yet)
 - [slack-mcp](https://github.com/korotovsky/slack-mcp-server) — read and send messages to Slack channels from your agent.
 - [filesystem / desktop-commander MCPs](https://github.com/wonderwhy-er/DesktopCommanderMCP) — give the agent controlled shell + filesystem access outside the repo (e.g. for ops scripts).
 - [sequential-thinking MCP](https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking) — gives the model an explicit scratchpad for multi-step reasoning; helps on hard refactors.
+- [Chrome DevTools MCP](https://github.com/ChromeDevTools/chrome-devtools-mcp) — gives the agent access to the Chrome DevTools Protocol for debugging, profiling, and inspecting web apps
 
 **Tools**
 - [PPT-Master](https://github.com/hugohe3/ppt-master) — Let your agent generate a natively editable PPTX from any document — real PowerPoint shapes with native animations, not images. 
@@ -164,6 +166,9 @@ Here is my top list of tools I would like to investigate and which are not (yet)
 
 **Cost, routing, observability**
 - [ccusage](https://github.com/ryoppippi/ccusage) — token / cost dashboards for Claude-style CLIs; the same pattern is useful for monitoring OpenCode spend.
+
+**Skills***
+- [DotNet Skills](https://github.com/dotnet/skills) - Microsoft's official skill pack for .NET development, with workflows for code generation, refactoring, testing, and documentation.
 
 And there are many more. On GitHub I maintain a list of interesting AI tools: [My list of AI tools](https://github.com/stars/evermeer/lists/ai)
 

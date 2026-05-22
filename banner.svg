@@ -134,11 +134,21 @@
 </g>
 
 <!-- ================= MEMORY (above agent) ================= -->
+<rect x="480" y="110" width="120" height="42" rx="6" stroke="#a78bfa" fill="none" stroke-width="1.2"/>
+<text x="540" y="135" fill="#a78bfa" text-anchor="middle" font-family="monospace" font-size="11">Vector Store</text>
+
+<g>
+  <line x1="540" y1="152" x2="650" y2="254" stroke="#a78bfa" stroke-width="1.2" stroke-dasharray="4 3">
+    <animate attributeName="stroke" values="#a78bfa;#e9ddff;#a78bfa" keyTimes="0;0.056;1" dur="6.3s" begin="1.1s" repeatCount="indefinite"/>
+    <animate attributeName="stroke-width" values="1.2;2.1;1.2" keyTimes="0;0.056;1" dur="6.3s" begin="1.1s" repeatCount="indefinite"/>
+  </line>
+  <line x1="540" y1="152" x2="650" y2="254" stroke="#f3ecff" stroke-width="4.2" stroke-dasharray="4 3" stroke-linecap="round" opacity="0" filter="url(#lineShine)">
+    <animate attributeName="opacity" values="0;0.82;0" keyTimes="0;0.056;1" dur="6.3s" begin="1.1s" repeatCount="indefinite"/>
+  </line>
+</g>
+
 <rect x="620" y="110" width="120" height="42" rx="6" stroke="#a78bfa" fill="none" stroke-width="1.2"/>
 <text x="680" y="135" fill="#a78bfa" text-anchor="middle" font-family="monospace" font-size="11">Memory / State</text>
-
-<rect x="620" y="60" width="120" height="42" rx="6" stroke="#a78bfa" fill="none" stroke-width="1.2"/>
-<text x="680" y="85" fill="#a78bfa" text-anchor="middle" font-family="monospace" font-size="11">Vector Store</text>
 
 <g>
   <line x1="680" y1="152" x2="698" y2="233" stroke="#a78bfa" stroke-width="1.2" stroke-dasharray="4 3">
@@ -149,7 +159,6 @@
     <animate attributeName="opacity" values="0;0.82;0" keyTimes="0;0.05;1" dur="7s" begin="1.7s" repeatCount="indefinite"/>
   </line>
 </g>
-<line x1="680" y1="110" x2="680" y2="102" stroke="#a78bfa" stroke-width="1"/>
 
 <!-- Workspace FS (top, next to memory) -->
 <rect x="760" y="110" width="120" height="42" rx="6" stroke="#66BB6A" fill="none" stroke-width="1.2"/>
