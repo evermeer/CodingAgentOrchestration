@@ -29,6 +29,19 @@ Source: https://github.com/OthmanAdi/planning-with-files.git
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
+
+### .Net Skills
+Official Microsoft .NET skills for code generation, refactoring, testing, and documentation.
+
+**Prompt for OpenCode:**
+
+```
+Goal: Install the official Microsoft .NET skill pack globally.
+
+Documentation and installation instructions can be found at https://github.com/dotnet/skills 
+Install GLOBALLY (user-scope), available in OpenCode, Visual Studio Copilot, and VS Code Copilot.
+```
+
 ### Open Design
 The open-source alternative to Claude Design. Local-first, web-deployable, BYOK at every layer — 16 coding-agent CLIs auto-detected on your PATH. Become the design engine, driven by 31 composable skills and 72 brand-grade design systems. No CLI? An OpenAI-compatible BYOK proxy is the same loop minus the spawn.
 

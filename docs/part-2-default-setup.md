@@ -73,6 +73,11 @@ Instructions:
 
 **Verify**: After restart, you should see the Sisyphus agent available in the agent selector dropdown.
 
+
+By default the oh-my-openagent already has gread model routing rules for its (currently) 10 different agents and 7 categories. If you do want custom model routing, then change the oh-my-openagent config.
+
+
+
 ## Step 4: Give your agent context.
 
 ### Step 4.1 Standard Method

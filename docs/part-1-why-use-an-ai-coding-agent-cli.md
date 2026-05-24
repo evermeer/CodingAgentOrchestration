@@ -167,9 +167,6 @@ Here is my top list of tools I would like to investigate and which are not (yet)
 **Cost, routing, observability**
 - [ccusage](https://github.com/ryoppippi/ccusage) — token / cost dashboards for Claude-style CLIs; the same pattern is useful for monitoring OpenCode spend.
 
-**Skills***
-- [DotNet Skills](https://github.com/dotnet/skills) - Microsoft's official skill pack for .NET development, with workflows for code generation, refactoring, testing, and documentation.
-
 And there are many more. On GitHub I maintain a list of interesting AI tools: [My list of AI tools](https://github.com/stars/evermeer/lists/ai)
 
 ---

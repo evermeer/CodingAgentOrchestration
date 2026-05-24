@@ -38,6 +38,8 @@ Start with Part 1 if you are new to AI coding agents. Go directly to Part 2 if y
 3. [Part 3: Advanced Use](docs/part-3-advanced-use.md)  
    Covers optional advanced additions such as engineering skills, custom review workflows, SQL LSP support, Jira workflows, Azure DevOps, and Azure MCP integration.
 
+4. [Part 4: Self optimisation](docs/part-4-self-optimisation.md)  
+   You have now installed a lot of tools and skills and there might be some overlap. Start here to let OpenCode optimize itself.
 ## Contribution
 
 Questions, corrections, and suggestions are welcome. Open an issue at [CodingAgentOrchestration issues](https://github.com/evermeer/CodingAgentOrchestration/issues/) or contribute with a [pull request](https://github.com/evermeer/CodingAgentOrchestration/pulls).
