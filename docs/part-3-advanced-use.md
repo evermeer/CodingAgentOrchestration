@@ -13,7 +13,7 @@ When asking OpenCode something, your prompt will be analyzed to select the right
 
 These skills add code review, planning, branching workflows, and development guidelines tailored for software engineers.
 
-### Planning with Files
+### [Planning with Files](https://github.com/OthmanAdi/planning-with-files) plugin
 A plugin that transforms your workflow to use persistent markdown files for planning, progress tracking, and knowledge storage. The Oh-my-OpenAgent also has a planning skill that uses markdown files for plan execution. It might be okay to stick to that one for medium size projects. I know the Planning with files also work for creating larger (60K lines of code) projects
 
 **Prompt for OpenCode:**
@@ -30,7 +30,7 @@ Source: https://github.com/OthmanAdi/planning-with-files.git
 ```
 
 
-### .Net Skills
+### [.Net](https://github.com/dotnet/skills ) Skills pack
 Official Microsoft .NET skills for code generation, refactoring, testing, and documentation.
 
 **Prompt for OpenCode:**
@@ -42,7 +42,7 @@ Documentation and installation instructions can be found at https://github.com/d
 Install GLOBALLY (user-scope), available in OpenCode, Visual Studio Copilot, and VS Code Copilot.
 ```
 
-### Open Design
+### [Open Design](https://github.com/nexu-io/open-design) skills pack
 The open-source alternative to Claude Design. Local-first, web-deployable, BYOK at every layer — 16 coding-agent CLIs auto-detected on your PATH. Become the design engine, driven by 31 composable skills and 72 brand-grade design systems. No CLI? An OpenAI-compatible BYOK proxy is the same loop minus the spawn.
 
 **Prompt for OpenCode:**
@@ -88,7 +88,7 @@ CONSTRAINTS:
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
-### Karpathy Guidelines
+### [Karpathy Guidelines](https://github.com/forrestchang/andrej-karpathy-skills) skill
 A distilled set of coding principles inspired by Andrej Karpathy's approach to software development. This skill encapsulates his emphasis on minimal assumptions, clear requirements, avoiding scope creep, and making evidence-based decisions. It serves as a guiding framework for writing clean, efficient, and maintainable code.
 
 **Prompt for OpenCode:**
@@ -257,8 +257,10 @@ Instructions:
 ```
 
 ### Bicep LSP
+
 Install and configure the official Microsoft Bicep language service GLOBALLY for OpenCode
- **Prompt for OpenCode:**
+
+**Prompt for OpenCode:**
 ```
 Goal: Install and configure the Azure DevOps MCP server GLOBALLY so any `.bicep` file in any repository gets hover, completion, and diagnostics.
 
@@ -273,8 +275,13 @@ Instructions:
 6. On any step failure, print the exact error and proposed fix before retrying.
 ```
 
-**Prompt for OpenCode:**
 
+### [Azure DevOps MCP server](https://github.com/microsoft/azure-devops-mcp)
+
+The [Azure DevOps MCP server](https://github.com/microsoft/azure-devops-mcp) bringing the power of Azure DevOps directly to your agents.
+
+**Prompt for OpenCode:**
+```
 Goal: Install the Azure DevOps MCP server GLOBALLY and create a companion skill for diagnosing pipeline / build failures.
 
 Instructions:
@@ -295,8 +302,9 @@ Instructions:
 6. On failure, print the exact API error and proposed fix before retrying.
 ```
 
-### Azure MCP
-Install the Azure MCP server GLOBALLY and create a companion skill for querying Azure resources.
+### [Azure MCP server](https://github.com/microsoft/github-copilot-for-azure)
+
+Install the [Azure MCP server](https://github.com/microsoft/github-copilot-for-azure) GLOBALLY and create a companion skill for querying Azure resources.
 
 **Prompt for OpenCode:**
 

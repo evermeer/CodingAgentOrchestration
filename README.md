@@ -6,7 +6,7 @@
 
 
 > [!TIP]
-> This guide is for software engineers with different levels of AI-assisted coding experience. It explains why an AI coding agent CLI can be useful, then walks through a practical OpenCode setup with plugins, skills, and integrations.
+> This guide is for software engineers with different levels of AI-assisted coding experience. It explains why an AI coding agent CLI can be useful, then walks through a practical [OpenCode](https://github.com/anomalyco/opencode) setup with plugins, skills, and integrations.
 
 > [!NOTE]
 > This is an opinionated selection of tools and instructions based on personal experience. The AI tooling ecosystem changes quickly, so treat this as a starting point and adapt it to your own workflow.
@@ -18,7 +18,7 @@
 ## Who this is for
 
 - Developers who already use AI coding assistance in an IDE and want to understand when a CLI agent adds value.
-- Engineers who want a repeatable OpenCode setup for local development, documentation, context, and external tools.
+- Engineers who want a repeatable [OpenCode](https://github.com/anomalyco/opencode) setup for local development, documentation, context, and external tools.
 - Advanced users who want to extend coding agents with skills, MCP servers, LSPs, Jira, Azure DevOps, and Azure integrations.
 
 Parts 1 and 2 are accessible to anyone interested in AI-assisted development. Part 3 is more advanced and focuses on optional tooling, custom skills, and integrations.

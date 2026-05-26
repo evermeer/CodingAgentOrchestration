@@ -46,9 +46,9 @@ The more relevant context you give to LLM models, the better the outcome will be
 
 ## Why Not Just Use GitHub Copilot in VS?
 
-The Visual Studio GitHub Copilot agent is getting better and can now also use skills and MCP, but there are still some things where OpenCode (and other CLIs) excels.
+The Visual Studio GitHub Copilot agent is getting better and can now also use skills and MCP, but there are still some things where [OpenCode](https://github.com/anomalyco/opencode) (and other CLIs) excels.
 
-**OpenCode (Desktop) benefits from:**
+**[OpenCode](https://github.com/anomalyco/opencode) (Desktop) benefits from:**
 - terminal automation
 - (multi-) repo-wide refactors
 - autonomous, long-running workflows
@@ -135,7 +135,7 @@ The underlying model still matters. Different LLMs vary in reasoning depth, codi
 Because the landscape moves so fast, model choice should be revisited regularly. Follow benchmarks such as [LLM Stats](https://llm-stats.com/), [SWE-bench](https://www.swebench.com/), [benchlm.ai](https://benchlm.ai/), [lm-arena](https://huggingface.co/spaces/lmarena-ai/arena-leaderboard), [livebench](https://livebench.ai/#/?highunseenbias=true), and [Artificial Analysis](https://artificialanalysis.ai/leaderboards/models) to see when something better lands.
 
 ## TODO
-In part 2 and 3 we will cover the practical setup of OpenCode with a selection of add-ons, but the landscape is evolving quickly. Here are some tools that I haven't included in the instructions below but are on my radar for future investigation:
+In part 2 and 3 we will cover the practical setup of [OpenCode](https://github.com/anomalyco/opencode) with a selection of add-ons, but the landscape is evolving quickly. Here are some tools that I haven't included in the instructions below but are on my radar for future investigation:
 
 Here is my top list of tools I would like to investigate and which are not (yet) in the instructions below:
 
@@ -168,6 +168,11 @@ Here is my top list of tools I would like to investigate and which are not (yet)
 - [ccusage](https://github.com/ryoppippi/ccusage) — token / cost dashboards for Claude-style CLIs; the same pattern is useful for monitoring OpenCode spend.
 
 And there are many more. On GitHub I maintain a list of interesting AI tools: [My list of AI tools](https://github.com/stars/evermeer/lists/ai)
+
+Other great resources for OpenCode are 
+[Awesome OpenCode](https://github.com/awesome-opencode/awesome-opencode)
+and
+[OpenCode cafe (Community-driven marketplace)](https://www.opencode.cafe/)
 
 ---
 

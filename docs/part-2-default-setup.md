@@ -3,7 +3,7 @@
 > [!NOTE]
 > This part turns the concepts from [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md) into a practical setup. After finishing this default setup, use [Part 3: Advanced Use](part-3-advanced-use.md) for optional skills, custom workflows, and integrations.
 
-This section gets you up and running with a working OpenCode environment. For each prompt first evaluate if you realy need it. If for instance you don't use Jira you also don't have to install the Atlassian MCP.
+This section gets you up and running with a working [OpenCode](https://github.com/anomalyco/opencode) environment. For each prompt first evaluate if you realy need it. If for instance you don't use Jira you also don't have to install the Atlassian MCP.
 
 > [!NOTE]
 > Be aware that some prompts below can take 10 minutes. Prompts that create custom skills can take half an hour or longer to complete.
@@ -20,7 +20,7 @@ This section gets you up and running with a working OpenCode environment. For ea
 
 ## Step 1: Install the OpenCode CLI
 
-Install the OpenCode CLI globally via npm:
+Install the [OpenCode](https://github.com/anomalyco/opencode) CLI globally via npm:
 
 ```bash
 npm i -g opencode-ai@latest
@@ -30,9 +30,9 @@ npm i -g opencode-ai@latest
 
 On first launch, follow the on-screen instructions to configure it for your LLM provider (e.g. GitHub Copilot).
 
-## Step 2: Install OpenCode Desktop
+## Step 2: Install [OpenCode](https://github.com/anomalyco/opencode) Desktop
 
-OpenCode Desktop gives you a GUI with advanced repository and session management on top of the CLI.
+[OpenCode](https://github.com/anomalyco/opencode) Desktop gives you a GUI with advanced repository and session management on top of the CLI.
 
 Download and install the Windows application (or macOS version) from: https://opencode.ai/download
 
@@ -48,9 +48,25 @@ Download and install the Windows application (or macOS version) from: https://op
 > The install prompts below often create and execute scripts. Your antivirus might block these, especially when using the Desktop app. You can add an exception for `opencode-cli.exe` if needed. If this happens, restart OpenCode, use `/session` to reconnect to the aborted session, and type `continue`.
 
 
-## Step 3: Extra power: Install and Configure Oh-My-OpenAgent
+## Step 3: Enable the [Safety net](https://github.com/kenryu42/claude-code-safety-net) plugin
 
-Oh-My-OpenAgent is the most impactful plugin for OpenCode. It gives you: intent parsing, classification / reranking, priority rules, fallback & recovery logic (an improved agent loop). The default agent in the CLI is getting better but Oh-My-OpenAgent still gives better results.
+The [Safety net](https://github.com/kenryu42/claude-code-safety-net) plugin prevent critical mistakes like deleting files or pushing directly to main.
+
+**Prompt for OpenCode:**
+
+```
+Goal: Install a safety net plugin for OpenCode to prevent critical mistakes like deleting files or pushing directly to main.
+
+Instructions:
+1. Fetch and follow the latest official installation guide for the cc-safety-net plugin at: https://github.com/kenryu42/claude-code-safety-net
+2. Make sure to follow the instructions for OpenCode.
+3. Install the cc-safety-net plugin globally (user-scope) in `~/.config/opencode/opencode.json` (or `.jsonc`) according to the schema at: https://opencode.ai/config.json
+```
+
+
+## Step 4: Extra power: Install and Configure [Oh-My-OpenAgent](https://github.com/code-yeongyu/oh-my-openagent)
+
+[Oh-My-OpenAgent](https://github.com/code-yeongyu/oh-my-openagent) is the most impactful plugin for OpenCode. It gives you: intent parsing, classification / reranking, priority rules, fallback & recovery logic (an improved agent loop). The default agent in the CLI is getting better but Oh-My-OpenAgent still gives better results.
 
 **Prompt for OpenCode:**
 
@@ -78,9 +94,9 @@ By default the oh-my-openagent already has gread model routing rules for its (cu
 
 
 
-## Step 4: Give your agent context.
+## Step 5: Give your agent context.
 
-### Step 4.1 Standard Method
+### Step 5.1 Standard Method
 The standard way to add context is to create an `Agents.md` file in the root of your repository. This file will be used as a knowledge base for your agent when running skills. You can add any relevant information about your project, architecture, coding guidelines, etc. The more relevant context you provide, the better the agent's performance will be. Don't make the file too big. Something between 100 and 200 lines should be enough.
 
 Run `/init` inside OpenCode in your repository folder. This will create an `Agents.md` file. Customize it with information specific to your repository. It would be nice to commit this so that everyone on your team uses the same knowledge base.
@@ -102,12 +118,12 @@ Instructions:
 5. Print the list of files created or modified, and verify by opening one solution folder and confirming Copilot picks up the instructions.
 ```
 
-### Step 4.2 Advanced knowledge tool for your repository or documents (partially alternative for Agents.md):
-Graphify is a tool that can create a knowledge graph of your repository and/or documentation. This can give your agent a much richer context to work with. You can install it and use it to generate a graph of your repo, then point your agent to that graph for enhanced understanding.
+### Step 5.2 Advanced knowledge tool for your repository or documents (partially alternative for Agents.md):
+[Graphify](https://github.com/safishamsi/graphify) is a tool that can create a knowledge graph of your repository and/or documentation. This can give your agent a much richer context to work with. You can install it and use it to generate a graph of your repo, then point your agent to that graph for enhanced understanding.
 
 **Warning**: First close all applications because this step could easily use 6GB+ of memory during processing if you execute it on a folder with a lot of data.
 
-**Warning 2**: If you run this in the root of a OneDrive folder then a lot of generated cache files will be synced to the cloud.
+**Warning 2**: If you run this in the root of a OneDrive folder then a lot of generated cache files could be synced to the cloud.
 
 **Prompt for OpenCode:**
 
@@ -139,8 +155,8 @@ pip install graphifyy[sql]
 You could use the agents.md and Graphify graph together. The agents.md can be used for more high level information about the project and the graph can be used for more detailed information about the codebase.
 
 
-### Step 4.3 AI Agent Session Memory 
-Adding a session memory tool to your agent can give it an intent context that persists across interactions. This can help the agent remember previous conversations, decisions, and actions, allowing for more coherent and context-aware responses.
+### Step 5.3 AI Agent Session Memory 
+Adding [MemPalace](https://github.com/MemPalace/mempalace) as a session memory tool to your agent can give it an intent context that persists across interactions. This can help the agent remember previous conversations, decisions, and actions, allowing for more coherent and context-aware responses.
 
 **Prompt for OpenCode:**
 
@@ -175,10 +191,10 @@ Here a short overview of the differences between mempalace and graphify:
 | Best for         | *Why we decided something*             | *How the system is structured*                |
 
 
-## Step 5: Give your agent tools.
+## Step 6: Give your agent tools.
 
-### Step 5.1 Reading various document formats.
-Install markitdown from Microsoft to give your agent the power to understand all kinds of document formats (office, pdf, etc.). 
+### Step 6.1 Reading various document formats.
+Install [markitdown](https://github.com/microsoft/markitdown) from Microsoft to give your agent the power to understand all kinds of document formats (office, pdf, etc.). 
 
 **Prompt for OpenCode:**
 
@@ -197,9 +213,9 @@ Instructions:
 4. Verify by converting one sample file of each: PDF, DOCX, XLSX, PPTX (skip the ones I do not have), and report the result.
 ```
 
-### Step 5.2: Connect to Jira with the Jira MCP
+### Step 6.2: Connect to Jira with the Jira MCP
 
-Install the Jira MCP server to give your agent the power to read and write Jira tickets. 
+Install the [Atlassian (Jira) MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/) to give your agent the power to read and write Jira tickets. 
 This can be very useful for generating tickets from code reviews, linking code changes to existing tickets, 
 or asking your agent to update a ticket based on code changes or even ask to refine or implement a ticket. 
 
@@ -231,7 +247,7 @@ Instructions:
 9. If the above did not work without manual steps, then show me what prompt I should have used to get it right so that it could be reproduced on another machine.
 ```
 
-## Step 6: Give your agent skills
+## Step 7: Give your agent skills
 
 These skills give OpenCode broad capabilities: superpowers, planning, agency roles, and more.
 
@@ -239,7 +255,7 @@ You can use the complete prompt below to install all in one go, or copy and past
 
 ---
 
-### Superpowers 
+### [Superpowers](https://github.com/obra/superpowers) skills pack
 Superpowers is a complete software development methodology for your coding agents, built on top of a set of composable skills and some initial instructions that make sure your agent uses them.
 
 **Prompt for OpenCode:**
@@ -255,7 +271,7 @@ Source: https://github.com/obra/superpowers.git
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
-### Agency Agents
+### [Agency Agents](https://github.com/msitarzewski/agency-agents) skills pack
 A complete AI agency at your fingertips - From frontend wizards to Reddit community ninjas, from whimsy injectors to reality checkers. Each agent is a specialized expert with personality, processes, and proven deliverables.
 **Prompt for OpenCode:**
 
@@ -273,7 +289,7 @@ Source: https://github.com/msitarzewski/agency-agents
 - Apply the mapping consistently for every category, not only engineering.
 ```
 
-### Knowledge Work Plugins
+### [Knowledge Work](https://github.com/anthropics/knowledge-work-plugins) skills pack
 A collection of skills for knowledge workers for your role, team, and company.
 
 **Prompt for OpenCode:**
@@ -289,7 +305,7 @@ Source: https://github.com/anthropics/knowledge-work-plugins
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
-### PM Skills
+### [Product Manager](https://github.com/phuryn/pm-skills) skills pack
 The AI Operating System for Better Product Decisions. 65 PM skills and 36 chained workflows across 8 plugins. From discovery to strategy, execution, launch, and growth.
 
 **Prompt for OpenCode:**
@@ -305,7 +321,7 @@ Source: https://github.com/phuryn/pm-skills
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
-### The Minimalist Entrepreneur Skills
+### [The Minimalist Entrepreneur](https://github.com/slavingia/skills) Skills pack
 A collection of skills based on the book "The Minimalist Entrepreneur" by Sahil Laving
 
 **Prompt for OpenCode:**
@@ -321,7 +337,7 @@ Source: https://github.com/slavingia/skills
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
-### Gary Tang gstack Skills
+### [Gary Tang gstack](https://github.com/garrytan/gstack) Skills pack
 A collection of skills based on Gary Tang's gstack framework. A virtual engineering team — a CEO who rethinks the product, an eng manager who locks architecture, a designer who catches AI slop, a reviewer who finds production bugs, a QA lead who opens a real browser, a security officer who runs OWASP + STRIDE audits, and a release engineer who ships the PR.
 
 **Prompt for OpenCode:**
