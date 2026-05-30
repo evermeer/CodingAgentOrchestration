@@ -217,6 +217,68 @@ Instructions:
 4. Verify by converting one sample file of each: PDF, DOCX, XLSX, PPTX (skip the ones I do not have), and report the result.
 ```
 
+### Step 6.2 Up-to-date library documentation.
+Install [Context7](https://github.com/upstash/context7) from Upstash to give your agent on-demand access to current, version-specific documentation and code examples for any library or framework.
+
+**Prompt for OpenCode:**
+
+```
+Goal: Install Upstash Context7 globally and expose it as a tool/MCP in OpenCode, Visual Studio Copilot, and VS Code Copilot.
+
+Instructions:
+1. Install the Context7 MCP server globally (user-scope) following the latest instructions at:
+   https://github.com/upstash/context7
+   Detect my OS and use the matching commands. Requires Node.js >= v18.
+   If an API key is needed, get one from https://context7.com/dashboard and store it in my global config (never hardcode it in a committed file).
+2. Register the Context7 MCP server in the global config of:
+   - OpenCode
+   - Visual Studio GitHub Copilot
+   - VS Code GitHub Copilot
+3. On any step failure, print the exact error plus proposed fix before retrying.
+4. Verify by resolving one library and fetching its docs (e.g. "Next.js routing"), and report the result.
+```
+
+### Step 6.3 Web search.
+Install the [Exa MCP server](https://github.com/exa-labs/exa-mcp-server) to give your agent fast, clean web search that returns ready-to-use content instead of raw result pages.
+
+**Prompt for OpenCode:**
+
+```
+Goal: Install the Exa web-search MCP server globally and expose it as a tool/MCP in OpenCode, Visual Studio Copilot, and VS Code Copilot.
+
+Instructions:
+1. Configure the Exa MCP server (user-scope, global) following the latest instructions at:
+   https://github.com/exa-labs/exa-mcp-server
+   Prefer the hosted remote endpoint https://mcp.exa.ai/mcp. Detect my OS and use the matching commands.
+   An Exa API key is required: get one from https://dashboard.exa.ai and store it in my global config (never hardcode it in a committed file).
+2. Register the Exa MCP server in the global config of:
+   - OpenCode
+   - Visual Studio GitHub Copilot
+   - VS Code GitHub Copilot
+3. On any step failure, print the exact error plus proposed fix before retrying.
+4. Verify by running one web search and report the result.
+```
+
+### Step 6.4 Search real-world code on GitHub.
+Install the [grep.app MCP server](https://mcp.grep.app) to let your agent search literal code patterns across a million-plus public GitHub repositories for real-world usage examples.
+
+**Prompt for OpenCode:**
+
+```
+Goal: Install the grep.app code-search MCP server globally and expose it as a tool/MCP in OpenCode, Visual Studio Copilot, and VS Code Copilot.
+
+Instructions:
+1. Configure the grep.app MCP server (user-scope, global) using the hosted HTTP endpoint:
+   https://mcp.grep.app
+   No API key is required. Detect my OS and use the matching commands (e.g. an HTTP/remote transport entry).
+2. Register the grep.app MCP server in the global config of:
+   - OpenCode
+   - Visual Studio GitHub Copilot
+   - VS Code GitHub Copilot
+3. On any step failure, print the exact error plus proposed fix before retrying.
+4. Verify by searching for one code pattern (e.g. `useState(`) and report the result.
+```
+
 ## Step 7: Give your agent skills
 
 These skills give OpenCode broad capabilities: superpowers, planning, agency roles, and more.
