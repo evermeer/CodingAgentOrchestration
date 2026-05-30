@@ -1,12 +1,16 @@
 # AI Coding Agent Orchestration
 
+A reference architecture for agentic software development.
+
 ![AI Agent Orchestration](./banner.svg)
 
-
-
+This configuration guide is an opinionated but practical handbook that argues for treating AI coding tools as a composable, multi-agent system rather than a single assistant, 
+and then walks through how to implement that mindset using [OpenCode](https://github.com/anomalyco/opencode)’s CLI, configuration system, and ecosystem (agents, tools, skills, and plugins). 
+It emphasizes that productivity gains come from structured context, explicit orchestration, and layered configuration (global → project → runtime), 
+enabling developers to build a repeatable “AI team” that plans, codes, reviews, and integrates work with minimal manual prompting.
 
 > [!TIP]
-> This guide is for software engineers with different levels of AI-assisted coding experience. It explains why an AI coding agent CLI can be useful, then walks through a practical [OpenCode](https://github.com/anomalyco/opencode) setup with plugins, skills, and integrations.
+> Even if you already know the composition of an AI Coding agent. The first part would still be a good startingpoint to fresh up that knowledge.
 
 > [!NOTE]
 > This is an opinionated selection of tools and instructions based on personal experience. The AI tooling ecosystem changes quickly, so treat this as a starting point and adapt it to your own workflow.
@@ -25,7 +29,7 @@ Parts 1 and 2 are accessible to anyone interested in AI-assisted development. Pa
 
 ## How to read this guide
 
-Start with Part 1 if you are new to AI coding agents. Go directly to Part 2 if you already understand the concepts and want the default setup. Use Part 3 as a reference when you are ready to extend the environment.
+Start with Part 1 if you are new to AI coding agents or if you want to fresh up that knowledge. Go directly to Part 2 if you already understand the concepts and want the default setup. Use Part 3 as a reference when you are ready to extend the environment.
 
 ## Guide parts
 

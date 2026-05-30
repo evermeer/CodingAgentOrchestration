@@ -1,7 +1,7 @@
 # Part 2: A default setup
 
 > [!NOTE]
-> This part turns the concepts from [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md) into a practical setup. After finishing this default setup, use [Part 3: Advanced Use](part-3-advanced-use.md) for optional skills, custom workflows, and integrations.
+> This part turns the concepts from [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md) into a practical setup. After finishing this default setup, use [Part 3: Advanced Use](part-3-advanced-use.md) for optional skills, custom workflows, and integrations and then to [Part 4: Self optimisation](part-4-self-optimisation.md) to let OpenCode optimize itself and remove any remaining orchestration overlap.
 
 This section gets you up and running with a working [OpenCode](https://github.com/anomalyco/opencode) environment. For each prompt first evaluate if you realy need it. If for instance you don't use Jira you also don't have to install the Atlassian MCP.
 
@@ -64,9 +64,16 @@ Instructions:
 ```
 
 
-## Step 4: Extra power: Install and Configure [Oh-My-OpenAgent](https://github.com/code-yeongyu/oh-my-openagent)
+## Step 4: Extra Agent power
 
-[Oh-My-OpenAgent](https://github.com/code-yeongyu/oh-my-openagent) is the most impactful plugin for OpenCode. It gives you: intent parsing, classification / reranking, priority rules, fallback & recovery logic (an improved agent loop). The default agent in the CLI is getting better but Oh-My-OpenAgent still gives better results.
+### 4.1 Install and Configure [Oh-My-OpenAgent](https://github.com/code-yeongyu/oh-my-openagent)
+
+[Oh-My-OpenAgent](https://github.com/code-yeongyu/oh-my-openagent) is the most impactful plugin for OpenCode. It gives you: intent parsing, classification / reranking, priority rules, fallback & recovery logic (an improved agent loop) and model routing.
+
+> [!WARNING]
+> I have had some issues with oh-my-openagent where it would get stuck in a loop and not recognize a "done" or "continue" signal. If that happens, restart OpenCode, use `/session` to reconnect to the aborted session, and type `continue`. This could happen when another plugin rewrites what the LLM returns and removes or ajust the flow commands for this plugin.
+>
+> If the issue persists, you can temporarily disable the plugin by removing it from the OpenCode config file (~/.config/opencode/opencode.json) and restarting OpenCode. You could then ask opencode to analyse the previous session to see what plugin interferes.
 
 **Prompt for OpenCode:**
 
@@ -123,8 +130,6 @@ Instructions:
 
 **Warning**: First close all applications because this step could easily use 6GB+ of memory during processing if you execute it on a folder with a lot of data.
 
-**Warning 2**: If you run this in the root of a OneDrive folder then a lot of generated cache files could be synced to the cloud.
-
 **Prompt for OpenCode:**
 
 ```
@@ -153,7 +158,6 @@ pip install graphifyy[sql]
 ```
 
 You could use the agents.md and Graphify graph together. The agents.md can be used for more high level information about the project and the graph can be used for more detailed information about the codebase.
-
 
 ### Step 5.3 AI Agent Session Memory 
 Adding [MemPalace](https://github.com/MemPalace/mempalace) as a session memory tool to your agent can give it an intent context that persists across interactions. This can help the agent remember previous conversations, decisions, and actions, allowing for more coherent and context-aware responses.
@@ -213,40 +217,6 @@ Instructions:
 4. Verify by converting one sample file of each: PDF, DOCX, XLSX, PPTX (skip the ones I do not have), and report the result.
 ```
 
-### Step 6.2: Connect to Jira with the Jira MCP
-
-Install the [Atlassian (Jira) MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/) to give your agent the power to read and write Jira tickets. 
-This can be very useful for generating tickets from code reviews, linking code changes to existing tickets, 
-or asking your agent to update a ticket based on code changes or even ask to refine or implement a ticket. 
-
-> Be aware that the prompt below may still need improvement. Authentication required manual tweaking during the first attempt, so validate the result before reusing it on another machine.
-
-**Prompt for OpenCode:**
-
-```
-Goal: Install the Atlassian Jira MCP server globally for OpenCode, Visual Studio Copilot, and VS Code Copilot, authenticated via a personal API token (not interactive OAuth), and bind a board to this repository.
-
-Instructions:
-1. Follow the latest instructions at:
-   https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/
-2. Register the MCP in the GLOBAL config of:
-   - OpenCode
-   - Visual Studio GitHub Copilot
-   - VS Code GitHub Copilot
-   so it is available in every session and every repository. Do not write secrets into a per-repo file that could be committed.
-3. Open this URL in my default browser so I can create a token:
-   https://id.atlassian.com/manage-profile/security/api-tokens
-4. Then ask me for:
-   - my Atlassian account email
-   - my Atlassian base URL (e.g. https://<workspace>.atlassian.net)
-   - the API token I just created
-   and use that for the configuration of the MCP.
-6. After auth works, query Jira for the boards I have access to, present a numbered list, let me pick one, and persist that board id PER REPOSITORY (e.g. in a local, git-ignored config file) so opening this folder auto-selects it. Do not store the token in this per-repo file.
-7. On any failure, print the exact API response and the proposed fix before retrying.
-8. Verify by listing the most recent 5 issues from the selected board.
-9. If the above did not work without manual steps, then show me what prompt I should have used to get it right so that it could be reproduced on another machine.
-```
-
 ## Step 7: Give your agent skills
 
 These skills give OpenCode broad capabilities: superpowers, planning, agency roles, and more.
@@ -263,11 +233,8 @@ Superpowers is a complete software development methodology for your coding agent
 ```
 Goal: Install the "superpowers" skill pack globally for OpenCode, Visual Studio Copilot, and VS Code Copilot.
 Source: https://github.com/obra/superpowers.git
-- Install GLOBALLY for the current user (e.g. `~/.config/opencode/skills/<pack-name>/` or the OS-equivalent), NOT inside this repository.
-- Clone the repo with `git clone --depth 1` so it can later be updated with `git pull`. If the destination already exists, run `git pull --ff-only` instead of re-cloning.
-- Also register the skills for Visual Studio Copilot and VS Code Copilot using their supported skill / prompt-file mechanism (symlink or copy when symlinks are not supported on the OS).
-- Preserve the upstream folder structure unless told otherwise. Do not rename files.
-- After install, list the install path and the number of skills registered, and verify by running `/help` (or the equivalent skill list command) in OpenCode.
+- Install GLOBALLY for the current user, NOT inside this repository.
+- Follow the instructions for each coding agent.
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
@@ -278,11 +245,8 @@ A complete AI agency at your fingertips - From frontend wizards to Reddit commun
 ```
 Goal: Install the "agency" skill pack globally for OpenCode, Visual Studio Copilot, and VS Code Copilot.
 Source: https://github.com/msitarzewski/agency-agents
-- Install GLOBALLY for the current user (e.g. `~/.config/opencode/skills/<pack-name>/` or the OS-equivalent), NOT inside this repository.
-- Clone the repo with `git clone --depth 1` so it can later be updated with `git pull`. If the destination already exists, run `git pull --ff-only` instead of re-cloning.
-- Also register the skills for Visual Studio Copilot and VS Code Copilot using their supported skill / prompt-file mechanism (symlink or copy when symlinks are not supported on the OS).
-- Preserve the upstream folder structure unless told otherwise. Do not rename files.
-- After install, list the install path and the number of skills registered, and verify by running `/help` (or the equivalent skill list command) in OpenCode.
+- Install GLOBALLY for the current user, NOT inside this repository.
+- Follow the instructions for each coding agent.
 - On any failure, print the exact error and proposed fix before retrying.
 - Re-map skill paths so each file `<category>/<category>-<name>.md` becomes the skill `/agency/<category>/<name>`.
   Example: `engineering/engineering-devops-automator.md` -> `/agency/engineering/devops-automator`.
@@ -297,11 +261,8 @@ A collection of skills for knowledge workers for your role, team, and company.
 ```
 Goal: Install the "knowledge-work" skill pack globally for OpenCode, Visual Studio Copilot, and VS Code Copilot.
 Source: https://github.com/anthropics/knowledge-work-plugins
-- Install GLOBALLY for the current user (e.g. `~/.config/opencode/skills/<pack-name>/` or the OS-equivalent), NOT inside this repository.
-- Clone the repo with `git clone --depth 1` so it can later be updated with `git pull`. If the destination already exists, run `git pull --ff-only` instead of re-cloning.
-- Also register the skills for Visual Studio Copilot and VS Code Copilot using their supported skill / prompt-file mechanism (symlink or copy when symlinks are not supported on the OS).
-- Preserve the upstream folder structure unless told otherwise. Do not rename files.
-- After install, list the install path and the number of skills registered, and verify by running `/help` (or the equivalent skill list command) in OpenCode.
+- Install GLOBALLY for the current user, NOT inside this repository.
+- Follow the instructions for each coding agent.
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
@@ -313,11 +274,8 @@ The AI Operating System for Better Product Decisions. 65 PM skills and 36 chaine
 ```
 Goal: Install the "PM" skill pack globally for OpenCode, Visual Studio Copilot, and VS Code Copilot.
 Source: https://github.com/phuryn/pm-skills
-- Install GLOBALLY for the current user (e.g. `~/.config/opencode/skills/<pack-name>/` or the OS-equivalent), NOT inside this repository.
-- Clone the repo with `git clone --depth 1` so it can later be updated with `git pull`. If the destination already exists, run `git pull --ff-only` instead of re-cloning.
-- Also register the skills for Visual Studio Copilot and VS Code Copilot using their supported skill / prompt-file mechanism (symlink or copy when symlinks are not supported on the OS).
-- Preserve the upstream folder structure unless told otherwise. Do not rename files.
-- After install, list the install path and the number of skills registered, and verify by running `/help` (or the equivalent skill list command) in OpenCode.
+- Install GLOBALLY for the current user, NOT inside this repository.
+- Follow the instructions for each coding agent.
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
@@ -329,11 +287,8 @@ A collection of skills based on the book "The Minimalist Entrepreneur" by Sahil 
 ```
 Goal: Install "The Minimalist Entrepreneur" skill pack globally for OpenCode, Visual Studio Copilot, and VS Code Copilot.
 Source: https://github.com/slavingia/skills
-- Install GLOBALLY for the current user (e.g. `~/.config/opencode/skills/<pack-name>/` or the OS-equivalent), NOT inside this repository.
-- Clone the repo with `git clone --depth 1` so it can later be updated with `git pull`. If the destination already exists, run `git pull --ff-only` instead of re-cloning.
-- Also register the skills for Visual Studio Copilot and VS Code Copilot using their supported skill / prompt-file mechanism (symlink or copy when symlinks are not supported on the OS).
-- Preserve the upstream folder structure unless told otherwise. Do not rename files.
-- After install, list the install path and the number of skills registered, and verify by running `/help` (or the equivalent skill list command) in OpenCode.
+- Install GLOBALLY for the current user, NOT inside this repository.
+- Follow the instructions for each coding agent.
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
@@ -345,11 +300,8 @@ A collection of skills based on Gary Tang's gstack framework. A virtual engineer
 ```
 Goal: Install the "Gary Tang gstack" skill pack globally for OpenCode, Visual Studio Copilot, and VS Code Copilot.
 Source: https://github.com/garrytan/gstack
-- Install GLOBALLY for the current user (e.g. `~/.config/opencode/skills/<pack-name>/` or the OS-equivalent), NOT inside this repository.
-- Clone the repo with `git clone --depth 1` so it can later be updated with `git pull`. If the destination already exists, run `git pull --ff-only` instead of re-cloning.
-- Also register the skills for Visual Studio Copilot and VS Code Copilot using their supported skill / prompt-file mechanism (symlink or copy when symlinks are not supported on the OS).
-- Preserve the upstream folder structure unless told otherwise. Do not rename files.
-- After install, list the install path and the number of skills registered, and verify by running `/help` (or the equivalent skill list command) in OpenCode.
+- Install GLOBALLY for the current user, NOT inside this repository.
+- Follow the instructions for each coding agent.
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 

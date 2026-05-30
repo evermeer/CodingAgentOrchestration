@@ -1,7 +1,7 @@
 # Part 3: Advanced Use
 
 > [!NOTE]
-> This part assumes you have completed, or at least reviewed, [Part 2: A default setup](part-2-default-setup.md). Use these sections selectively; not every developer needs every advanced integration.
+> This part assumes you have completed, or at least reviewed, [Part 2: A default setup](part-2-default-setup.md). Use these sections selectively; not every developer needs every advanced integration. After this you can continue with [Part 4: Self optimisation](part-4-self-optimisation.md) to let OpenCode optimize itself and remove any remaining orchestration overlap.
 
 This section covers installing skills, Language Server Protocols, and MCP integrations. Each block below is an independent prompt you can paste into OpenCode.
 
@@ -9,9 +9,9 @@ Skills give your CLI additional capabilities. You can use them for reviews, guid
 
 When asking OpenCode something, your prompt will be analyzed to select the right skills. There are many skills available. You can add technology-specific skills for SQL and Vue.js, or role-specific skills for Scrum, marketing, service, or management workflows.
 
-## 3.1 Install Software Engineering Skills
+## 3.1 Install Software Engineering (and DevOps) extensions
 
-These skills add code review, planning, branching workflows, and development guidelines tailored for software engineers.
+First evaluate each of these extensions and decide which ones are useful for your workflow. Then run the corresponding prompts to install them.
 
 ### [Planning with Files](https://github.com/OthmanAdi/planning-with-files) plugin
 A plugin that transforms your workflow to use persistent markdown files for planning, progress tracking, and knowledge storage. The Oh-my-OpenAgent also has a planning skill that uses markdown files for plan execution. It might be okay to stick to that one for medium size projects. I know the Planning with files also work for creating larger (60K lines of code) projects
@@ -21,16 +21,12 @@ A plugin that transforms your workflow to use persistent markdown files for plan
 ```
 Goal: Install the "planning-with-files" skill pack globally for OpenCode, Visual Studio Copilot, and VS Code Copilot.
 Source: https://github.com/OthmanAdi/planning-with-files.git
-- Install GLOBALLY for the current user (e.g. `~/.config/opencode/skills/<pack-name>/` or the OS-equivalent), NOT inside this repository.
-- Clone the repo with `git clone --depth 1` so it can later be updated with `git pull`. If the destination already exists, run `git pull --ff-only` instead of re-cloning.
-- Also register the skills for Visual Studio Copilot and VS Code Copilot using their supported skill / prompt-file mechanism (symlink or copy when symlinks are not supported on the OS).
-- Preserve the upstream folder structure unless told otherwise. Do not rename files.
-- After install, list the install path and the number of skills registered, and verify by running `/help` (or the equivalent skill list command) in OpenCode.
+- Install GLOBALLY for the current user, NOT inside this repository.
+- Follow the instructions for each coding agent.
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
-
-### [.Net](https://github.com/dotnet/skills ) Skills pack
+### Microsoft [.Net Skills](https://github.com/dotnet/skills ) pack
 Official Microsoft .NET skills for code generation, refactoring, testing, and documentation.
 
 **Prompt for OpenCode:**
@@ -42,7 +38,42 @@ Documentation and installation instructions can be found at https://github.com/d
 Install GLOBALLY (user-scope), available in OpenCode, Visual Studio Copilot, and VS Code Copilot.
 ```
 
+### [Atlassian (Jira) MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/)
+
+Install the [Atlassian (Jira) MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/) to give your agent the power to read and write Jira tickets. 
+This can be very useful for generating tickets from code reviews, linking code changes to existing tickets, 
+or asking your agent to update a ticket based on code changes or even ask to refine or implement a ticket. 
+
+> Be aware that the prompt below may still need improvement. Authentication required manual tweaking during the first attempt, so validate the result.
+
+**Prompt for OpenCode:**
+
+```
+Goal: Install the Atlassian Jira MCP server globally for OpenCode, Visual Studio Copilot, and VS Code Copilot, authenticated via a personal API token (not interactive OAuth), and bind a board to this repository.
+
+Instructions:
+1. Follow the latest instructions at:
+   https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/
+2. Register the MCP in the GLOBAL config of:
+   - OpenCode
+   - Visual Studio GitHub Copilot
+   - VS Code GitHub Copilot
+   so it is available in every session and every repository. Do not write secrets into a per-repo file that could be committed.
+3. Open this URL in my default browser so I can create a token:
+   https://id.atlassian.com/manage-profile/security/api-tokens
+4. Then ask me for:
+   - my Atlassian account email
+   - my Atlassian base URL (e.g. https://<workspace>.atlassian.net)
+   - the API token I just created
+   and use that for the configuration of the MCP.
+6. After auth works, query Jira for the boards I have access to, present a numbered list, let me pick one, and persist that board id PER REPOSITORY (e.g. in a local, git-ignored config file) so opening this folder auto-selects it. Do not store the token in this per-repo file.
+7. On any failure, print the exact API response and the proposed fix before retrying.
+8. Verify by listing the most recent 5 issues from the selected board.
+9. If the above did not work without manual steps, then show me what prompt I should have used to get it right so that it could be reproduced on another machine.
+```
+
 ### [Open Design](https://github.com/nexu-io/open-design) skills pack
+
 The open-source alternative to Claude Design. Local-first, web-deployable, BYOK at every layer — 16 coding-agent CLIs auto-detected on your PATH. Become the design engine, driven by 31 composable skills and 72 brand-grade design systems. No CLI? An OpenAI-compatible BYOK proxy is the same loop minus the spawn.
 
 **Prompt for OpenCode:**
@@ -87,6 +118,108 @@ CONSTRAINTS:
 - Do NOT install inside a project repo — install globally for the user.
 - On any failure, print the exact error and proposed fix before retrying.
 ```
+
+### SQL Server T-SQL LSP
+Install and configure the official Microsoft SQL Server T-SQL language service GLOBALLY for OpenCode
+
+**Prompt for OpenCode:**
+
+```
+Goal: Install and configure the official Microsoft SQL Server T-SQL language service GLOBALLY for OpenCode, so any `.sql` file in any repository gets hover, completion, and diagnostics.
+
+Instructions:
+1. Determine whether Microsoft SQL Tools Service (`sqltoolsservice`) exposes an LSP-over-stdio entry point. Cite the official source (link + quote).
+2. If yes:
+   - Download the latest `sqltoolsservice` release for my OS/architecture.
+   - Install it to a stable user-scope location and add it to PATH if needed.
+   - Show the exact install commands.
+3. If Microsoft's tooling does NOT expose LSP, say so explicitly with cited evidence, then propose:
+   - the best Microsoft-backed workaround (e.g. extracting the LSP server binary that ships with the VS Code MSSQL extension), and/or
+   - the closest viable third-party LSP, with explicit tradeoffs.
+   Pick one, justify it, and proceed.
+4. Add the LSP entry to the OpenCode GLOBAL config (not per-repo) so every project benefits. Show the final config snippet verbatim.
+5. Verification:
+   - Open a `.sql` file with a deliberately invalid statement.
+   - Confirm hover info appears on a known keyword.
+   - Confirm at least one diagnostic is reported.
+   - Print the expected vs actual result.
+6. On any step failure, print the exact error and proposed fix before retrying.
+```
+
+### Bicep LSP
+
+Install and configure the official Microsoft Bicep language service GLOBALLY for OpenCode
+
+**Prompt for OpenCode:**
+```
+Goal: Install and configure the Azure DevOps MCP server GLOBALLY so any `.bicep` file in any repository gets hover, completion, and diagnostics.
+
+Instructions:
+1. Check availability of the bicep lsp. If not available, install the latest Bicep CLI per https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install.
+2. Add the LSP entry to the OpenCode GLOBAL config (not per-repo) so every project benefits. Show the final config snippet verbatim.
+5. Verification:
+   - Open a `.bicep` file with a deliberately invalid statement.
+   - Confirm hover info appears on a known keyword.
+   - Confirm at least one diagnostic is reported.
+   - Print the expected vs actual result.
+6. On any step failure, print the exact error and proposed fix before retrying.
+```
+
+### [Azure DevOps MCP server](https://github.com/microsoft/azure-devops-mcp)
+
+The [Azure DevOps MCP server](https://github.com/microsoft/azure-devops-mcp) bringing the power of Azure DevOps directly to your agents.
+
+**Prompt for OpenCode:**
+```
+Goal: Install the Azure DevOps MCP server GLOBALLY and create a companion skill for diagnosing pipeline / build failures.
+
+Instructions:
+1. Follow the latest installation guide at:
+   https://github.com/microsoft/azure-devops-mcp/blob/main/docs/GETTINGSTARTED.md
+2. Register the MCP in the GLOBAL config of:
+   - OpenCode
+   - Visual Studio GitHub Copilot
+   - VS Code GitHub Copilot
+   so it is available in every session and every repository.
+3. Use a secure auth method (PAT stored in environment variable or OS keychain). Do not commit secrets. Ask me for the Azure DevOps organization URL and the PAT, and the default project name.
+4. Create a global, user-invocable skill named `azure-devops-build-doctor` that:
+   - finds the latest failing build/pipeline run for the current repo + branch (or asks me to pick if ambiguous),
+   - downloads the failing log,
+   - summarizes the root cause with file:line references where possible,
+   - proposes a concrete fix and (optionally) applies it.
+5. Verify by listing my pipelines and fetching the most recent build status for one of them.
+6. On failure, print the exact API error and proposed fix before retrying.
+```
+
+### [Azure MCP server](https://github.com/microsoft/github-copilot-for-azure)
+
+Install the [Azure MCP server](https://github.com/microsoft/github-copilot-for-azure) GLOBALLY and create a companion skill for querying Azure resources.
+
+**Prompt for OpenCode:**
+
+```
+Goal: Install the Azure MCP server GLOBALLY plus the related skills so I can query and act on my Azure resources from OpenCode, Visual Studio Copilot, and VS Code Copilot.
+
+Instructions:
+1. Follow the latest official guidance at:
+   https://github.com/microsoft/github-copilot-for-azure
+2. Register the Azure MCP in the GLOBAL config of all three agents (OpenCode, Visual Studio Copilot, VS Code Copilot).
+3. Use Azure CLI (`az login`) credentials by default. Do not hard-code secrets. If an alternative auth (service principal, managed identity) is more appropriate for my environment, ask me before switching.
+4. After install, list:
+   - the install location and config paths updated
+   - the active subscription(s) the MCP can see
+5. Verify with a read-only query: "List all Azure App Services in my default subscription" and print the count.
+6. On any failure, print the exact error and proposed fix before retrying.
+```
+
+**Verify**:
+- **SQL LSP**: Open a `.sql` file in OpenCode — you should get hover info and diagnostics.
+- **Azure DevOps MCP**: Create a build error in a PR and ask OpenCode: Fix the azure devops build error in my current pull request for this branch.
+- **Azure MCP**: Ask OpenCode: List all Azure App services.
+
+## 3.2 Create (custom) Software Engineering skills
+
+These skills add code review, planning, branching workflows, and development guidelines tailored for software engineers.
 
 ### [Karpathy Guidelines](https://github.com/forrestchang/andrej-karpathy-skills) skill
 A distilled set of coding principles inspired by Andrej Karpathy's approach to software development. This skill encapsulates his emphasis on minimal assumptions, clear requirements, avoiding scope creep, and making evidence-based decisions. It serves as a guiding framework for writing clean, efficient, and maintainable code.
@@ -158,6 +291,7 @@ Implementation:
 ```
 
 ### Interactive Code Review Follow-up
+
 An extension to the `code-review-expert` skill that adds an interactive follow-up step,
 
 **Prompt for OpenCode:**
@@ -175,6 +309,26 @@ Instructions:
 3. Keep all existing behavior intact (default base branch, evidence rules, output filename).
 4. Print the diff of the skill file on completion.
 ```
+
+### Functional validation added to the code review workflow.
+
+An extension to the `code-review-expert` skill that adds a functional validation step where it checks the Jira user story for functional requirements.
+
+**Prompt for OpenCode:**
+
+```
+Goal: Extend the global `code-review-expert` skill with a functional validation step against the linked Jira user story.
+
+Instructions:
+1. Locate the existing global `code-review-expert` skill (do not create a new one). If it is not installed, stop and tell me.
+2. When the review is done, append a new step that:
+   - checks if the current branch or commit message contains a Jira issue key (e.g. PROJ-123),
+   - if found, fetches the user story details via the Jira MCP,
+   - extracts functional requirements and acceptance criteria,
+   - validates that the code changes in the current branch address those functional requirements (e.g. by checking for relevant test cases, code paths, or comments in the review file),
+   - adds a "Functional Validation" section to the review markdown with findings and evidence.
+```
+
 
 **Verify**: Run `/code-review-expert` in a repository with a feature branch. It should automatically detect the `develop` base branch and produce a review markdown file.
 
@@ -221,116 +375,6 @@ Implementation:
 - YAML frontmatter `user-invocable: true`.
 - Print the two release branch names, the worktree path, and the review file path.
 ```
-
-
----
-
-## 3.2. Install DevOps Skills, LSPs and MCPs
-
-These integrations connect OpenCode to SQL Server, Azure DevOps, and Azure resources.
-
-### SQL Server T-SQL LSP
-Install and configure the official Microsoft SQL Server T-SQL language service GLOBALLY for OpenCode
-
-**Prompt for OpenCode:**
-
-```
-Goal: Install and configure the official Microsoft SQL Server T-SQL language service GLOBALLY for OpenCode, so any `.sql` file in any repository gets hover, completion, and diagnostics.
-
-Instructions:
-1. Determine whether Microsoft SQL Tools Service (`sqltoolsservice`) exposes an LSP-over-stdio entry point. Cite the official source (link + quote).
-2. If yes:
-   - Download the latest `sqltoolsservice` release for my OS/architecture.
-   - Install it to a stable user-scope location and add it to PATH if needed.
-   - Show the exact install commands.
-3. If Microsoft's tooling does NOT expose LSP, say so explicitly with cited evidence, then propose:
-   - the best Microsoft-backed workaround (e.g. extracting the LSP server binary that ships with the VS Code MSSQL extension), and/or
-   - the closest viable third-party LSP, with explicit tradeoffs.
-   Pick one, justify it, and proceed.
-4. Add the LSP entry to the OpenCode GLOBAL config (not per-repo) so every project benefits. Show the final config snippet verbatim.
-5. Verification:
-   - Open a `.sql` file with a deliberately invalid statement.
-   - Confirm hover info appears on a known keyword.
-   - Confirm at least one diagnostic is reported.
-   - Print the expected vs actual result.
-6. On any step failure, print the exact error and proposed fix before retrying.
-```
-
-### Bicep LSP
-
-Install and configure the official Microsoft Bicep language service GLOBALLY for OpenCode
-
-**Prompt for OpenCode:**
-```
-Goal: Install and configure the Azure DevOps MCP server GLOBALLY so any `.bicep` file in any repository gets hover, completion, and diagnostics.
-
-Instructions:
-1. Check availability of the bicep lsp. If not available, install the latest Bicep CLI per https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install.
-2. Add the LSP entry to the OpenCode GLOBAL config (not per-repo) so every project benefits. Show the final config snippet verbatim.
-5. Verification:
-   - Open a `.bicep` file with a deliberately invalid statement.
-   - Confirm hover info appears on a known keyword.
-   - Confirm at least one diagnostic is reported.
-   - Print the expected vs actual result.
-6. On any step failure, print the exact error and proposed fix before retrying.
-```
-
-
-### [Azure DevOps MCP server](https://github.com/microsoft/azure-devops-mcp)
-
-The [Azure DevOps MCP server](https://github.com/microsoft/azure-devops-mcp) bringing the power of Azure DevOps directly to your agents.
-
-**Prompt for OpenCode:**
-```
-Goal: Install the Azure DevOps MCP server GLOBALLY and create a companion skill for diagnosing pipeline / build failures.
-
-Instructions:
-1. Follow the latest installation guide at:
-   https://github.com/microsoft/azure-devops-mcp/blob/main/docs/GETTINGSTARTED.md
-2. Register the MCP in the GLOBAL config of:
-   - OpenCode
-   - Visual Studio GitHub Copilot
-   - VS Code GitHub Copilot
-   so it is available in every session and every repository.
-3. Use a secure auth method (PAT stored in environment variable or OS keychain). Do not commit secrets. Ask me for the Azure DevOps organization URL and the PAT, and the default project name.
-4. Create a global, user-invocable skill named `azure-devops-build-doctor` that:
-   - finds the latest failing build/pipeline run for the current repo + branch (or asks me to pick if ambiguous),
-   - downloads the failing log,
-   - summarizes the root cause with file:line references where possible,
-   - proposes a concrete fix and (optionally) applies it.
-5. Verify by listing my pipelines and fetching the most recent build status for one of them.
-6. On failure, print the exact API error and proposed fix before retrying.
-```
-
-### [Azure MCP server](https://github.com/microsoft/github-copilot-for-azure)
-
-Install the [Azure MCP server](https://github.com/microsoft/github-copilot-for-azure) GLOBALLY and create a companion skill for querying Azure resources.
-
-**Prompt for OpenCode:**
-
-```
-Goal: Install the Azure MCP server GLOBALLY plus the related skills so I can query and act on my Azure resources from OpenCode, Visual Studio Copilot, and VS Code Copilot.
-
-Instructions:
-1. Follow the latest official guidance at:
-   https://github.com/microsoft/github-copilot-for-azure
-2. Register the Azure MCP in the GLOBAL config of all three agents (OpenCode, Visual Studio Copilot, VS Code Copilot).
-3. Use Azure CLI (`az login`) credentials by default. Do not hard-code secrets. If an alternative auth (service principal, managed identity) is more appropriate for my environment, ask me before switching.
-4. After install, list:
-   - the install location and config paths updated
-   - the active subscription(s) the MCP can see
-5. Verify with a read-only query: "List all Azure App Services in my default subscription" and print the count.
-6. On any failure, print the exact error and proposed fix before retrying.
-```
-
-**Verify**:
-- **SQL LSP**: Open a `.sql` file in OpenCode — you should get hover info and diagnostics.
-- **Azure DevOps MCP**: Create a build error in a PR and ask OpenCode: Fix the azure devops build error in my current pull request for this branch.
-- **Azure MCP**: Ask OpenCode: List all Azure App services.
-
----
-
-## 3.3 Custom skills for refining and implementing jira stories
 
 ### Jira Refine
 A skill that helps you refine Jira user stories by fetching them, restating them in the agent and adding it back into the Jira user story.
@@ -422,3 +466,6 @@ Implementation:
 | **Global config sanity check** | Periodically run a prompt like: "List every MCP and skill currently registered in OpenCode, Visual Studio Copilot, and VS Code Copilot, with their versions and source paths, and flag anything missing, duplicated, or out of date." |
 
 ---
+
+> [!NOTE]
+> Continue with [Part 4: Self Optimisation](part-4-self-optimisation.md) for optional skills, custom workflows, and integrations.
