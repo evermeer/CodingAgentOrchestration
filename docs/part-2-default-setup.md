@@ -1,9 +1,11 @@
-# Part 2: A default setup
+# Part 2: A Default Setup
 
 > [!NOTE]
-> This part turns the concepts from [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md) into a practical setup. After finishing this default setup, use [Part 3: Advanced Use](part-3-advanced-use.md) for optional skills, custom workflows, and integrations and then to [Part 4: Self optimisation](part-4-self-optimisation.md) to let OpenCode optimize itself and remove any remaining orchestration overlap.
+> This part turns the concepts from [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md) into a practical setup. After finishing this default setup, use [Part 3: Advanced Use](part-3-advanced-use.md) for optional skills, custom workflows, and integrations, and then use [Part 4: Self optimisation](part-4-self-optimisation.md) to let OpenCode optimize itself and remove any remaining orchestration overlap.
 
-This section gets you up and running with a working [OpenCode](https://github.com/anomalyco/opencode) environment. For each prompt first evaluate if you realy need it. If for instance you don't use Jira you also don't have to install the Atlassian MCP.
+This section gets you up and running with a working [OpenCode](https://github.com/anomalyco/opencode) environment. Before running each prompt, evaluate whether you actually need it. If you do not use Jira, for example, you do not need to install the Atlassian MCP.
+
+To make the install prompts below more reproducible across machines, keep the same discipline every time: prefer user-scope installs over repo-local ones, print exact versions and install paths, list every config file changed, and verify the result with one concrete command or action before moving on.
 
 > [!NOTE]
 > Be aware that some prompts below can take 10 minutes. Prompts that create custom skills can take half an hour or longer to complete.
@@ -30,6 +32,8 @@ npm i -g opencode-ai@latest
 
 On first launch, follow the on-screen instructions to configure it for your LLM provider (e.g. GitHub Copilot).
 
+If this does not work, stop here and fix the base install first. Most later setup issues become much harder to diagnose when the CLI itself is only partially working.
+
 ## Step 2: Install [OpenCode](https://github.com/anomalyco/opencode) Desktop
 
 [OpenCode](https://github.com/anomalyco/opencode) Desktop gives you a GUI with advanced repository and session management on top of the CLI.
@@ -38,11 +42,13 @@ Download and install the Windows application (or macOS version) from: https://op
 
 **Verify**: Launch OpenCode Desktop. It should detect your CLI installation and show available repositories.
 
+If Desktop cannot see the CLI, close both tools, open a fresh terminal, run `opencode --help`, and then restart Desktop. That usually confirms whether the problem is the install itself or Desktop's detection.
+
 > [!TIP]
 > Turn off the panel that shows git diffs and file changes — you already have that in Visual Studio / VS Code, and it can cause performance issues on large repositories or changes.
 
 > [!NOTE]
-> OpenCode Desktop is still in beta. I have had issues with it that it would not continue a session and appeared to got stuck in a loop and also it did not recognized a done making it repeat the last step over and over again.
+> OpenCode Desktop is still in beta. I have seen cases where it would not continue a session, appeared to get stuck in a loop, or failed to recognize that a task was already done and kept repeating the last step.
 
 > [!WARNING]
 > The install prompts below often create and execute scripts. Your antivirus might block these, especially when using the Desktop app. You can add an exception for `opencode-cli.exe` if needed. If this happens, restart OpenCode, use `/session` to reconnect to the aborted session, and type `continue`.
@@ -50,7 +56,7 @@ Download and install the Windows application (or macOS version) from: https://op
 
 ## Step 3: Enable the [Safety net](https://github.com/kenryu42/claude-code-safety-net) plugin
 
-The [Safety net](https://github.com/kenryu42/claude-code-safety-net) plugin prevent critical mistakes like deleting files or pushing directly to main.
+The [Safety net](https://github.com/kenryu42/claude-code-safety-net) plugin helps prevent critical mistakes like deleting files or pushing directly to main.
 
 **Prompt for OpenCode:**
 
@@ -61,17 +67,19 @@ Instructions:
 1. Fetch and follow the latest official installation guide for the cc-safety-net plugin at: https://github.com/kenryu42/claude-code-safety-net
 2. Make sure to follow the instructions for OpenCode.
 3. Install the cc-safety-net plugin globally (user-scope) in `~/.config/opencode/opencode.json` (or `.jsonc`) according to the schema at: https://opencode.ai/config.json
+4. Print the final plugin version, the config file path that was modified, and the exact config snippet that was added.
+5. Verify that the plugin is loaded by restarting OpenCode and showing that the plugin is registered.
 ```
 
 
-## Step 4: Extra Agent power
+## Step 4: Extra Agent Power
 
 ### 4.1 Install and Configure [Oh-My-OpenAgent](https://github.com/code-yeongyu/oh-my-openagent)
 
 [Oh-My-OpenAgent](https://github.com/code-yeongyu/oh-my-openagent) is the most impactful plugin for OpenCode. It gives you: intent parsing, classification / reranking, priority rules, fallback & recovery logic (an improved agent loop) and model routing.
 
 > [!WARNING]
-> I have had some issues with oh-my-openagent where it would get stuck in a loop and not recognize a "done" or "continue" signal. If that happens, restart OpenCode, use `/session` to reconnect to the aborted session, and type `continue`. This could happen when another plugin rewrites what the LLM returns and removes or ajust the flow commands for this plugin.
+> I have had some issues with oh-my-openagent where it would get stuck in a loop and not recognize a "done" or "continue" signal. If that happens, restart OpenCode, use `/session` to reconnect to the aborted session, and type `continue`. This can happen when another plugin rewrites what the LLM returns and removes or adjusts the flow commands for this plugin.
 >
 > If the issue persists, you can temporarily disable the plugin by removing it from the OpenCode config file (~/.config/opencode/opencode.json) and restarting OpenCode. You could then ask opencode to analyse the previous session to see what plugin interferes.
 
@@ -86,22 +94,23 @@ Instructions:
 2. Install globally (user-scope), not per-repository, so it is available in every OpenCode session.
 3. Detect my OS (Windows / macOS / Linux) and use the matching commands. Do not assume a shell.
 4. If a step fails, print the exact error and proposed fix before retrying. Do not silently skip.
-5. Verify by listing the available agents in OpenCode and confirming Sisyphus is selectable.
+5. Print the installed version, install location, and every config file changed.
+6. Verify by listing the available agents in OpenCode and confirming Sisyphus is selectable.
 ```
 
 **After installation:**
-1. Close OpenCode Desktop, and start Opencode CLI 
+1. Close OpenCode Desktop and start OpenCode CLI.
 2. Activate the Sisyphus Agent (oh-my-opencode) with GPT 5.4 or later or Claude Opus 4.6 or later if reasoning is your major task.
-3. Close OpenCode CLI and start OpenCode Desktop. 
+3. Close OpenCode CLI and start OpenCode Desktop.
 
 **Verify**: After restart, you should see the Sisyphus agent available in the agent selector dropdown.
 
 
-By default the oh-my-openagent already has gread model routing rules for its (currently) 10 different agents and 7 categories. If you do want custom model routing, then change the oh-my-openagent config.
+By default, oh-my-openagent already includes good model-routing rules for its current set of agents and categories. If you want custom routing, then adjust the oh-my-openagent config.
 
 
 
-## Step 5: Give your agent context.
+## Step 5: Give Your Agent Context
 
 ### Step 5.1 Standard Method
 The standard way to add context is to create an `Agents.md` file in the root of your repository. This file will be used as a knowledge base for your agent when running skills. You can add any relevant information about your project, architecture, coding guidelines, etc. The more relevant context you provide, the better the agent's performance will be. Don't make the file too big. Something between 100 and 200 lines should be enough.
@@ -123,12 +132,14 @@ Instructions:
 3. Make sure it will be used no matter which solution is opened
 4. Do not duplicate the content; reference it.
 5. Print the list of files created or modified, and verify by opening one solution folder and confirming Copilot picks up the instructions.
+6. If the Visual Studio and VS Code setups differ, explain the difference explicitly instead of hiding it behind one generic instruction.
 ```
 
-### Step 5.2 Advanced knowledge tool for your repository or documents (partially alternative for Agents.md):
+### Step 5.2 Advanced Knowledge Tool for Your Repository or Documents
 [Graphify](https://github.com/safishamsi/graphify) is a tool that can create a knowledge graph of your repository and/or documentation. This can give your agent a much richer context to work with. You can install it and use it to generate a graph of your repo, then point your agent to that graph for enhanced understanding.
 
-**Warning**: First close all applications because this step could easily use 6GB+ of memory during processing if you execute it on a folder with a lot of data.
+> [!WARNING]
+> First close all applications because this step could easily use 6GB+ of memory during processing if you execute it on a folder with a lot of data.
 
 **Prompt for OpenCode:**
 
@@ -150,6 +161,8 @@ Instructions:
 6. Graphify has no hard size cap. If it prompts for a sub-folder to limit scope, process the entire filtered tree recursively without asking for confirmation. Only stop when the full filtered tree is processed and verified.
 7. After completion, print:
    - the number of indexed files / nodes / edges
+   - the Graphify version and install path
+   - every config file or ignore file that was changed
    - how to query the graph from OpenCode and from Copilot.
 
 pip install --upgrade graphifyy
@@ -157,9 +170,9 @@ pip install graphifyy[sql]
 /graphify .
 ```
 
-You could use the agents.md and Graphify graph together. The agents.md can be used for more high level information about the project and the graph can be used for more detailed information about the codebase.
+You can use `Agents.md` and the Graphify graph together. `Agents.md` is better for higher-level project guidance, while the graph is better for detailed structural context about the codebase.
 
-### Step 5.3 AI Agent Session Memory 
+### Step 5.3 AI Agent Session Memory
 Adding [MemPalace](https://github.com/MemPalace/mempalace) as a session memory tool to your agent can give it an intent context that persists across interactions. This can help the agent remember previous conversations, decisions, and actions, allowing for more coherent and context-aware responses.
 
 **Prompt for OpenCode:**
@@ -179,12 +192,13 @@ Instructions:
 3. From this repository folder, run the `init` command to create a memory palace for it, then run the `mine` command to seed memory from the existing code and history.
 4. Link the resulting memory palace to the active agent so it is queried automatically.
 5. After completion, print:
+   - the installed MemPalace version
    - the install location and global config paths that were updated
    - the location of the memory palace for this repo
    - a one-line verification query showing recall works.
 ```
 
-Here a short overview of the differences between mempalace and graphify:
+Here is a short overview of the differences between MemPalace and Graphify:
 
 | Dimension        | MemPalace                              | Graphify                                      |
 |------------------|----------------------------------------|-----------------------------------------------|
@@ -195,10 +209,24 @@ Here a short overview of the differences between mempalace and graphify:
 | Best for         | *Why we decided something*             | *How the system is structured*                |
 
 
-## Step 6: Give your agent tools.
+## Step 6: Give Your Agent Tools
 
-### Step 6.1 Reading various document formats.
-Install [markitdown](https://github.com/microsoft/markitdown) from Microsoft to give your agent the power to understand all kinds of document formats (office, pdf, etc.). 
+Before adding more tools, do one quick sanity check on the base environment:
+
+- `git --version` should succeed without first-run prompts
+- `node --version` and `npm --version` should both work from the same shell you use for OpenCode
+- `opencode --help` should render cleanly and exit normally
+- if a global install succeeds but the command is missing, your PATH is usually the first thing to inspect
+
+Common quick fixes:
+
+- Command not found: restart the terminal so PATH changes are picked up
+- Wrong Node version: switch to the expected version before installing packages globally
+- Antivirus blocked a script: add the needed exception, restart the session, and continue from there
+- Corporate laptop restrictions: prefer the package manager and shell already approved in your environment instead of mixing installers
+
+### Step 6.1 Reading Various Document Formats
+Install [markitdown](https://github.com/microsoft/markitdown) from Microsoft to give your agent the ability to understand common document formats such as Office files and PDFs.
 
 **Prompt for OpenCode:**
 
@@ -214,10 +242,11 @@ Instructions:
    - Visual Studio GitHub Copilot
    - VS Code GitHub Copilot
 3. On any step failure, print the exact error plus proposed fix before retrying.
-4. Verify by converting one sample file of each: PDF, DOCX, XLSX, PPTX (skip the ones I do not have), and report the result.
+4. Print the installed version, install path, and config files changed.
+5. Verify by converting one sample file of each: PDF, DOCX, XLSX, PPTX (skip the ones I do not have), and report the result.
 ```
 
-### Step 6.2 Up-to-date library documentation.
+### Step 6.2 Up-to-Date Library Documentation
 Install [Context7](https://github.com/upstash/context7) from Upstash to give your agent on-demand access to current, version-specific documentation and code examples for any library or framework.
 
 **Prompt for OpenCode:**
@@ -234,11 +263,12 @@ Instructions:
    - OpenCode
    - Visual Studio GitHub Copilot
    - VS Code GitHub Copilot
-3. On any step failure, print the exact error plus proposed fix before retrying.
-4. Verify by resolving one library and fetching its docs (e.g. "Next.js routing"), and report the result.
+3. Print the installed version, install path, and config files changed.
+4. On any step failure, print the exact error plus proposed fix before retrying.
+5. Verify by resolving one library and fetching its docs (e.g. "Next.js routing"), and report the result.
 ```
 
-### Step 6.3 Web search.
+### Step 6.3 Web Search
 Install the [Exa MCP server](https://github.com/exa-labs/exa-mcp-server) to give your agent fast, clean web search that returns ready-to-use content instead of raw result pages.
 
 **Prompt for OpenCode:**
@@ -255,11 +285,12 @@ Instructions:
    - OpenCode
    - Visual Studio GitHub Copilot
    - VS Code GitHub Copilot
-3. On any step failure, print the exact error plus proposed fix before retrying.
-4. Verify by running one web search and report the result.
+3. Print the configured endpoint, install or registration path, and every config file changed.
+4. On any step failure, print the exact error plus proposed fix before retrying.
+5. Verify by running one web search and report the result.
 ```
 
-### Step 6.4 Search real-world code on GitHub.
+### Step 6.4 Search Real-World Code on GitHub
 Install the [grep.app MCP server](https://mcp.grep.app) to let your agent search literal code patterns across a million-plus public GitHub repositories for real-world usage examples.
 
 **Prompt for OpenCode:**
@@ -275,11 +306,12 @@ Instructions:
    - OpenCode
    - Visual Studio GitHub Copilot
    - VS Code GitHub Copilot
-3. On any step failure, print the exact error plus proposed fix before retrying.
-4. Verify by searching for one code pattern (e.g. `useState(`) and report the result.
+3. Print the configured endpoint and every config file changed.
+4. On any step failure, print the exact error plus proposed fix before retrying.
+5. Verify by searching for one code pattern (e.g. `useState(`) and report the result.
 ```
 
-## Step 7: Give your agent skills
+## Step 7: Give Your Agent Skills
 
 These skills give OpenCode broad capabilities: superpowers, planning, agency roles, and more.
 
@@ -380,7 +412,7 @@ Source: https://github.com/garrytan/gstack
 - **Read the diff** — Always review what the agent changed before committing. Treat it like a junior developer's PR.
 - **Write down recurring corrections** — When you keep correcting the same thing, move it into `Agents.md` (or a skill) so the agent learns it permanently.
 
-### More Tips (after installing the Advanced Use add-ons)
+### More Tips (After Installing the Advanced Use Add-ons)
 - **Automatic code reviews** — Use `/code-review-expert` to review your current branch against `develop`. No manual input needed; it will ask which improvements to apply.
 - **Planning** — Create one or more markdown files with functional specs and ask OpenCode to build a plan from them using `planning-with-files`, then ask it to execute the plan step-by-step.
 - **Worktrees for parallel agents** — Use `git worktree` (see the `branch-review` skill) so multiple agents can work on different branches simultaneously without stepping on each other.

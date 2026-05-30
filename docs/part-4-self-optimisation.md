@@ -1,23 +1,34 @@
-# Part 4: Self optimisation
+# Part 4: Self Optimisation
+
+> [!NOTE]
+> Complete [Part 2 (Default setup)](part-2-default-setup.md) first. If you added skills, LSP, or MCP servers from [Part 3 (Advanced use)](part-3-advanced-use.md), those will be preserved during optimisation.
+
+Over time your OpenCode configuration accumulates layers — skill packs, custom agents, routing rules, pipeline definitions. Some of these overlap or conflict. This part provides a prompt that you paste into OpenCode to let it audit and simplify its own orchestration.
+
+**How it works:** The prompt implements a 3-phase model — **Conductor** (routes work), **Planner/Executor** (does work), and **Verifier** (checks results) — replacing any redundant orchestration layers while keeping all your installed capabilities (MCP servers, skills, parallelism) intact.
+
+The important mindset is to treat orchestration changes the same way you treat code changes: make the smallest useful change, verify it, and keep the system understandable.
 
 Below is a prompt you can paste into OpenCode.
 
-- Run it at repo root
-- Let it run 2–3 iterations for best result.
+- Run it at repo root.
+- Let it run 2–3 iterations for best results.
 
 It is designed to:
 
-- ✅ analyze your current setup (Oh‑My‑OpenAgent + skills + pipelines)
+- ✅ analyse your current setup (Oh‑My‑OpenAgent + skills + pipelines)
 - ✅ remove orchestration overlap
 - ✅ implement the minimal 3‑phase model
 - ✅ preserve all your power (MCP, routing, parallelism, etc.)
 
 
-## Self check after optimization
+## Self Check After Optimization
 
 When the optimization is complete, you will have a much simpler, more efficient orchestration model with a single Conductor agent and clear role separation between Planner, Executor, and Verifier.
 
-At the end, You could run a final pass to see if there is still anything to improve
+At the end, you could run a final pass to see if there is still anything to improve.
+
+This only works if the result is observable. Avoid vague prompt edits that merely sound better. Prefer changes that produce behavior you can actually detect in future sessions.
 
 **Prompt for OpenCode:**
 
@@ -30,12 +41,50 @@ Review the new OpenCode orchestration model and identify:
 Propose only minimal changes.
 ```
 
-## Here is the main prompt to run first:
+## Main Prompt
+
+### What Good Looks Like
+
+Before optimisation:
+
+- multiple skills try to plan the same task
+- execution loops back into planning without a clear owner
+- verification is mixed into editing prompts
+
+After optimisation:
+
+- one conductor decides the path
+- planning happens once unless explicitly re-triggered
+- execution follows a plan instead of renegotiating it
+- verification approves, retries, or requests replanning without editing code
+
+### Small Before/After Prompt Examples
+
+Weak instruction:
+
+- "be proactive"
+
+Better instruction:
+
+- "when a task requires 3 or more concrete steps, create a todo list before editing files"
+
+Weak verifier rule:
+
+- "check quality"
+
+Better verifier rule:
+
+- "before marking work complete, report the exact verification command and whether it passed, failed, or could not run"
+
+The second version is better in both cases because it is specific enough to verify.
+
+### Rollback Rule
+
+If an orchestration change makes behavior less predictable, revert that change instead of layering on another workaround. Prompt systems become fragile quickly when every problem is solved by adding more text.
 
 **Prompt for OpenCode:**
 
 ```
-
 You are an expert AI agent architect.
 
 Goal:
@@ -45,7 +94,7 @@ Refactor my OpenCode / Oh-My-OpenAgent setup into a minimal, high-performance or
 
 ## Target architecture (strict)
 
-Implement a minimal orchestration model with:
+Implement a minimal (global, not at repository level) orchestration model with:
 
 1. ONE central Conductor agent (single decision authority)
 2. EXACTLY THREE phases:

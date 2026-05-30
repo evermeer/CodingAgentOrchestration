@@ -14,7 +14,9 @@ When getting familiar with AI-assisted coding you will probably go through the f
 5. **AI Agent in IDE** — A Goal → Plan → Act → Reflect loop. Good at multi-file changes while continuously reflecting on what it's doing.
 6. **AI Agent CLI / Desktop** — Same loop, but unconstrained by an IDE: can run terminal commands, drive multiple repos, work in parallel, and run long autonomous tasks. This is what the rest of this guide focuses on.
 
-Depending on your task you may want to use one or more of these in combination. For example, you can use Copilot for tight inline suggestions, but then switch to an agent CLI for a large refactor that requires planning, testing, and multiple steps and you can ask in an only chat why a specific choice made by the agent would be valid.
+Depending on your task you may want to use one or more of these in combination. For example, you can use Copilot for tight inline suggestions, but then switch to an agent CLI for a large refactor that requires planning, testing, and multiple steps and you can ask in an online chat why a specific choice made by the agent would be valid.
+
+The important takeaway is not that each step replaces the previous one. It is that each step expands the range of tasks you can reasonably hand off.
 
 ## The Agent Loop
 
@@ -37,12 +39,14 @@ This loop is what separates an agent from a simple chat — it can plan work, ex
 
 ## Context Is Everything
 
-The more relevant context you give to LLM models, the better the outcome will be. But giving them everything you have can create long wait times and unnecessary costs. Besides that current models also have a maximum context size (Currently less than 1MB) You have to solve this by optimizing what you send to the LLM:
+The more relevant context you give to LLMs, the better the outcome will be. But sending everything you have creates longer wait times, higher cost, and lower signal. Current models also have context limits, so you have to be deliberate about what you send:
 
 - **Behavior context** — Let your agent select skills, or instruct it directly, to give it a behavior and work-mode context.
 - **Content context** — Construct an agents.md or use a tool that creates a graph of your data to give it a content context.
 - **External context** — Give your agent access to external systems (via MCP) to extend the content context.
 - **Intent context** — Add an agent session memory tool to give it an intent context.
+
+This is usually where the biggest practical gains come from. Better models help, but better context often helps more.
 
 ## Why Not Just Use GitHub Copilot in VS?
 
@@ -58,10 +62,22 @@ The Visual Studio GitHub Copilot agent is getting better and can now also use sk
 
 A realistic setup is to use **both**: GitHub Copilot in your IDE for tight inline edits, and OpenCode for everything broader (refactors, reviews, ops tasks).
 
+### When a CLI Agent Is a Bad Fit
+
+A CLI agent is not automatically the best choice. It is often the wrong tool when:
+
+- the task is a tiny edit in one file that you can do faster directly in the IDE
+- the cost of reviewing the agent's output is higher than writing the change yourself
+- the task involves sensitive production systems that you do not want an agent touching
+- the problem is still too ambiguous for autonomous execution
+- you do not yet have enough repo context, tests, or guardrails to make autonomous changes safe
+
+In those situations, inline assistance or a normal chat workflow is usually the better option.
+
 ## Why OpenCode?
 
-We want a CLI with great support for add-ons. There are many CLI environments available. All major LLM providers have 
-their own and there are a lot of open source CLIs. They all work very similar and most available add-ons are compatible. 
+We want a CLI with strong support for add-ons. There are many CLI environments available. All major LLM providers have
+their own, and there are many open source CLIs as well. They work similarly enough that many add-ons are portable across them.
 I chose OpenCode because:
 
 - It's **open source**
@@ -69,13 +85,13 @@ I chose OpenCode because:
 - It can use **most add-ons** even if they are created for other CLIs
 - It has **OpenCode Desktop** which gives you advanced repository and session management
 
+This guide uses OpenCode as the reference implementation, but most of the orchestration ideas in this document also apply to other coding-agent CLIs.
+
 ## The Landscape: Other CLIs and Autonomous Agents
 
-There are many other open source CLIs available. Now that Anthropic's CLI code is leaked many new CLIs are popping up in 
-all kinds of variations with added tools, skills and other functionality. So far it's still unclear if any of these will 
-pop out as superior. If you install the right add-ons yourself then for now there is not much need to try these.
+There are many other open source CLIs available. The space is moving quickly, and new variants keep appearing with extra tools, skills, and workflow layers. So far it is still unclear whether any single option will clearly dominate. If you install the right add-ons yourself, there is currently not much pressure to switch constantly.
 
-There are also autonomous agents like OpenClaw.  These are not meant for coding but for 24/7 fully autonomous tasks.
+There are also autonomous agents like OpenClaw. These are not meant for coding but for 24/7 fully autonomous tasks.
 They run continuously with persistent memory across sessions and integrations for messaging platforms, maintaining independent decision loops. Be aware that automated execution based on external input is a real security concern: because they run autonomously for a given task/workflow, they may try to "improve" themselves and end up doing harm instead of good. Also be aware that with the right combination of MCPs, skills, and scheduling you can get close to similar functionality from a CLI agent — the main difference being that it won't be *fully* autonomous.
 
 ## How to Improve Your Agent's Results
@@ -91,6 +107,8 @@ Here's what you can tune at each layer:
 The prompt is where everything starts. If you ask a vague question, the agent will often make assumptions, choose the wrong scope, or move too quickly into implementation. A much better pattern is to begin with problem framing: paste the Jira ticket, issue, or rough requirement and ask the agent to restate the task, list assumptions, identify unknowns, and suggest a plan before it writes code.
 
 This works because prompt quality is not just about wording, but about giving the model the right level of direction. Good prompts define the goal, the constraints, the expected output, and the level of autonomy you want. In practice, this is a skill you improve over time by experimenting with different prompt styles and noticing which ones produce the best planning and the fewest corrections.
+
+As a rule, the less obvious the task is, the more useful it is to ask for restatement, assumptions, and a plan before execution.
 
 ### LSP
 
@@ -109,6 +127,8 @@ The `oh-my-opencode` and `planning-with-files` add-ons mentioned below are good 
 Model Context Protocol is how you connect the agent to systems outside the repository. Instead of limiting the agent to local files, MCP lets it retrieve or update information in tools such as SQL Server, Azure, Azure DevOps, Jira, and many others. That makes the agent much more useful for real work, because most engineering tasks depend on context that lives outside the codebase.
 
 Used well, MCP turns the agent from a code editor into a workflow participant. It can inspect tickets, read docs, query data, or interact with operational systems while staying inside one task flow. See [Awesome MCP](https://github.com/wong2/awesome-mcp-servers) for inspiration and examples.
+
+Used badly, MCP just gives the agent more ways to make mistakes. That is why verification and permission boundaries matter as much as raw tool access.
 
 ### Repo settings
 
@@ -134,15 +154,16 @@ The underlying model still matters. Different LLMs vary in reasoning depth, codi
 
 Because the landscape moves so fast, model choice should be revisited regularly. Follow benchmarks such as [LLM Stats](https://llm-stats.com/), [SWE-bench](https://www.swebench.com/), [benchlm.ai](https://benchlm.ai/), [lm-arena](https://huggingface.co/spaces/lmarena-ai/arena-leaderboard), [livebench](https://livebench.ai/#/?highunseenbias=true), and [Artificial Analysis](https://artificialanalysis.ai/leaderboards/models) to see when something better lands.
 
-## TODO
-In part 2 and 3 we will cover the practical setup of [OpenCode](https://github.com/anomalyco/opencode) with a selection of add-ons, but the landscape is evolving quickly. Here are some tools that I haven't included in the instructions below but are on my radar for future investigation:
+If your tool supports routing, you do not need one perfect model. You need a reasonable model for planning, a fast model for execution, and a reliable model for verification.
 
-Here is my top list of tools I would like to investigate and which are not (yet) in the instructions below:
+## Tools To Watch
+
+Parts 2 and 3 cover a practical [OpenCode](https://github.com/anomalyco/opencode) setup with a curated set of add-ons, but the landscape is evolving quickly. These are tools that are still on my radar and may be worth evaluating later:
 
 **Agent / orchestration**
 - [serena](https://github.com/oraios/serena) — semantic code retrieval, editing and refactoring tools (LSP-aware), often dramatically reduces token usage on large repos.
 - [archon](https://github.com/coleam00/Archon) — workflow engine. Instead of one skill doing multiple steps, define a workflow of tasks each using its own steps/skills. Use this when a task is open-ended, uncertain, or long-running.
-- [superset](https://github.com/superset-sh/superset) — for AI agent swarm orchestration. 
+- [superset](https://github.com/superset-sh/superset) — for AI agent swarm orchestration.
 - [aider](https://aider.chat) — alternative coding CLI worth knowing; very strong git integration and a useful benchmark leaderboard even if you don't switch.
 
 **Context & memory**
@@ -161,15 +182,15 @@ Here is my top list of tools I would like to investigate and which are not (yet)
 - [Chrome DevTools MCP](https://github.com/ChromeDevTools/chrome-devtools-mcp) — gives the agent access to the Chrome DevTools Protocol for debugging, profiling, and inspecting web apps
 
 **Tools**
-- [PPT-Master](https://github.com/hugohe3/ppt-master) — Let your agent generate a natively editable PPTX from any document — real PowerPoint shapes with native animations, not images. 
-- [CLI-Anything](https://github.com/HKUDS/CLI-Anything) — Bridging the Gap Between AI Agents and the World's Software.
+- [PPT-Master](https://github.com/hugohe3/ppt-master) — lets your agent generate a natively editable PPTX from any document: real PowerPoint shapes with native animations, not images.
+- [CLI-Anything](https://github.com/HKUDS/CLI-Anything) — bridging the gap between AI agents and the world's software.
 
 **Cost, routing, observability**
 - [ccusage](https://github.com/ryoppippi/ccusage) — token / cost dashboards for Claude-style CLIs; the same pattern is useful for monitoring OpenCode spend.
 
-And there are many more. On GitHub I maintain a list of interesting AI tools: [My list of AI tools](https://github.com/stars/evermeer/lists/ai)
+And there are many more. On GitHub I maintain a list of interesting AI tools: [My list of AI tools](https://github.com/stars/evermeer/lists/ai).
 
-Other great resources for OpenCode are 
+Other great resources for OpenCode are
 [Awesome OpenCode](https://github.com/awesome-opencode/awesome-opencode)
 and
 [OpenCode cafe (Community-driven marketplace)](https://www.opencode.cafe/)

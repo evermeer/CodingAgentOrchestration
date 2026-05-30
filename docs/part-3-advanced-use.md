@@ -1,20 +1,26 @@
 # Part 3: Advanced Use
 
 > [!NOTE]
-> This part assumes you have completed, or at least reviewed, [Part 2: A default setup](part-2-default-setup.md). Use these sections selectively; not every developer needs every advanced integration. After this you can continue with [Part 4: Self optimisation](part-4-self-optimisation.md) to let OpenCode optimize itself and remove any remaining orchestration overlap.
+> This part assumes you have completed, or at least reviewed, [Part 2: A default setup](part-2-default-setup.md). Use these sections selectively; not every developer needs every advanced integration. After that, continue with [Part 4: Self optimisation](part-4-self-optimisation.md) if you want OpenCode to simplify overlapping orchestration layers.
 
-This section covers installing skills, Language Server Protocols, and MCP integrations. Each block below is an independent prompt you can paste into OpenCode.
+This part covers three categories of extensions you can add to OpenCode:
 
-Skills give your CLI additional capabilities. You can use them for reviews, guidelines, validation, and planning. There are also skills available for almost any role you can think of, such as PO, CEO, developer, architect, designer, support, and more.
+- **Skills** (3.1–3.2): Installable capabilities for planning, code review, design, and role-specific workflows (PO, architect, designer, and more). When you prompt OpenCode, it automatically selects the right skill for the job.
+- **Language Server Protocols** (3.3): Give OpenCode real-time access to compiler diagnostics, type information, and code navigation.
+- **MCP integrations** (3.4–3.5): Connect OpenCode to external services like Jira, Azure DevOps, and Azure cloud resources.
 
-When asking OpenCode something, your prompt will be analyzed to select the right skills. There are many skills available. You can add technology-specific skills for SQL and Vue.js, or role-specific skills for Scrum, marketing, service, or management workflows.
+Each block below is an independent prompt you can paste into OpenCode. Pick the ones that match your workflow — you do not need all of them.
 
-## 3.1 Install Software Engineering (and DevOps) extensions
+For better reproducibility, expect every installation prompt in this part to produce four things: the exact version installed, the install location, the config files changed, and one concrete verification result. If a prompt does not naturally force those outputs, add them when you run it.
+
+## 3.1 Install Software Engineering (and DevOps) Extensions
 
 First evaluate each of these extensions and decide which ones are useful for your workflow. Then run the corresponding prompts to install them.
 
 ### [Planning with Files](https://github.com/OthmanAdi/planning-with-files) plugin
-A plugin that transforms your workflow to use persistent markdown files for planning, progress tracking, and knowledge storage. The Oh-my-OpenAgent also has a planning skill that uses markdown files for plan execution. It might be okay to stick to that one for medium size projects. I know the Planning with files also work for creating larger (60K lines of code) projects
+A plugin that transforms your workflow to use persistent markdown files for planning, progress tracking, and knowledge storage. The Oh-my-OpenAgent (installed in [Part 2](part-2-default-setup.md)) also has a planning skill for plan execution — that one is sufficient for medium-size projects. Planning with Files scales better for larger efforts (tested up to 60K lines of code).
+
+**Expected outcome:** After installation, when you ask OpenCode to plan a multi-step task it will create and maintain `task_plan.md`, `findings.md`, and `progress.md` in your repo root.
 
 **Prompt for OpenCode:**
 
@@ -26,7 +32,7 @@ Source: https://github.com/OthmanAdi/planning-with-files.git
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
-### Microsoft [.Net Skills](https://github.com/dotnet/skills ) pack
+### Microsoft [.NET Skills](https://github.com/dotnet/skills) pack
 Official Microsoft .NET skills for code generation, refactoring, testing, and documentation.
 
 **Prompt for OpenCode:**
@@ -36,13 +42,13 @@ Goal: Install the official Microsoft .NET skill pack globally.
 
 Documentation and installation instructions can be found at https://github.com/dotnet/skills 
 Install GLOBALLY (user-scope), available in OpenCode, Visual Studio Copilot, and VS Code Copilot.
+Print the installed version, install location, and config files changed.
 ```
 
 ### [Atlassian (Jira) MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/)
 
-Install the [Atlassian (Jira) MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/) to give your agent the power to read and write Jira tickets. 
-This can be very useful for generating tickets from code reviews, linking code changes to existing tickets, 
-or asking your agent to update a ticket based on code changes or even ask to refine or implement a ticket. 
+Install the [Atlassian (Jira) MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/) to give your agent the ability to read and write Jira tickets.
+This is useful for generating tickets from code reviews, linking code changes to existing tickets, and asking the agent to refine, implement, or update tickets based on code changes.
 
 > Be aware that the prompt below may still need improvement. Authentication required manual tweaking during the first attempt, so validate the result.
 
@@ -66,6 +72,7 @@ Instructions:
    - my Atlassian base URL (e.g. https://<workspace>.atlassian.net)
    - the API token I just created
    and use that for the configuration of the MCP.
+5. Print the final MCP registration details, the config files changed, and the install or endpoint information used.
 6. After auth works, query Jira for the boards I have access to, present a numbered list, let me pick one, and persist that board id PER REPOSITORY (e.g. in a local, git-ignored config file) so opening this folder auto-selects it. Do not store the token in this per-repo file.
 7. On any failure, print the exact API response and the proposed fix before retrying.
 8. Verify by listing the most recent 5 issues from the selected board.
@@ -116,11 +123,12 @@ UPDATE (later):
 CONSTRAINTS:
 - Preserve upstream folder structure. Do not rename files.
 - Do NOT install inside a project repo — install globally for the user.
+- Print the final install path, resolved version or commit, and every config file changed.
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
 ### SQL Server T-SQL LSP
-Install and configure the official Microsoft SQL Server T-SQL language service GLOBALLY for OpenCode
+Install and configure the official Microsoft SQL Server T-SQL language service globally for OpenCode.
 
 **Prompt for OpenCode:**
 
@@ -138,36 +146,38 @@ Instructions:
    - the closest viable third-party LSP, with explicit tradeoffs.
    Pick one, justify it, and proceed.
 4. Add the LSP entry to the OpenCode GLOBAL config (not per-repo) so every project benefits. Show the final config snippet verbatim.
-5. Verification:
+5. Print the installed version, install path, and config files changed.
+6. Verification:
    - Open a `.sql` file with a deliberately invalid statement.
    - Confirm hover info appears on a known keyword.
    - Confirm at least one diagnostic is reported.
    - Print the expected vs actual result.
-6. On any step failure, print the exact error and proposed fix before retrying.
+7. On any step failure, print the exact error and proposed fix before retrying.
 ```
 
 ### Bicep LSP
 
-Install and configure the official Microsoft Bicep language service GLOBALLY for OpenCode
+Install and configure the official Microsoft Bicep language service globally for OpenCode.
 
 **Prompt for OpenCode:**
 ```
-Goal: Install and configure the Azure DevOps MCP server GLOBALLY so any `.bicep` file in any repository gets hover, completion, and diagnostics.
+Goal: Install and configure the official Microsoft Bicep language service GLOBALLY for OpenCode so any `.bicep` file in any repository gets hover, completion, and diagnostics.
 
 Instructions:
 1. Check availability of the bicep lsp. If not available, install the latest Bicep CLI per https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install.
 2. Add the LSP entry to the OpenCode GLOBAL config (not per-repo) so every project benefits. Show the final config snippet verbatim.
+3. Print the installed version, install path, and config files changed.
+4. On any step failure, print the exact error and proposed fix before retrying.
 5. Verification:
-   - Open a `.bicep` file with a deliberately invalid statement.
-   - Confirm hover info appears on a known keyword.
-   - Confirm at least one diagnostic is reported.
-   - Print the expected vs actual result.
-6. On any step failure, print the exact error and proposed fix before retrying.
+    - Open a `.bicep` file with a deliberately invalid statement.
+    - Confirm hover info appears on a known keyword.
+    - Confirm at least one diagnostic is reported.
+    - Print the expected vs actual result.
 ```
 
 ### [Azure DevOps MCP server](https://github.com/microsoft/azure-devops-mcp)
 
-The [Azure DevOps MCP server](https://github.com/microsoft/azure-devops-mcp) bringing the power of Azure DevOps directly to your agents.
+The [Azure DevOps MCP server](https://github.com/microsoft/azure-devops-mcp) brings the power of Azure DevOps directly to your agents.
 
 **Prompt for OpenCode:**
 ```
@@ -183,12 +193,13 @@ Instructions:
    so it is available in every session and every repository.
 3. Use a secure auth method (PAT stored in environment variable or OS keychain). Do not commit secrets. Ask me for the Azure DevOps organization URL and the PAT, and the default project name.
 4. Create a global, user-invocable skill named `azure-devops-build-doctor` that:
-   - finds the latest failing build/pipeline run for the current repo + branch (or asks me to pick if ambiguous),
-   - downloads the failing log,
-   - summarizes the root cause with file:line references where possible,
-   - proposes a concrete fix and (optionally) applies it.
-5. Verify by listing my pipelines and fetching the most recent build status for one of them.
-6. On failure, print the exact API error and proposed fix before retrying.
+    - finds the latest failing build/pipeline run for the current repo + branch (or asks me to pick if ambiguous),
+    - downloads the failing log,
+    - summarizes the root cause with file:line references where possible,
+    - proposes a concrete fix and (optionally) applies it.
+5. Print the installed version, registration details, and config files changed.
+6. Verify by listing my pipelines and fetching the most recent build status for one of them.
+7. On failure, print the exact API error and proposed fix before retrying.
 ```
 
 ### [Azure MCP server](https://github.com/microsoft/github-copilot-for-azure)
@@ -206,6 +217,7 @@ Instructions:
 2. Register the Azure MCP in the GLOBAL config of all three agents (OpenCode, Visual Studio Copilot, VS Code Copilot).
 3. Use Azure CLI (`az login`) credentials by default. Do not hard-code secrets. If an alternative auth (service principal, managed identity) is more appropriate for my environment, ask me before switching.
 4. After install, list:
+   - the installed version or endpoint details
    - the install location and config paths updated
    - the active subscription(s) the MCP can see
 5. Verify with a read-only query: "List all Azure App Services in my default subscription" and print the count.
@@ -217,12 +229,16 @@ Instructions:
 - **Azure DevOps MCP**: Create a build error in a PR and ask OpenCode: Fix the azure devops build error in my current pull request for this branch.
 - **Azure MCP**: Ask OpenCode: List all Azure App services.
 
-## 3.2 Create (custom) Software Engineering skills
+## 3.2 Create (Custom) Software Engineering Skills
 
 These skills add code review, planning, branching workflows, and development guidelines tailored for software engineers.
 
+The practical test for each skill in this section is straightforward: after installing it, you should be able to point to one clear workflow improvement it creates. If you cannot describe that outcome, the skill is probably not worth keeping enabled.
+
 ### [Karpathy Guidelines](https://github.com/forrestchang/andrej-karpathy-skills) skill
 A distilled set of coding principles inspired by Andrej Karpathy's approach to software development. This skill encapsulates his emphasis on minimal assumptions, clear requirements, avoiding scope creep, and making evidence-based decisions. It serves as a guiding framework for writing clean, efficient, and maintainable code.
+
+**Expected outcome:** smaller diffs, fewer unnecessary abstractions, and more explicit assumptions before implementation starts.
 
 **Prompt for OpenCode:**
 
@@ -239,6 +255,8 @@ Instructions:
 
 ### Evidence Validator
 A custom skill that audits code reviews to eliminate AI slop by verifying that every claim is backed by concrete evidence.
+
+**Expected outcome:** review comments become easier to trust because they cite commands, test output, file paths, and observed behavior instead of generic opinions.
 
 **Prompt for OpenCode:**    
 
@@ -262,6 +280,8 @@ Implementation:
 
 ### Code Review Expert
 A custom skill that performs comprehensive code reviews by orchestrating multiple specialized sub-skills, with a strict evidence requirement to ensure actionable feedback.
+
+**Expected outcome:** more consistent pre-merge reviews with concrete findings around correctness, architecture, security, and maintainability.
 
 **Prompt for OpenCode:**
 
@@ -335,6 +355,8 @@ Instructions:
 ### Branch Review
 A skill that lets you pick any recent branch, creates a worktree for it, and runs the `code-review-expert` skill against it, so you can review multiple branches in parallel without affecting your main working directory.
 
+**Expected outcome:** you can inspect another branch in isolation without stashing, switching branches, or disrupting your current worktree.
+
 **Prompt for OpenCode:**
 
 ```
@@ -357,6 +379,8 @@ Implementation:
 
 ### Release Review
 A skill that automatically finds the latest release branch, creates a worktree for it, and runs the `code-review-expert` skill against it, so you can review release branches without affecting your main working directory.
+
+**Expected outcome:** release checks become repeatable because each review is compared against the previous shipped release instead of an arbitrary base branch.
 
 **Prompt for OpenCode:**
 
@@ -393,7 +417,7 @@ Behavior:
    - Restate the user story in the agent's own words in the language of the story.
    - List all assumptions.
    - Ask me to confirm or correct before continuing.
-4. Use the `wwas` skill for the user-story format ("As a ... I want ... so that ..." / "who, what, an so that").
+4. Use the `wwas` skill for the user-story format ("As a ... I want ... so that ..." / "who, what, and so that").
 5. Use the current repository context (see Agents.md) to add technical details and constraints to the story.
 6. Use the `test-scenarios` skill to turn acceptance criteria into concrete validation scenarios (Given / When / Then).
 7. Whenever something is ambiguous, add questions to the description.
@@ -448,6 +472,8 @@ Implementation:
 
 ## Keeping Things Up to Date
 
+Treat this table as the minimum maintenance checklist for the advanced setup in this part. If a skill pack, LSP, or MCP integration starts behaving strangely after a tool update, stale installs are one of the first things worth ruling out.
+
 | What | How to update |
 |---|---|
 | **OpenCode CLI** | `npm i -g opencode-ai@latest` |
@@ -468,4 +494,4 @@ Implementation:
 ---
 
 > [!NOTE]
-> Continue with [Part 4: Self Optimisation](part-4-self-optimisation.md) for optional skills, custom workflows, and integrations.
+> Continue with [Part 4: Self optimisation](part-4-self-optimisation.md) to simplify and verify the orchestration layers you have added.
