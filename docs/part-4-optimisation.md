@@ -40,7 +40,9 @@ auto-difficulty detection per step
 
 ## Confidence scoring
 
-You can let your prompt return a confidence score for each step of the workflow, and then use that to trigger escalation to more powerful models or human review. Add the following to your Agent.md file to add confidence scoring to your workflow:
+When using the oh-my-openagent plugin then you don't need confidence scoring like other platforms use. The oh-my-openagent uses the better Category- and agent-based routing, Iterative verification + self-correction loops, Fallback chains (failure-based escalation) and Heuristic / learned routing (cost + success patterns)
+
+If you do want to use Confidence scoring, then you can let your prompt return a confidence score for each step of the workflow, and then use that to trigger escalation to more powerful models or human review. Add the following to your Agent.md file to add confidence scoring to your workflow:
 
 ```
 After completing the task, evaluate your answer:
@@ -80,27 +82,3 @@ And if you are spending too much on loops, you can adjust the routing to use che
 "loop-ultra-cheap"
 
 
-## Difficulty detection signals (automatic escalation triggers)
-
-You can control when to escalate to a more powerful category/ model or a human by defining something like the following in your Agents.md file.
-
-```
-Add these checks BEFORE escalating:
-
-Detect “hard task”
-Escalate to "reasoning" if:
-
-same file changed > 2 times
-tests failing repeatedly
-response too short / vague
-confidence < 0.6
-
-
-Detect “critical task”
-Escalate to "critical" if:
-
-multi-file change
-architecture change
-security-sensitive code
-final verification step
-```
