@@ -20,6 +20,13 @@ To make the install prompts below more reproducible across machines, keep the sa
 | **Python** | Some plugins run Python scripts |
 | **GitHub Copilot account** | For model access — but almost any LLM provider will do |
 
+> [!WARNING]
+> I have had some issues where the agent would get stuck in a loop and not recognize a "done" or "continue" signal. If that happens, restart OpenCode, use `/session` to reconnect to the aborted session, and type `continue`. This can happen when a plugin rewrites what the LLM returns and removes or adjusts the flow commands for this plugin. 
+>
+>Different models format endings differently, follow agent-control instructions with different strictness, or produce slightly different tool/result wrappers. If the plugin is matching fragile "done" / "continue" patterns, one model can appear "broken" while another works. It seems to happen more often with Opus than GPT models (Especially Opus 4.6)
+>
+> If the issue persists, you can temporarily disable plugins, mcp's and select different models. You could then ask opencode to analyse the previous session to see what interferes.
+
 ## Step 1: Install the OpenCode CLI
 
 Install the [OpenCode](https://github.com/anomalyco/opencode) CLI globally via npm:
@@ -48,7 +55,7 @@ If Desktop cannot see the CLI, close both tools, open a fresh terminal, run `ope
 > Turn off the panel that shows git diffs and file changes — you already have that in Visual Studio / VS Code, and it can cause performance issues on large repositories or changes.
 
 > [!NOTE]
-> OpenCode Desktop is still in beta. I have seen cases where it would not continue a session, appeared to get stuck in a loop, or failed to recognize that a task was already done and kept repeating the last step.
+> OpenCode Desktop is still in beta. The loop issue seems to happen more often on Desktop. If you experience repeated loop issues, consider using the CLI version until the issue is resolved in Desktop.
 
 > [!WARNING]
 > The install prompts below often create and execute scripts. Your antivirus might block these, especially when using the Desktop app. You can add an exception for `opencode-cli.exe` if needed. If this happens, restart OpenCode, use `/session` to reconnect to the aborted session, and type `continue`.
@@ -77,11 +84,6 @@ Instructions:
 ### 4.1 Install and Configure [Oh-My-OpenAgent](https://github.com/code-yeongyu/oh-my-openagent)
 
 [Oh-My-OpenAgent](https://github.com/code-yeongyu/oh-my-openagent) is the most impactful plugin for OpenCode. It gives you: intent parsing, classification / reranking, priority rules, fallback & recovery logic (an improved agent loop) and model routing.
-
-> [!WARNING]
-> I have had some issues with oh-my-openagent where it would get stuck in a loop and not recognize a "done" or "continue" signal. If that happens, restart OpenCode, use `/session` to reconnect to the aborted session, and type `continue`. This can happen when another plugin rewrites what the LLM returns and removes or adjusts the flow commands for this plugin.
->
-> If the issue persists, you can temporarily disable the plugin by removing it from the OpenCode config file (~/.config/opencode/opencode.json) and restarting OpenCode. You could then ask opencode to analyse the previous session to see what plugin interferes.
 
 **Prompt for OpenCode:**
 
