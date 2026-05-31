@@ -1,7 +1,7 @@
 # Part 3: Advanced Use
 
 > [!NOTE]
-> This part assumes you have completed, or at least reviewed, [Part 2: A default setup](part-2-default-setup.md). Use these sections selectively; not every developer needs every advanced integration. After that, continue with [Part 4: Self optimisation](part-4-self-optimisation.md) if you want OpenCode to simplify overlapping orchestration layers.
+> This part assumes you have completed, or at least reviewed, [Part 2: A default setup](part-2-default-setup.md). Use these sections selectively; not every developer needs every advanced integration. After that, continue with [Part 4: Self optimisation](part-4-optimisation.md) if you want OpenCode to simplify overlapping orchestration layers.
 
 This part covers three categories of extensions you can add to OpenCode:
 
@@ -494,4 +494,4 @@ Treat this table as the minimum maintenance checklist for the advanced setup in 
 ---
 
 > [!NOTE]
-> Continue with [Part 4: Self optimisation](part-4-self-optimisation.md) to simplify and verify the orchestration layers you have added.
+> Continue with [Part 4: Self optimisation](part-4-optimisation.md) to simplify and verify the orchestration layers you have added.

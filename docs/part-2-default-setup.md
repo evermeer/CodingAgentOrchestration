@@ -1,7 +1,7 @@
 # Part 2: A Default Setup
 
 > [!NOTE]
-> This part turns the concepts from [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md) into a practical setup. After finishing this default setup, use [Part 3: Advanced Use](part-3-advanced-use.md) for optional skills, custom workflows, and integrations, and then use [Part 4: Self optimisation](part-4-self-optimisation.md) to let OpenCode optimize itself and remove any remaining orchestration overlap.
+> This part turns the concepts from [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md) into a practical setup. After finishing this default setup, use [Part 3: Advanced Use](part-3-advanced-use.md) for optional skills, custom workflows, and integrations, and then use [Part 4: Self optimisation](part-4-optimisation.md) to let OpenCode optimize itself and remove any remaining orchestration overlap.
 
 This section gets you up and running with a working [OpenCode](https://github.com/anomalyco/opencode) environment. Before running each prompt, evaluate whether you actually need it. If you do not use Jira, for example, you do not need to install the Atlassian MCP.
 

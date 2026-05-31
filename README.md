@@ -50,8 +50,8 @@ Suggested reading paths:
 3. [Part 3: Advanced Use](docs/part-3-advanced-use.md)  
    Covers optional advanced additions such as engineering skills, custom review workflows, SQL LSP support, Jira workflows, Azure DevOps, and Azure MCP integration.
 
-4. [Part 4: Self optimisation](docs/part-4-self-optimisation.md)  
-   After installing multiple skill packs and MCP servers, orchestration layers can overlap. This part provides a prompt that audits your configuration and consolidates it into a minimal 3-phase model (Conductor → Planner/Executor → Verifier).
+4. [Part 4: Optimisation](docs/part-4-optimisation.md)  
+   After installing multiple skill packs and MCP servers, orchestration layers can overlap. This part analises this and provides a prompt that audits your configuration and consolidates it into a minimal 3-phase model (Conductor → Planner/Executor → Verifier).
 
 ## Contribution
 

@@ -1,11 +1,29 @@
-# Part 4: Self Optimisation
+# Part 4: Optimisation
 
 > [!NOTE]
 > Complete [Part 2 (Default setup)](part-2-default-setup.md) first. If you added skills, LSP, or MCP servers from [Part 3 (Advanced use)](part-3-advanced-use.md), those will be preserved during optimisation.
 
+## A quick health check and tune-up.
+
 Over time your OpenCode configuration accumulates layers — skill packs, custom agents, routing rules, pipeline definitions. Some of these overlap or conflict. This part provides a prompt that you paste into OpenCode to let it audit and simplify its own orchestration.
 
-**How it works:** The prompt implements a 3-phase model — **Conductor** (routes work), **Planner/Executor** (does work), and **Verifier** (checks results) — replacing any redundant orchestration layers while keeping all your installed capabilities (MCP servers, skills, parallelism) intact.
+**Prompt for OpenCode:**
+
+```
+Review the new OpenCode orchestration model and identify:
+- any remaining hidden orchestration overlap
+- any unnecessary planning loops
+- any places where execution could be simplified
+
+Propose only minimal changes.
+```
+
+## Creating a Minimal Orchestration Model
+
+Depending on how many skills and pipelines you have added, your current orchestration may have multiple agents trying to plan the same task, execution loops that feed back into planning without a clear owner, and verification steps that are mixed into editing prompts. You then could create a custom orchestration layer.
+
+**How it works:** 
+The prompt implements a 3-phase model — **Conductor** (routes work), **Planner/Executor** (does work), and **Verifier** (checks results) — replacing any redundant orchestration layers while keeping all your installed capabilities (MCP servers, skills, parallelism) intact.
 
 The important mindset is to treat orchestration changes the same way you treat code changes: make the smallest useful change, verify it, and keep the system understandable.
 
@@ -21,25 +39,9 @@ It is designed to:
 - ✅ implement the minimal 3‑phase model
 - ✅ preserve all your power (MCP, routing, parallelism, etc.)
 
-
-## Self Check After Optimization
-
 When the optimization is complete, you will have a much simpler, more efficient orchestration model with a single Conductor agent and clear role separation between Planner, Executor, and Verifier.
 
-At the end, you could run a final pass to see if there is still anything to improve.
 
-This only works if the result is observable. Avoid vague prompt edits that merely sound better. Prefer changes that produce behavior you can actually detect in future sessions.
-
-**Prompt for OpenCode:**
-
-```
-Review the new OpenCode orchestration model and identify:
-- any remaining hidden orchestration overlap
-- any unnecessary planning loops
-- any places where execution could be simplified
-
-Propose only minimal changes.
-```
 
 ## Main Prompt
 
