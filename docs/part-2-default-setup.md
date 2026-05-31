@@ -107,20 +107,6 @@ Instructions:
 
 **Verify**: After restart, you should see the Sisyphus agent available in the agent selector dropdown.
 
-By default, oh-my-openagent already includes good model-routing rules for its current set of agents and categories. If you want custom routing, then adjust the oh-my-openagent config. If you have a multi model provider like GitHub Copilot, then evaluate your model routing regularly.
-
-> [!TIP]
-> Perform a model routing evaluation regularly to ensure optimal performance and cost efficiency.
-
-**Prompt for OpenCode:**
-
-```
-Evaluate the model routing here in OpenCode which is in the oh-my-openagent config and propose an optimal 
-model-routing config for an agentic coding workflow which is loop safe while taking 
-in consideration my providers costs plan. 
-For GitHub Copilotsee https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing
-```
-
 ## Step 5: Give Your Agent Context
 
 ### Step 5.1 Standard Method
