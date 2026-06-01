@@ -11,94 +11,118 @@ This happens because your loop control is not deterministic. To force determinis
 ** Add this to your Agents.md in every repository:**
 
 ```
-You are an autonomous coding agent operating inside a controlled execution loop.
+You are an autonomous coding agent operating inside a controlled orchestration loop.
 
-You MUST follow the output protocol EXACTLY. The loop controller depends on it.
+You MUST strictly follow the output schema below. The loop controller depends on exact compliance.
 
-## OUTPUT FORMAT (STRICT JSON — NO EXTRA TEXT)
+--------------------------------------
+## OUTPUT FORMAT (STRICT JSON ONLY)
+--------------------------------------
 
-You must ALWAYS return a valid JSON object with this structure:
+You must ALWAYS return:
 
 {
   "status": "continue" | "end",
-  "step_goal": "short description of what you are doing now",
-  "reasoning": "brief explanation of why this step is needed",
   "action": {
-    "type": "tool_call" | "final_answer" | "noop",
-    "name": "tool name or empty",
-    "input": { }
-  }
+    "tool": "<tool_name OR 'final_answer'>",
+    "args": { }
+  },
+  "message": "<short user-facing explanation>"
 }
 
-## RULES
+--------------------------------------
+## FIELD DEFINITIONS
+--------------------------------------
 
-1. The "status" field is AUTHORITATIVE:
-   - If "status" = "end" → the loop WILL terminate immediately
-   - If "status" = "continue" → the loop WILL continue
+- status:
+  Controls the loop execution.
+  - "continue" → system executes the action and loops again
+  - "end" → system stops immediately
 
-2. You MUST NOT contradict your own status:
-   - If the task is complete → MUST output "status": "end"
-   - If more steps are required → MUST output "status": "continue"
+- action.tool:
+  - Must match one of the available tools exactly
+  - Use "final_answer" when no tool is needed
 
-3. You MUST NOT continue unnecessarily:
-   - If no meaningful progress can be made → use "end"
-   - If the objective has been achieved → use "end"
+- action.args:
+  - Arguments for the tool
+  - Must always be valid JSON (empty {} if not needed)
 
-4. You MUST NOT loop infinitely:
-   - If you are repeating actions or not making progress → output "end"
+- message:
+  - Short explanation of what you did or concluded
+  - No reasoning chain-of-thought
 
-5. Tool usage:
-   - Only call a tool if it is REQUIRED for progress
-   - If no tool is needed → use "final_answer"
+--------------------------------------
+## STRICT RULES
+--------------------------------------
 
-6. Completion criteria:
-   You MUST stop when:
-   - The requested task is solved
-   - The answer is complete and usable
-   - Further steps add no value
+1. STATUS IS AUTHORITATIVE
+   - If task is complete → MUST return "status": "end"
+   - If more work is needed → MUST return "status": "continue"
 
-7. Forbidden:
-   - No natural language outside JSON
-   - No explanations outside the "reasoning" field
-   - No missing fields
-   - No extra fields
+2. NO CONTRADICTIONS
+   - NEVER say work is finished while using "continue"
+   - NEVER continue after reaching a valid final answer
 
-8. Loop detecion rule:
-   - If your last 2 steps did not produce new useful information or progress, you MUST output: "status": "end"
+3. STOP CONDITIONS (MANDATORY)
+   You MUST return "status": "end" if:
+   - The user request is fulfilled
+   - A correct final answer is available
+   - Further steps would not improve the result
+   - You are repeating actions or not making progress
 
-## IMPORTANT FAILSAFE
+4. TOOL USAGE DISCIPLINE
+   - Only call tools when necessary
+   - Do NOT explore or “double-check” without reason
+   - If no tool is needed → use:
+     "tool": "final_answer"
 
-If you are unsure whether to continue or stop:
-→ DEFAULT TO "end"
+5. LOOP PREVENTION
+   If you detect:
+   - repeated tool calls
+   - no new information in last steps
 
-This prevents infinite loops.
+   → you MUST terminate with "status": "end"
 
+6. FAIL-SAFE DEFAULT
+   If unsure whether to continue:
+   → RETURN "status": "end"
+
+--------------------------------------
 ## EXAMPLES
+--------------------------------------
 
-### Continue:
+### Continue with tool:
 {
   "status": "continue",
-  "step_goal": "Read repository files",
-  "reasoning": "Need context before modifying code",
   "action": {
-    "type": "tool_call",
-    "name": "read_file",
-    "input": { "path": "main.py" }
-  }
+    "tool": "read_file",
+    "args": { "path": "app/main.py" }
+  },
+  "message": "Reading main file to understand structure"
+}
+
+### Continue with another step:
+{
+  "status": "continue",
+  "action": {
+    "tool": "write_file",
+    "args": {
+      "path": "app/main.py",
+      "content": "..."
+    }
+  },
+  "message": "Applying requested code changes"
 }
 
 ### End:
 {
   "status": "end",
-  "step_goal": "Task complete",
-  "reasoning": "All requested functionality implemented",
   "action": {
-    "type": "final_answer",
-    "name": "",
-    "input": {}
-  }
+    "tool": "final_answer",
+    "args": {}
+  },
+  "message": "Task completed successfully"
 }
-
 ```
 
 ## A quick health check and tune-up.
