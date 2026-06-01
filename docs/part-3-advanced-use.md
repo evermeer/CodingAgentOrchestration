@@ -494,4 +494,4 @@ Treat this table as the minimum maintenance checklist for the advanced setup in 
 ---
 
 > [!NOTE]
-> Continue with [Part 4: Self optimisation](part-4-optimisation.md) to simplify and verify the orchestration layers you have added.
+> Continue with [Part 4: Optimisation](part-4-optimisation.md) to simplify and verify the orchestration layers you have added.

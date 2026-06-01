@@ -21,11 +21,7 @@ To make the install prompts below more reproducible across machines, keep the sa
 | **GitHub Copilot account** | For model access — but almost any LLM provider will do |
 
 > [!WARNING]
-> I have had some issues where the agent would get stuck in a loop and not recognize a "done" or "continue" signal. If that happens, restart OpenCode, use `/session` to reconnect to the aborted session, and type `continue`. This can happen when a plugin rewrites what the LLM returns and removes or adjusts the flow commands for this plugin. 
->
->Different models format endings differently, follow agent-control instructions with different strictness, or produce slightly different tool/result wrappers. If the plugin is matching fragile "done" / "continue" patterns, one model can appear "broken" while another works. It seems to happen more often with Opus than GPT models (Especially Opus 4.6)
->
-> If the issue persists, you can temporarily disable plugins, mcp's and select different models. You could then ask opencode to analyse the previous session to see what interferes.
+> I have had some issues where the agent would get stuck in a loop and not recognize a "done" or "continue" signal. If that happens, restart OpenCode, use `/session` to reconnect to the aborted session, and type `continue`. This can happen when the loop flow is not deterministic. If it happens more often, then see [Part 4: Optimisation](part-4-optimisation.md) for instructions that would make it more deterministic. 
 
 ## Step 1: Install the OpenCode CLI
 
