@@ -21,7 +21,7 @@ To make the install prompts below more reproducible across machines, keep the sa
 | **GitHub Copilot account** | For model access — but almost any LLM provider will do |
 
 > [!WARNING]
-> I have had some issues where the agent would get stuck in a loop and not recognize a "done" or "continue" signal. If that happens, restart OpenCode, use `/session` to reconnect to the aborted session, and type `continue`. This can happen when the loop flow is not deterministic. If it happens more often, then see [Part 4: Optimisation](part-4-optimisation.md) for instructions that would make it more deterministic. 
+> I have had some issues where the agent would get stuck in a loop and not recognize a "done" or "continue" signal. If that happens, restart OpenCode, use `/session` to reconnect to the aborted session, and type `continue`. This can happen when the loop flow is not deterministic. If it happens more often, then see [Part 4: Optimisation](part-4-optimisation.md) for instructions that would make it more deterministic.
 
 ## Step 1: Install the OpenCode CLI
 

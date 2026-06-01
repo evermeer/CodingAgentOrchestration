@@ -5,10 +5,10 @@
 
 ## Improved loop control
 
-It could happen that your agent does not respond well on continue or stop messages causing your agent to stay in a loop.
-This happens because your loop control is not deterministic. To force deterministic loop control instead of “hope the LLM behaves” you could add the following to your Agents.md file.
+It could happen that your agent does not respond well to continue or stop messages, causing your agent to stay in a loop.
+This happens because your loop control is not deterministic. To force deterministic loop control instead of “hope the LLM behaves,” you could add the following to your Agents.md file.
 
-** Add this to your Agents.md in every repository:**
+**Add this to your Agents.md in every repository:**
 
 ```
 You are an autonomous coding agent operating inside a controlled orchestration loop.
@@ -125,7 +125,7 @@ You must ALWAYS return:
 }
 ```
 
-## A quick health check and tune-up.
+## A quick health check and tune-up
 
 Over time your OpenCode configuration accumulates layers — skill packs, custom agents, routing rules, pipeline definitions. Some of these overlap or conflict. This part provides a prompt that you paste into OpenCode to let it audit and simplify its own orchestration.
 
@@ -142,7 +142,7 @@ Propose only minimal changes.
 
 ## Optimize model routing
 
-By default, oh-my-openagent already includes good model-routing rules for its current set of agents and categories. If you want custom routing, then adjust the oh-my-openagent config. If you have a multi model provider like GitHub Copilot, then evaluate your model routing regularly.
+By default, oh-my-openagent already includes good model-routing rules for its current set of agents and categories. If you want custom routing, then adjust the oh-my-openagent config. If you have a multi-model provider like GitHub Copilot, then evaluate your model routing regularly.
 
 > [!TIP]
 > Perform a model routing evaluation regularly to ensure optimal performance and cost efficiency.
@@ -150,10 +150,10 @@ By default, oh-my-openagent already includes good model-routing rules for its cu
 **Prompt for OpenCode:**
 
 ```
-Evaluate the model routing here in OpenCode which is in the oh-my-openagent config and propose an optimal 
-model-routing config for an agentic coding workflow which is loop safe while taking 
-in consideration my providers costs plan. 
-For GitHub Copilotsee https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing
+Evaluate the model routing here in OpenCode, which is in the oh-my-openagent config, and propose an optimal
+model-routing config for an agentic coding workflow that is loop safe while taking
+into consideration my provider's cost plan.
+For GitHub Copilot see https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing
 Fine tune the routing for the following categories of tasks:
 self-healing loops (retry before fallback)
 token-budget aware routing
@@ -162,9 +162,9 @@ auto-difficulty detection per step
 
 ## Confidence scoring
 
-When using the oh-my-openagent plugin then you don't need confidence scoring like other platforms use. The oh-my-openagent uses the better Category- and agent-based routing, Iterative verification + self-correction loops, Fallback chains (failure-based escalation) and Heuristic / learned routing (cost + success patterns)
+When using the oh-my-openagent plugin, you don't need confidence scoring like other platforms use. The oh-my-openagent uses better category- and agent-based routing, iterative verification plus self-correction loops, fallback chains (failure-based escalation), and heuristic / learned routing (cost + success patterns).
 
-If you do want to use Confidence scoring, then you can let your prompt return a confidence score for each step of the workflow, and then use that to trigger escalation to more powerful models or human review. Add the following to your Agent.md file to add confidence scoring to your workflow:
+If you do want to use confidence scoring, then you can let your prompt return a confidence score for each step of the workflow, and then use that to trigger escalation to more powerful models or human review. Add the following to your Agents.md file to add confidence scoring to your workflow:
 
 ```
 After completing the task, evaluate your answer:
@@ -181,8 +181,8 @@ Respond ONLY in this JSON format:
   "improve": "<yes|no>"
 }
 
-If the confidence is ≥ 0.85 and no issues are detected, accept the answer. 
-If the confidence is 0.6–0.85 or there are issues, retry the same model. 
+If the confidence is ≥ 0.85 and no issues are detected, accept the answer.
+If the confidence is 0.6–0.85 or there are issues, retry the same model.
 If the confidence is lower than 0.6 or improvement is needed, escalate to a more powerful model or human review.
 ```
 
@@ -193,14 +193,14 @@ If the confidence is lower than 0.6 or improvement is needed, escalate to a more
 
 During the month you can evaluate the cost and performance of your agentic workflow and adjust the loop category routing to optimize for cost and performance.
 
-In your Agent.md file, you can adjust the model routing for the oh-my-openagent categories to optimize for cost and performance.
+In your Agents.md file, you can adjust the model routing for the oh-my-openagent categories to optimize for cost and performance.
 
-By Default, the loop category routing is as follows:
+By default, the loop category routing is as follows:
 ```
-For the oh-my-openagent loop Category use "loop-default"
+For the oh-my-openagent loop category use "loop-default"
 ```
 And if you are spending too much on loops, you can adjust the routing to use cheaper models for loops:
-"loop-cheap"
-"loop-ultra-cheap"
+`loop-cheap`
+`loop-ultra-cheap`
 
 
