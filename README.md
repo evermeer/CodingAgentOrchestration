@@ -51,7 +51,7 @@ Suggested reading paths:
    Covers optional advanced additions such as engineering skills, custom review workflows, SQL LSP support, Jira workflows, Azure DevOps, and Azure MCP integration.
 
 4. [Part 4: Optimisation](docs/part-4-optimisation.md)  
-   After installing multiple skill packs and MCP servers, orchestration layers can overlap. This part analises this and provides a prompt that audits your configuration and consolidates it into a minimal 3-phase model (Conductor → Planner/Executor → Verifier).
+   This part describes a couple of post install optimisations that you could do for eliminating overlap in skill packs and MCP servers, orchestration layers. There is also a section about optimising your model routing strategy and budgeting managing. 
 
 ## Contribution
 
