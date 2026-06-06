@@ -201,6 +201,24 @@ Here is a short overview of the differences between MemPalace and Graphify:
 | Query style      | Semantic recall                        | Topological traversal                         |
 | Best for         | *Why we decided something*             | *How the system is structured*                |
 
+### Step 5.3: Context optimization plugin
+The [content-optimizer plugin](docs/context-optimizer-plugin.md) is a tool for optimizing the content that goes into your agent's context. It can do things like reranking, deduplication, and compression to make sure the most relevant information is prioritized and the overall content size stays within limits.
+
+This plugin will give you a 70–90% token reduction, faster responses, cleaner, higher-quality context, scales with long conversations and less context noise from Graphify + MemPalace.
+
+**Prompt for OpenCode:**
+
+```
+Goal: Install the content-optimizer plugin globally for OpenCode.
+
+Instructions:
+1. Install the content-optimizer plugin globally (user-scope) following the latest instructions at:
+   https://github.com/evermeer/CodingAgentOrchestration/blob/main/docs/context-optimizer-plugin.md
+   Detect my OS and use the matching commands. Prefer `pipx` if available so the install is isolated and global.
+3. On any step failure, print the exact error plus proposed fix before retrying.
+4. Print the installed versions, install path, and config files changed.
+5. Verify by running a sample optimization task and report the result.
+```
 
 ## Step 6: Give Your Agent Tools
 
