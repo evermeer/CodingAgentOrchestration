@@ -214,10 +214,12 @@ Goal: Install the content-optimizer plugin globally for OpenCode.
 Instructions:
 1. Install the content-optimizer plugin globally (user-scope) following the latest instructions at:
    https://github.com/evermeer/CodingAgentOrchestration/blob/main/docs/context-optimizer-plugin.md
-   Detect my OS and use the matching commands. Prefer `pipx` if available so the install is isolated and global.
+   Detect my OS and use the matching commands.
+2. Copy the source files from the repo `plugins/` folder into my global OpenCode plugin folder. 
 3. On any step failure, print the exact error plus proposed fix before retrying.
 4. Print the installed versions, install path, and config files changed.
-5. Verify by running a sample optimization task and report the result.
+5. Verify that `~/.config/opencode/plugins/context-optimizer.js` is present and that the Python bridge can be called successfully.
+6. If the wrapper falls back to no-op mode, report the exact warning and the fix.
 ```
 
 ## Step 6: Give Your Agent Tools

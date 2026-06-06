@@ -53,9 +53,7 @@ class ContextOptimizer:
         if not docs:
             return ""
 
-        combined = "
-
-".join(docs)
+        combined = "\n\n".join(docs)
 
         compressed = self.compressor.compress_prompt(
             combined,
