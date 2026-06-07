@@ -79,6 +79,17 @@ export function createCliPath(metaUrl) {
   return path.resolve(pluginDir, "context_optimizer_cli.py")
 }
 
+export function applyOptimizedContext(output, result) {
+  if (!output || !result?.optimizedContext) return
+
+  const nextContext = []
+  const summary = formatSizeSummary(result.initialSize, result.finalSize)
+  if (summary) nextContext.push(summary)
+  nextContext.push(`## Optimized Context\n\n${result.optimizedContext}`)
+
+  output.context = nextContext
+}
+
 export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = DEFAULT_TIMEOUT_MS }) {
   const python = resolvePythonCommand()
 
@@ -151,10 +162,7 @@ export const ContextOptimizerPlugin = async () => {
 
       if (!result.ok || !result.optimizedContext) return
 
-      output.context = [
-        ...(Array.isArray(output.context) ? output.context : []),
-        `## Optimized Context\n\n${result.optimizedContext}`,
-      ]
+      applyOptimizedContext(output, result)
     },
   }
 }

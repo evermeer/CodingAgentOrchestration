@@ -1,10 +1,13 @@
 import assert from "node:assert/strict"
 import test from "node:test"
+import { mkdtemp, writeFile } from "node:fs/promises"
+import os from "node:os"
 import path from "node:path"
 
 import {
   buildPayload,
   createCliPath,
+  applyOptimizedContext,
   formatSizeSummary,
   normalizePythonResult,
   resolvePythonCommand,
@@ -36,6 +39,21 @@ test("formatSizeSummary renders savings line", () => {
   )
 })
 
+test("applyOptimizedContext replaces source context", () => {
+  const output = { context: ["source one", "source two"] }
+
+  applyOptimizedContext(output, {
+    optimizedContext: "optimized body",
+    initialSize: 20,
+    finalSize: 5,
+  })
+
+  assert.deepEqual(output.context, [
+    "Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)",
+    "## Optimized Context\n\noptimized body",
+  ])
+})
+
 test("resolvePythonCommand respects override", () => {
   process.env.CONTEXT_OPTIMIZER_PYTHON = "custom-python"
   assert.deepEqual(resolvePythonCommand(), ["custom-python"])
@@ -56,4 +74,37 @@ test("runOptimizer returns no-op friendly result for missing cli", async () => {
   })
 
   assert.equal(result.ok, false)
+})
+
+test("runOptimizer parses size summary from a python bridge", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "context-optimizer-"))
+  const cliPath = path.join(tempDir, "bridge.py")
+
+  await writeFile(
+    cliPath,
+    [
+      "import json",
+      "import sys",
+      "payload = json.loads(sys.stdin.read() or '{}')",
+      "initial_size = len(payload['docs'][0]) if payload.get('docs') else 0",
+      "sys.stdout.write(json.dumps({",
+      '    "ok": True,',
+      '    "optimized_context": "bridge output",',
+      '    "initial_size": initial_size,',
+      '    "final_size": 13,',
+      '}))',
+    ].join("\n"),
+  )
+
+  const result = await runOptimizer({
+    payload: { query: "x", docs: ["source text"] },
+    sessionID: "test-session",
+    cliPath,
+    timeoutMs: 1000,
+  })
+
+  assert.equal(result.ok, true)
+  assert.equal(result.optimizedContext, "bridge output")
+  assert.equal(result.initialSize, 11)
+  assert.equal(result.finalSize, 13)
 })
