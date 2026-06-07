@@ -1,4 +1,6 @@
 import assert from "node:assert/strict"
+import childProcess from "node:child_process"
+import fs from "node:fs"
 import { copyFile, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises"
 import os from "node:os"
 import path from "node:path"
@@ -181,6 +183,97 @@ test("createSessionWarningTracker scopes warnings to the active session", () => 
   assert.equal(tracker.warnOnce("session-b", "python_missing: missing python"), true)
 })
 
+test("createSessionWarningTracker falls back to stderr when log writing fails", () => {
+  const originalAppendFileSync = fs.appendFileSync
+  const originalStderrWrite = process.stderr.write
+  const stderr = []
+
+  fs.appendFileSync = () => {
+    throw new Error("disk full")
+  }
+  process.stderr.write = (chunk) => {
+    stderr.push(String(chunk))
+    return true
+  }
+
+  try {
+    const tracker = createSessionWarningTracker()
+    assert.equal(tracker.warnOnce("session-a", "filesystem failure"), true)
+    assert.match(stderr.join(""), /logging failed/i)
+  } finally {
+    fs.appendFileSync = originalAppendFileSync
+    process.stderr.write = originalStderrWrite
+  }
+})
+
+test("runOptimizer reports stdin write failures to stderr", async () => {
+  const originalSpawn = childProcess.spawn
+  const originalAppendFileSync = fs.appendFileSync
+  const originalMkdirSync = fs.mkdirSync
+  const originalStderrWrite = process.stderr.write
+  const stderr = []
+
+  fs.appendFileSync = () => {}
+  fs.mkdirSync = () => {}
+  process.stderr.write = (chunk) => {
+    stderr.push(String(chunk))
+    return true
+  }
+
+  childProcess.spawn = () => {
+    const child = {
+      stdout: {
+        on(event, handler) {
+          if (event === "data") {
+            handler(Buffer.from('{"ok":true,"optimized_context":"ok","initial_size":1,"final_size":1}'))
+          }
+          return child.stdout
+        },
+      },
+      stderr: {
+        on() {
+          return child.stderr
+        },
+      },
+      stdin: {
+        write() {
+          throw new Error("broken pipe")
+        },
+        end() {},
+        on() {
+          return child.stdin
+        },
+      },
+      on(event, handler) {
+        if (event === "close") {
+          setImmediate(() => handler(0, null))
+        }
+        return child
+      },
+      kill() {},
+    }
+
+    return child
+  }
+
+  try {
+    const result = await runOptimizer({
+      payload: { query: "x", docs: ["a"] },
+      sessionID: "test-session",
+      cliPath: path.join(process.cwd(), "context-optimizer", "missing_cli.py"),
+      timeoutMs: 1000,
+    })
+
+    assert.equal(result.ok, true)
+    assert.match(stderr.join(""), /stdin write failed/i)
+  } finally {
+    childProcess.spawn = originalSpawn
+    fs.appendFileSync = originalAppendFileSync
+    fs.mkdirSync = originalMkdirSync
+    process.stderr.write = originalStderrWrite
+  }
+})
+
 test("runOptimizer returns no-op friendly result for missing cli", async () => {
   const result = await runOptimizer({
     payload: { query: "x", docs: ["a"] },
@@ -296,6 +389,69 @@ test("ContextOptimizerPlugin leaves context untouched when the optimizer fails (
   ])
 })
 
+test("ContextOptimizerPlugin reports toast failures to stderr", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "context-optimizer-toast-"))
+  const installRoot = path.join(tempDir, "context-optimizer")
+  const pluginDir = path.join(installRoot, "plugin")
+  const supportDir = path.join(installRoot, "support-files")
+
+  await mkdir(pluginDir, { recursive: true })
+  await mkdir(supportDir, { recursive: true })
+
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "plugin", "context-optimizer.js"),
+    path.join(pluginDir, "context-optimizer.js"),
+  )
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer.py"),
+    path.join(supportDir, "context_optimizer.py"),
+  )
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_cli.py"),
+    path.join(supportDir, "context_optimizer_cli.py"),
+  )
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_hook.py"),
+    path.join(supportDir, "context_optimizer_hook.py"),
+  )
+
+  const tempPlugin = await import(pathToFileURL(path.join(pluginDir, "context-optimizer.js")).href)
+  const originalAppendFileSync = fs.appendFileSync
+  const originalStderrWrite = process.stderr.write
+  const stderr = []
+
+  fs.appendFileSync = () => {}
+  process.stderr.write = (chunk) => {
+    stderr.push(String(chunk))
+    return true
+  }
+
+  try {
+    const pluginInstance = await tempPlugin.ContextOptimizerPlugin({
+      runOptimizer: async () => ({
+        ok: true,
+        optimizedContext: "stubbed optimized context",
+        initialSize: 42,
+        finalSize: 11,
+      }),
+      client: {
+        tui: {
+          showToast: () => {
+            throw new Error("toast failed")
+          },
+        },
+      },
+    })
+
+    await pluginInstance["experimental.session.compacting"]({ sessionID: "session-a", prompt: "hello" }, { context: ["original source"] })
+
+    assert.match(stderr.join(""), /toast failed/i)
+  } finally {
+    fs.appendFileSync = originalAppendFileSync
+    process.stderr.write = originalStderrWrite
+  }
+})
+
 test("ContextOptimizerPlugin logs one savings summary during compaction", async () => {
   const tempDir = await mkdtemp(path.join(os.tmpdir(), "context-optimizer-plugin-"))
   const installRoot = path.join(tempDir, "context-optimizer")
@@ -306,19 +462,19 @@ test("ContextOptimizerPlugin logs one savings summary during compaction", async 
   await mkdir(supportDir, { recursive: true })
 
   await copyFile(
-    path.join(process.cwd(), "plugin", "context-optimizer.js"),
+    path.join(process.cwd(), "context-optimizer", "plugin", "context-optimizer.js"),
     path.join(pluginDir, "context-optimizer.js"),
   )
   await copyFile(
-    path.join(process.cwd(), "support-files", "context_optimizer.py"),
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer.py"),
     path.join(supportDir, "context_optimizer.py"),
   )
   await copyFile(
-    path.join(process.cwd(), "support-files", "context_optimizer_cli.py"),
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_cli.py"),
     path.join(supportDir, "context_optimizer_cli.py"),
   )
   await copyFile(
-    path.join(process.cwd(), "support-files", "context_optimizer_hook.py"),
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_hook.py"),
     path.join(supportDir, "context_optimizer_hook.py"),
   )
 

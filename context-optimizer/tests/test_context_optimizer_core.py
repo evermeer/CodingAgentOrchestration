@@ -1,4 +1,6 @@
 import importlib.util
+import contextlib
+import io
 import sys
 import types
 import unittest
@@ -103,6 +105,20 @@ def load_hook_module(context_optimizer_module):
 
 
 class ContextOptimizerCoreTests(unittest.TestCase):
+    def test_context_optimizer_initialization_logs_device_and_models(self):
+        module = load_core_module()
+        stderr = io.StringIO()
+
+        with contextlib.redirect_stderr(stderr):
+            optimizer = module.ContextOptimizer()
+
+        self.assertIsNotNone(optimizer)
+        output = stderr.getvalue()
+        self.assertIn("initializing optimizer", output)
+        self.assertRegex(output, r"device=(cuda|cpu)")
+        self.assertIn("reranker=", output)
+        self.assertIn("compressor=", output)
+
     def test_optimize_reranks_and_compresses_combined_context(self):
         module = load_core_module()
         optimizer = module.ContextOptimizer(compression_rate=0.25, max_chunks=2)
@@ -182,6 +198,25 @@ class ContextOptimizerHookTests(unittest.TestCase):
         self.assertNotIn("optimized_context", result)
         self.assertEqual(result.get("optimized_context_error"), "optimizer initialization failed")
 
+    def test_run_logs_initialization_failure(self):
+        core = load_core_module()
+
+        class RaisingOptimizer:
+            def __init__(self):
+                raise RuntimeError("boom")
+
+        setattr(core, "ContextOptimizer", RaisingOptimizer)
+        hook = load_hook_module(core)
+
+        context = cast(dict[str, Any], {"query": "hello"})
+        stderr = io.StringIO()
+
+        with contextlib.redirect_stderr(stderr):
+            result = hook.run(context)
+
+        self.assertIs(result, context)
+        self.assertIn("optimizer initialization failed", stderr.getvalue())
+
     def test_run_returns_original_context_with_error_marker_when_optimization_fails(self):
         core = load_core_module()
 
@@ -198,6 +233,25 @@ class ContextOptimizerHookTests(unittest.TestCase):
         self.assertIs(result, context)
         self.assertNotIn("optimized_context", result)
         self.assertEqual(result.get("optimized_context_error"), "optimizer optimization failed")
+
+    def test_run_logs_optimization_failure(self):
+        core = load_core_module()
+
+        class StubOptimizer:
+            def optimize(self, query, graph_ctx=None, memory_ctx=None):
+                raise RuntimeError("boom")
+
+        setattr(core, "ContextOptimizer", lambda: StubOptimizer())
+        hook = load_hook_module(core)
+
+        context = cast(dict[str, Any], {"query": "hello"})
+        stderr = io.StringIO()
+
+        with contextlib.redirect_stderr(stderr):
+            result = hook.run(context)
+
+        self.assertIs(result, context)
+        self.assertIn("optimizer optimization failed", stderr.getvalue())
 
 
 if __name__ == "__main__":

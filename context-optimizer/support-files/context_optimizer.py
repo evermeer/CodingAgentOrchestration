@@ -1,5 +1,14 @@
 from sentence_transformers import CrossEncoder, SentenceTransformer, util
 from llmlingua import PromptCompressor
+import sys
+
+def log(message):
+    try:
+        sys.stderr.write(f"[context-optimizer] {message}\n")
+        sys.stderr.flush()
+    except Exception:
+        pass
+
 
 try:
     import torch
@@ -14,7 +23,7 @@ class ContextOptimizer:
         compression_rate=0.5,
         max_chunks=6,
         dedupe_threshold=0.9,
-    ):
+    ): 
         device = "cuda" if torch is not None and torch.cuda.is_available() else "cpu"
         # Keep the LLMLingua-2 algorithm on both devices; on CPU use the smaller
         # multilingual BERT checkpoint instead of the large xlm-roberta model so
@@ -23,6 +32,10 @@ class ContextOptimizer:
             "microsoft/llmlingua-2-xlm-roberta-large-meetingbank"
             if device == "cuda"
             else "microsoft/llmlingua-2-bert-base-multilingual-cased-meetingbank"
+        )
+
+        log(
+            f"initializing optimizer device={device} reranker={reranker_model} embedder={embed_model} compressor={compressor_model}"
         )
 
         self.reranker = CrossEncoder(reranker_model, device=device)
@@ -36,6 +49,8 @@ class ContextOptimizer:
         self.compression_rate = compression_rate
         self.max_chunks = max_chunks
         self.dedupe_threshold = dedupe_threshold
+
+        log("optimizer initialized")
 
     def rerank(self, query, docs):
         pairs = [(query, doc) for doc in docs]

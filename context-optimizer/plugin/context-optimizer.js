@@ -1,5 +1,5 @@
-import { spawn } from "node:child_process"
-import { appendFileSync, existsSync, mkdirSync } from "node:fs"
+import childProcess from "node:child_process"
+import fs from "node:fs"
 import path from "node:path"
 import process from "node:process"
 import { fileURLToPath } from "node:url"
@@ -31,13 +31,21 @@ function resolveLogPath(metaUrl) {
   return path.resolve(pluginDir, "..", "context-optimizer", "context-optimizer.log")
 }
 
+function writeDiagnostic(message) {
+  try {
+    process.stderr.write(`${message}\n`)
+  } catch {
+    // If stderr is unavailable, keep failing open.
+  }
+}
+
 function writeLog(metaUrl, message) {
   try {
     const logPath = resolveLogPath(metaUrl)
-    mkdirSync(path.dirname(logPath), { recursive: true })
-    appendFileSync(logPath, `${new Date().toISOString()} ${message}\n`, "utf8")
-  } catch {
-    // Intentionally swallow logging failures; plugin behavior should not depend on file logging.
+    fs.mkdirSync(path.dirname(logPath), { recursive: true })
+    fs.appendFileSync(logPath, `${new Date().toISOString()} ${message}\n`, "utf8")
+  } catch (error) {
+    writeDiagnostic(`[context-optimizer] logging failed: ${error}`)
   }
 }
 
@@ -147,13 +155,13 @@ export function createSessionWarningTracker() {
 export function createCliPath(metaUrl) {
   const pluginDir = dirnameFromMeta(metaUrl)
   const preferred = path.resolve(pluginDir, "..", "support-files", "context_optimizer_cli.py")
-  if (existsSync(preferred)) return preferred
+  if (fs.existsSync(preferred)) return preferred
 
   const installed = path.resolve(pluginDir, "..", "context-optimizer", "context_optimizer_cli.py")
-  if (existsSync(installed)) return installed
+  if (fs.existsSync(installed)) return installed
 
   const legacy = path.resolve(pluginDir, "context_optimizer_cli.py")
-  if (existsSync(legacy)) return legacy
+  if (fs.existsSync(legacy)) return legacy
 
   return preferred
 }
@@ -181,7 +189,7 @@ export function applyOptimizedContext(output, result) {
 }
 
 function resolveToastClient(dependencies = {}, input = {}, output = {}) {
-  const client = dependencies.client || dependencies.ui || input?.client || output?.client || null
+    const client = dependencies.client || dependencies.ui || input?.client || output?.client || null
   if (!client) return null
 
   const candidates = [
@@ -206,8 +214,8 @@ async function showToast(toastFn, message, variant = "default") {
         variant,
       },
     })
-  } catch {
-    // Toasts are best-effort UI affordances; they must not affect compaction.
+  } catch (error) {
+    writeDiagnostic(`[context-optimizer] toast failed: ${error}`)
   }
 }
 
@@ -218,7 +226,7 @@ export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = resolveT
   const warnTracker = tracker || createSessionWarningTracker()
 
   return new Promise((resolve) => {
-    const child = spawn(python[0], [cliPath], { stdio: ["pipe", "pipe", "pipe"] })
+    const child = childProcess.spawn(python[0], [cliPath], { stdio: ["pipe", "pipe", "pipe"] })
     let stdout = ""
     let stderr = ""
     let settled = false
@@ -268,8 +276,8 @@ export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = resolveT
     try {
       child.stdin.write(JSON.stringify(payload))
       child.stdin.end()
-    } catch {
-      // The "error"/"close" handlers above resolve the promise; nothing to do here.
+    } catch (error) {
+      writeDiagnostic(`[context-optimizer] stdin write failed: ${error}`)
     }
   }).then((result) => {
     if (!result.ok) {

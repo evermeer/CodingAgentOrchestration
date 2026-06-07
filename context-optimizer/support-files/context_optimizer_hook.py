@@ -1,3 +1,5 @@
+import sys
+
 try:
     from context_optimizer import ContextOptimizer
 except Exception:
@@ -5,6 +7,14 @@ except Exception:
 
 _optimizer = None
 _init_failed = False
+
+
+def _log(message):
+    try:
+        sys.stderr.write(f"[context-optimizer] {message}\n")
+        sys.stderr.flush()
+    except Exception:
+        pass
 
 
 def _get_optimizer():
@@ -19,9 +29,10 @@ def _get_optimizer():
 
     try:
         _optimizer = ContextOptimizer()
-    except Exception:
+    except Exception as exc:
         _init_failed = True
         _optimizer = None
+        _log(f"optimizer initialization failed: {type(exc).__name__}: {exc}")
         return None
 
     return _optimizer
@@ -43,7 +54,8 @@ def run(context):
             graph_ctx=graph_ctx,
             memory_ctx=memory_ctx,
         )
-    except Exception:
+    except Exception as exc:
+        _log(f"optimizer optimization failed: {type(exc).__name__}: {exc}")
         context["optimized_context_error"] = "optimizer optimization failed"
         return context
 

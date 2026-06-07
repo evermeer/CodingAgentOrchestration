@@ -1,0 +1,14 @@
+2026-06-07T21:07:21.609Z [context-optimizer] python_missing: missing python
+2026-06-07T21:07:21.617Z [context-optimizer] python_missing: missing python
+2026-06-07T21:07:22.081Z [context-optimizer] runtime_error: SyntaxError: Unexpected end of JSON input
+C:\Users\EdwinVermeer\AppData\Local\Python\pythoncore-3.14-64\python.exe: can't open file 'C:\\D\\OS\\CodingAgentOrchestration\\context-optimizer\\missing_cli.py': [Errno 2] No such file or directory
+2026-06-07T21:07:22.478Z [context-optimizer] disabled during startup: ReferenceError: existsSync is not defined
+2026-06-07T21:07:22.484Z [context-optimizer] disabled during startup: ReferenceError: existsSync is not defined
+2026-06-07T21:07:54.013Z [context-optimizer] python_missing: missing python
+2026-06-07T21:07:54.019Z [context-optimizer] python_missing: missing python
+2026-06-07T21:07:54.399Z [context-optimizer] runtime_error: SyntaxError: Unexpected end of JSON input
+C:\Users\EdwinVermeer\AppData\Local\Python\pythoncore-3.14-64\python.exe: can't open file 'C:\\D\\OS\\CodingAgentOrchestration\\context-optimizer\\missing_cli.py': [Errno 2] No such file or directory
+2026-06-07T21:07:54.709Z [context-optimizer] outbound docs: 1
+2026-06-07T21:07:54.714Z [context-optimizer] optimized context emitted. Initial size: 42 chars, final size: 11 chars, saved: 31 chars (74%)
+2026-06-07T21:07:54.720Z [context-optimizer] outbound docs: 1
+2026-06-07T21:07:54.724Z [context-optimizer] optimization skipped: missing dep
