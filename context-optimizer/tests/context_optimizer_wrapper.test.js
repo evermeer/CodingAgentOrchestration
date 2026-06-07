@@ -232,8 +232,16 @@ test("ContextOptimizerPlugin rewrites output context when runOptimizer is stubbe
     initialSize: 42,
     finalSize: 11,
   })
+  const toasts = []
 
-  const pluginInstance = await ContextOptimizerPlugin({ runOptimizer: stubRunOptimizer })
+  const pluginInstance = await ContextOptimizerPlugin({
+    runOptimizer: stubRunOptimizer,
+    client: {
+      tui: {
+        showToast: (payload) => toasts.push(payload),
+      },
+    },
+  })
   const compacting = pluginInstance["experimental.session.compacting"]
   const output = { context: ["original source"] }
 
@@ -243,6 +251,16 @@ test("ContextOptimizerPlugin rewrites output context when runOptimizer is stubbe
     "[context-optimizer] optimized context emitted. Initial size: 42 chars, final size: 11 chars, saved: 31 chars (74%)",
     "Initial size: 42 chars, final size: 11 chars, saved: 31 chars (74%)",
     "## Optimized Context\n\nstubbed optimized context",
+  ])
+
+  assert.deepEqual(toasts, [
+    {
+      body: {
+        message:
+          "[context-optimizer] optimized context emitted. Initial size: 42 chars, final size: 11 chars, saved: 31 chars (74%)",
+        variant: "default",
+      },
+    },
   ])
 })
 
@@ -254,12 +272,28 @@ test("ContextOptimizerPlugin leaves context untouched when the optimizer fails (
     status: "failed",
     reason: "missing dep",
   })
+  const toasts = []
 
-  const pluginInstance = await ContextOptimizerPlugin({ runOptimizer: stubRunOptimizer })
+  const pluginInstance = await ContextOptimizerPlugin({
+    runOptimizer: stubRunOptimizer,
+    client: {
+      tui: {
+        showToast: (payload) => toasts.push(payload),
+      },
+    },
+  })
   const compacting = pluginInstance["experimental.session.compacting"]
   const output = { context: ["original source"] }
 
   await compacting({ sessionID: "session-a", prompt: "hello" }, output)
 
   assert.deepEqual(output.context, ["original source"])
+  assert.deepEqual(toasts, [
+    {
+      body: {
+        message: "missing dep",
+        variant: "error",
+      },
+    },
+  ])
 })

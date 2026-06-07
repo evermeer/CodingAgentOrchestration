@@ -164,6 +164,7 @@ export function applyOptimizedContext(output, result) {
   if (!output || !result?.optimizedContext) return
 
   const summary = formatSizeSummary(result.initialSize, result.finalSize)
+  const savingsText = summary || ""
   const statusLine = summary
     ? `[context-optimizer] optimized context emitted. ${summary}`
     : (() => {
@@ -179,6 +180,42 @@ export function applyOptimizedContext(output, result) {
   nextContext.push(`## Optimized Context\n\n${result.optimizedContext}`)
 
   output.context = nextContext
+
+  writeLog(
+    import.meta.url,
+    `[context-optimizer] success: optimized context emitted${savingsText ? `. ${savingsText}` : "."}`,
+  )
+}
+
+function resolveToastClient(dependencies = {}, input = {}, output = {}) {
+  const client = dependencies.client || dependencies.ui || input?.client || output?.client || null
+  if (!client) return null
+
+  const candidates = [
+    client.tui?.showToast,
+    client.showToast,
+    client.toast?.show,
+    client.toast,
+    client.tui?.toast,
+  ]
+
+  const toastFn = candidates.find((candidate) => typeof candidate === "function")
+  return toastFn ? toastFn.bind(client.tui || client) : null
+}
+
+async function showToast(toastFn, message, variant = "default") {
+  if (!toastFn) return
+
+  try {
+    await toastFn({
+      body: {
+        message,
+        variant,
+      },
+    })
+  } catch {
+    // Toasts are best-effort UI affordances; they must not affect compaction.
+  }
 }
 
 export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = resolveTimeoutMs(), metaUrl = import.meta.url, tracker }) {
@@ -259,6 +296,7 @@ export const ContextOptimizerPlugin = async (dependencies = {}) => {
 
     return {
       "experimental.session.compacting": async (input, output) => {
+        const toast = resolveToastClient(dependencies, input, output)
         const payload = buildPayload(input, output)
         if (!payload.docs.length) {
           writeLog(import.meta.url, "[context-optimizer] no optimization applied: no compaction documents were provided.")
@@ -277,6 +315,16 @@ export const ContextOptimizerPlugin = async (dependencies = {}) => {
         // applyOptimizedContext is fail-open: it only rewrites output.context
         // when the optimizer returned real optimized content.
         applyOptimizedContext(output, result)
+
+        if (result?.ok && result?.optimizedContext) {
+          await showToast(toast, formatOutcomeMessage(result), "default")
+        } else if (!result?.ok) {
+          await showToast(
+            toast,
+            result?.reason || result?.message || result?.errorCode || "Context optimization failed.",
+            "error",
+          )
+        }
       },
     }
   } catch (error) {
