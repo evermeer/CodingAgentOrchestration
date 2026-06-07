@@ -16,16 +16,20 @@ class ContextOptimizer:
         dedupe_threshold=0.9,
     ):
         device = "cuda" if torch is not None and torch.cuda.is_available() else "cpu"
+        # Keep the LLMLingua-2 algorithm on both devices; on CPU use the smaller
+        # multilingual BERT checkpoint instead of the large xlm-roberta model so
+        # the optimizer stays responsive without a CUDA GPU.
         compressor_model = (
             "microsoft/llmlingua-2-xlm-roberta-large-meetingbank"
             if device == "cuda"
-            else "openai-community/gpt2"
+            else "microsoft/llmlingua-2-bert-base-multilingual-cased-meetingbank"
         )
 
         self.reranker = CrossEncoder(reranker_model, device=device)
         self.embedder = SentenceTransformer(embed_model, device=device)
         self.compressor = PromptCompressor(
             model_name=compressor_model,
+            use_llmlingua2=True,
             device_map=device,
         )
 
@@ -98,8 +102,10 @@ class ContextOptimizer:
         if not combined:
             return ""
 
-        ranked = self.rerank(query, combined)
-        unique = self.dedupe(ranked)
-        compressed = self.compress(unique)
+        # Deduplicate before reranking so duplicate chunks do not consume the
+        # limited max_chunks budget that rerank applies.
+        unique = self.dedupe(combined)
+        ranked = self.rerank(query, unique)
+        compressed = self.compress(ranked)
 
         return compressed

@@ -13,7 +13,6 @@ This plugin adds token reduction to your OpenCode setup.
 - 🔃 Reranking (removes irrelevant context)
 - 🧹 Deduplication (removes repeated info)
 - 🗜️Compression (LLMLingua)
-- 📝 Rolling summary
 - 🔌Works with Oh-My-Openagent + Graphify + MemPalace
 
 #### 🚀 What You’ll Notice Immediately:
@@ -120,7 +119,7 @@ python -m pip install sentence-transformers llmlingua
 If you do have an NVIDIA GPU, use the official PyTorch installer selector to pick the matching CUDA wheel for your machine instead.
 
 > [!NOTE]
-> On CPU-only Windows installs, the optimizer automatically falls back to a CPU-safe compression model so it does not try to load the LLMLingua-2 CUDA path.
+> On CPU-only installs, the optimizer automatically selects a smaller, CPU-friendly LLMLingua-2 model (`microsoft/llmlingua-2-bert-base-multilingual-cased-meetingbank`) instead of the larger CUDA-oriented `xlm-roberta-large` model. It keeps the LLMLingua-2 compression algorithm either way.
 
 > [!NOTE]
 > This is a sizeable download (PyTorch alone is several hundred MB). On a slow connection this step can take a few minutes.
@@ -239,7 +238,7 @@ For the current setup, activation is handled by the global OpenCode plugin loade
 
 In the supported wrapper path, the optimizer automatically:
 
-1. Combines graph + memory
+1. Collects the compaction context documents
 2. Keeps only relevant chunks
 3. Removes duplicates
 4. Compresses context
@@ -283,6 +282,23 @@ embed_model    = "all-MiniLM-L6-v2"          # used for deduplication embeddings
 > [!TIP]
 > Start with the defaults. If responses lose important detail, raise `compression_rate` (keep more) or `max_chunks`. If prompts are still too large, lower them.
 
+### Process timeout and first-run warm-up
+
+The JS wrapper kills the Python bridge if it does not respond within a timeout (default **120000 ms / 2 minutes**). Override it with the `CONTEXT_OPTIMIZER_PYTHON` interpreter's environment, e.g.:
+
+```bash
+# longer timeout for slow machines (milliseconds)
+export CONTEXT_OPTIMIZER_TIMEOUT_MS=300000
+```
+
+The very first run downloads several GB of models (see [What gets downloaded on first run](#what-gets-downloaded-on-first-run)) and will almost certainly exceed any practical timeout. Warm the cache **once** before relying on the plugin so the first real compaction loads from disk:
+
+```bash
+python -c "from context_optimizer import ContextOptimizer; ContextOptimizer()"
+```
+
+Run that from the directory containing `context_optimizer.py` (your installed `~/.config/opencode/context-optimizer/`). If the wrapper times out, it fails open and leaves the original context untouched.
+
 ---
 
 ## What gets downloaded on first run
@@ -293,7 +309,7 @@ The first time the plugin runs, the underlying libraries download three models f
 | --- | --- | --- |
 | `BAAI/bge-reranker-large` | Reranks chunks by relevance | `reranker_model` |
 | `all-MiniLM-L6-v2` | Embeddings used for deduplication | `embed_model` |
-| `microsoft/llmlingua-2-xlm-roberta-large-meetingbank` | Prompt compression | LLMLingua |
+| `microsoft/llmlingua-2-xlm-roberta-large-meetingbank` (CUDA) or `microsoft/llmlingua-2-bert-base-multilingual-cased-meetingbank` (CPU) | Prompt compression | LLMLingua (auto-selected by device) |
 
 This download happens **once** and only needs network access the first time. Expect the first session to be slower while the models are fetched. Subsequent sessions load from cache.
 
@@ -302,7 +318,7 @@ This download happens **once** and only needs network access the first time. Exp
 ## Expected Results
 
 - 70–90% token reduction
-- Faster Copilot responses
+- Faster responses
 - Cleaner prompts
 
 ---
@@ -325,7 +341,7 @@ mempalace.store(compressed)
 | `ModuleNotFoundError: sentence_transformers` or `llmlingua` | Packages installed into a different Python than OpenCode uses | Re-install with `python -m pip install sentence-transformers llmlingua`, or activate the same virtual environment before launching OpenCode |
 | `ImportError: cannot import name 'ContextOptimizer'` | The Python bridge cannot import the core optimizer | Make sure `context-optimizer/support-files/context_optimizer.py` and `context-optimizer/support-files/context_optimizer_cli.py` stay together in the repo, and that the installed copies stay together inside `~/.config/opencode/context-optimizer/` |
 | `pip: command not found` | pip not installed / not on PATH | See [Install pip (one-liner)](#install-pip-one-liner) |
-| First message hangs for a long time | Models are downloading from Hugging Face | Wait for the one-time download to finish; see [What gets downloaded on first run](#what-gets-downloaded-on-first-run) |
+| First message hangs for a long time | Models are downloading from Hugging Face | Wait for the one-time download to finish; see [What gets downloaded on first run](#what-gets-downloaded-on-first-run). Warm the cache once (see [Process timeout and first-run warm-up](#process-timeout-and-first-run-warm-up)) and/or raise `CONTEXT_OPTIMIZER_TIMEOUT_MS` |
 | Hook never runs / context unchanged | The JS wrapper was not loaded or compaction did not fire | Confirm `~/.config/opencode/plugins/context-optimizer.js` exists and trigger a session compaction |
 | You expect console output but see none | Logging was moved to `context-optimizer/context-optimizer.log` under the OpenCode config root | Check the `.log` file instead of the terminal |
 | You see a warning and no optimized context block | The wrapper fell back to no-op mode because Python, dependencies, or the bridge failed | Read the warning text, fix the Python issue, and retry |

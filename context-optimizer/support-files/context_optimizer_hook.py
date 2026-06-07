@@ -3,14 +3,31 @@ try:
 except Exception:
     ContextOptimizer = None
 
-optimizer = None
-if ContextOptimizer is not None:
+_optimizer = None
+_init_failed = False
+
+
+def _get_optimizer():
+    # Lazily construct the optimizer on first use so importing this module does
+    # not download or load the (multi-GB) models as an import side effect.
+    global _optimizer, _init_failed
+
+    if _optimizer is not None:
+        return _optimizer
+    if _init_failed or ContextOptimizer is None:
+        return None
+
     try:
-        optimizer = ContextOptimizer()
+        _optimizer = ContextOptimizer()
     except Exception:
-        optimizer = None
+        _init_failed = True
+        return None
+
+    return _optimizer
+
 
 def run(context):
+    optimizer = _get_optimizer()
     if optimizer is None:
         return context
 

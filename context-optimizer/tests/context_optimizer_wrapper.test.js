@@ -12,7 +12,6 @@ import plugin, {
   createSessionWarningTracker,
   formatOutcomeMessage,
   formatSizeSummary,
-  logSizeSummary,
   normalizePythonResult,
   resolvePythonCommand,
   runOptimizer,
@@ -109,7 +108,7 @@ test("applyOptimizedContext leaves output untouched when there is no optimized c
   assert.deepEqual(output.context, ["source one"])
 })
 
-test("applyOptimizedContext emits status-only no-optimization results", () => {
+test("applyOptimizedContext leaves context untouched for status-only no-optimization results", () => {
   const output = { context: ["source one"] }
 
   applyOptimizedContext(output, {
@@ -121,13 +120,10 @@ test("applyOptimizedContext emits status-only no-optimization results", () => {
     finalSize: 20,
   })
 
-  assert.deepEqual(output.context, [
-    "[context-optimizer] no optimization applied: nothing safer",
-    "## Optimized Context\n\n",
-  ])
+  assert.deepEqual(output.context, ["source one"])
 })
 
-test("applyOptimizedContext emits status-only failed results", () => {
+test("applyOptimizedContext leaves context untouched for failed results", () => {
   const output = { context: ["source one"] }
 
   applyOptimizedContext(output, {
@@ -139,10 +135,7 @@ test("applyOptimizedContext emits status-only failed results", () => {
     finalSize: 20,
   })
 
-  assert.deepEqual(output.context, [
-    "[context-optimizer] optimization skipped: boom",
-    "## Optimized Context\n\n",
-  ])
+  assert.deepEqual(output.context, ["source one"])
 })
 
 test("formatOutcomeMessage reports missing size metadata details", () => {
@@ -166,22 +159,6 @@ test("applyOptimizedContext reports missing size metadata details", () => {
     "[context-optimizer] optimization completed, but savings summary was unavailable because size metadata was missing or non-numeric. (final_size=undefined)",
     "## Optimized Context\n\noptimized body",
   ])
-})
-
-test("logSizeSummary returns a size summary", () => {
-  const messages = []
-  const originalLog = console.log
-  console.log = (message) => {
-    messages.push(message)
-  }
-
-  try {
-    const summary = logSizeSummary({ initialSize: 20, finalSize: 5 })
-    assert.equal(summary, "Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)")
-    assert.deepEqual(messages, [])
-  } finally {
-    console.log = originalLog
-  }
 })
 
 test("resolvePythonCommand respects override", () => {
@@ -267,4 +244,22 @@ test("ContextOptimizerPlugin rewrites output context when runOptimizer is stubbe
     "Initial size: 42 chars, final size: 11 chars, saved: 31 chars (74%)",
     "## Optimized Context\n\nstubbed optimized context",
   ])
+})
+
+test("ContextOptimizerPlugin leaves context untouched when the optimizer fails (fail open)", async () => {
+  const stubRunOptimizer = async () => ({
+    ok: false,
+    errorCode: "dependency_missing",
+    message: "missing dep",
+    status: "failed",
+    reason: "missing dep",
+  })
+
+  const pluginInstance = await ContextOptimizerPlugin({ runOptimizer: stubRunOptimizer })
+  const compacting = pluginInstance["experimental.session.compacting"]
+  const output = { context: ["original source"] }
+
+  await compacting({ sessionID: "session-a", prompt: "hello" }, output)
+
+  assert.deepEqual(output.context, ["original source"])
 })

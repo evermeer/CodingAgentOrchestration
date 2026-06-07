@@ -4,7 +4,13 @@ import path from "node:path"
 import process from "node:process"
 import { fileURLToPath } from "node:url"
 
-const DEFAULT_TIMEOUT_MS = 30000
+const DEFAULT_TIMEOUT_MS = 120000
+
+export function resolveTimeoutMs() {
+  const raw = process.env.CONTEXT_OPTIMIZER_TIMEOUT_MS
+  const parsed = raw ? Number.parseInt(raw, 10) : Number.NaN
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_TIMEOUT_MS
+}
 
 function dirnameFromMeta(metaUrl) {
   return path.dirname(fileURLToPath(metaUrl))
@@ -12,6 +18,16 @@ function dirnameFromMeta(metaUrl) {
 
 function resolveLogPath(metaUrl) {
   const pluginDir = dirnameFromMeta(metaUrl)
+  // Repo layout: <root>/context-optimizer/plugin/context-optimizer.js
+  // Write the log next to the support files instead of a doubled directory.
+  if (
+    path.basename(pluginDir) === "plugin" &&
+    path.basename(path.dirname(pluginDir)) === "context-optimizer"
+  ) {
+    return path.resolve(pluginDir, "..", "context-optimizer.log")
+  }
+
+  // Installed layout: <config>/plugins/context-optimizer.js
   return path.resolve(pluginDir, "..", "context-optimizer", "context-optimizer.log")
 }
 
@@ -31,12 +47,6 @@ export function formatSizeSummary(initialSize, finalSize) {
   const saved = initialSize - finalSize
   const percent = initialSize > 0 ? Math.round((saved / initialSize) * 100) : 0
   return `Initial size: ${initialSize} chars, final size: ${finalSize} chars, saved: ${saved} chars (${percent}%)`
-}
-
-export function logSizeSummary(result = {}, metaUrl = import.meta.url) {
-  const summary = formatSizeSummary(result.initialSize, result.finalSize)
-  if (summary) writeLog(metaUrl, `[context-optimizer] ${summary}`)
-  return summary
 }
 
 export function formatOutcomeMessage(result = {}) {
@@ -76,11 +86,6 @@ export function buildPayload(input = {}, output = {}) {
       input.prompt ||
       "Optimize the most relevant context for compaction.",
     docs: context,
-    options: {
-      compression_rate: 0.5,
-      max_chunks: 6,
-      dedupe_threshold: 0.9,
-    },
   }
 }
 
@@ -154,35 +159,33 @@ export function createCliPath(metaUrl) {
 }
 
 export function applyOptimizedContext(output, result) {
-  if (!output || (!result?.optimizedContext && result?.status !== "no_optimization" && result?.status !== "failed")) return
+  // Fail open: only replace the original context when the optimizer produced a
+  // real optimized replacement. Failures and no-op results leave context intact.
+  if (!output || !result?.optimizedContext) return
 
-  const nextContext = []
   const summary = formatSizeSummary(result.initialSize, result.finalSize)
-  const statusLine =
-    result?.status === "no_optimization"
-      ? `[context-optimizer] no optimization applied: ${result.reason || "the optimizer found no safer or smaller replacement for the current context."}`
-      : result?.status === "failed"
-        ? `[context-optimizer] optimization skipped: ${result.reason || result.message || "the optimizer could not complete."}`
-        : summary
-          ? `[context-optimizer] optimized context emitted. ${summary}`
-          : (() => {
-              const parts = []
-              if (!Number.isFinite(result.initialSize)) parts.push(`initial_size=${String(result.initialSize)}`)
-              if (!Number.isFinite(result.finalSize)) parts.push(`final_size=${String(result.finalSize)}`)
-              const detail = parts.length ? ` (${parts.join(", ")})` : ""
-              return `[context-optimizer] optimization completed, but savings summary was unavailable because size metadata was missing or non-numeric.${detail}`
-            })()
+  const statusLine = summary
+    ? `[context-optimizer] optimized context emitted. ${summary}`
+    : (() => {
+        const parts = []
+        if (!Number.isFinite(result.initialSize)) parts.push(`initial_size=${String(result.initialSize)}`)
+        if (!Number.isFinite(result.finalSize)) parts.push(`final_size=${String(result.finalSize)}`)
+        const detail = parts.length ? ` (${parts.join(", ")})` : ""
+        return `[context-optimizer] optimization completed, but savings summary was unavailable because size metadata was missing or non-numeric.${detail}`
+      })()
 
-  nextContext.push(statusLine)
-  if (summary && result?.status !== "no_optimization" && result?.status !== "failed") nextContext.push(summary)
-  nextContext.push(`## Optimized Context\n\n${result.optimizedContext || ""}`)
+  const nextContext = [statusLine]
+  if (summary) nextContext.push(summary)
+  nextContext.push(`## Optimized Context\n\n${result.optimizedContext}`)
 
   output.context = nextContext
 }
 
-export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = DEFAULT_TIMEOUT_MS, metaUrl = import.meta.url }) {
+export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = resolveTimeoutMs(), metaUrl = import.meta.url, tracker }) {
   const python = resolvePythonCommand()
-  const tracker = createSessionWarningTracker()
+  // Reuse the caller-provided tracker so "warn once per session" survives across
+  // compactions. Fall back to a local tracker only for standalone/test calls.
+  const warnTracker = tracker || createSessionWarningTracker()
 
   return new Promise((resolve) => {
     const child = spawn(python[0], [cliPath], { stdio: ["pipe", "pipe", "pipe"] })
@@ -214,6 +217,11 @@ export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = DEFAULT_
       finish({ ok: false, errorCode: "python_missing", message: String(error) })
     })
 
+    child.stdin.on("error", () => {
+      // Ignore stdin pipe errors (e.g. EPIPE when the child exits before we
+      // finish writing). The "error"/"close" handlers settle the promise.
+    })
+
     child.on("close", () => {
       clearTimeout(timer)
       try {
@@ -227,11 +235,15 @@ export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = DEFAULT_
       }
     })
 
-    child.stdin.write(JSON.stringify(payload))
-    child.stdin.end()
+    try {
+      child.stdin.write(JSON.stringify(payload))
+      child.stdin.end()
+    } catch {
+      // The "error"/"close" handlers above resolve the promise; nothing to do here.
+    }
   }).then((result) => {
     if (!result.ok) {
-      tracker.warnOnce(sessionID || "global", `${result.errorCode}: ${result.message}`, metaUrl)
+      warnTracker.warnOnce(sessionID || "global", `${result.errorCode}: ${result.message}`, metaUrl)
     }
     return result
   })
@@ -243,6 +255,7 @@ export const ContextOptimizerPlugin = async (dependencies = {}) => {
   try {
     const cliPath = createCliPath(import.meta.url)
     const run = dependencies.runOptimizer || runOptimizer
+    const tracker = createSessionWarningTracker()
 
     return {
       "experimental.session.compacting": async (input, output) => {
@@ -257,14 +270,13 @@ export const ContextOptimizerPlugin = async (dependencies = {}) => {
           sessionID: input?.sessionID,
           cliPath,
           metaUrl: import.meta.url,
+          tracker,
         })
 
         writeLog(import.meta.url, formatOutcomeMessage(result))
-        if (result?.optimizedContext || result?.status === "no_optimization" || result?.status === "failed") {
-          applyOptimizedContext(output, result)
-        }
-
-        if (!result.ok || !result.optimizedContext) return
+        // applyOptimizedContext is fail-open: it only rewrites output.context
+        // when the optimizer returned real optimized content.
+        applyOptimizedContext(output, result)
       },
     }
   } catch (error) {
