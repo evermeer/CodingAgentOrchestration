@@ -90,7 +90,6 @@ test("applyOptimizedContext replaces source context", () => {
 
   assert.deepEqual(output.context, [
     "[context-optimizer] optimized context emitted. Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)",
-    "Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)",
     "## Optimized Context\n\noptimized body",
   ])
 })
@@ -249,7 +248,6 @@ test("ContextOptimizerPlugin rewrites output context when runOptimizer is stubbe
 
   assert.deepEqual(output.context, [
     "[context-optimizer] optimized context emitted. Initial size: 42 chars, final size: 11 chars, saved: 31 chars (74%)",
-    "Initial size: 42 chars, final size: 11 chars, saved: 31 chars (74%)",
     "## Optimized Context\n\nstubbed optimized context",
   ])
 

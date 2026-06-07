@@ -180,6 +180,24 @@ class ContextOptimizerHookTests(unittest.TestCase):
 
         self.assertIs(result, context)
         self.assertNotIn("optimized_context", result)
+        self.assertEqual(result.get("optimized_context_error"), "optimizer initialization failed")
+
+    def test_run_returns_original_context_with_error_marker_when_optimization_fails(self):
+        core = load_core_module()
+
+        class StubOptimizer:
+            def optimize(self, query, graph_ctx=None, memory_ctx=None):
+                raise RuntimeError("boom")
+
+        setattr(core, "ContextOptimizer", lambda: StubOptimizer())
+        hook = load_hook_module(core)
+
+        context = cast(dict[str, Any], {"query": "hello"})
+        result = hook.run(context)
+
+        self.assertIs(result, context)
+        self.assertNotIn("optimized_context", result)
+        self.assertEqual(result.get("optimized_context_error"), "optimizer optimization failed")
 
 
 if __name__ == "__main__":

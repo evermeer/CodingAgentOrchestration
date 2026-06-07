@@ -9,18 +9,22 @@ def emit(payload: Dict[str, Any], exit_code: int = 0) -> NoReturn:
     raise SystemExit(exit_code)
 
 
+def emit_error(error_code: str, message: str, exit_code: int = 1) -> NoReturn:
+    emit(
+        {
+            "ok": False,
+            "error_code": error_code,
+            "message": message,
+        },
+        exit_code=exit_code,
+    )
+
+
 ContextOptimizer: Any = None
 try:
     from context_optimizer import ContextOptimizer
 except ModuleNotFoundError as exc:
-    emit(
-        {
-            "ok": False,
-            "error_code": "dependency_missing",
-            "message": str(exc),
-        },
-        exit_code=0,
-    )
+    emit_error("dependency_missing", str(exc))
 
 
 def main() -> None:
@@ -29,37 +33,23 @@ def main() -> None:
     try:
         payload = json.loads(raw or "{}")
     except json.JSONDecodeError as exc:
-        emit(
-            {
-                "ok": False,
-                "error_code": "invalid_input",
-                "message": str(exc),
-            }
-        )
-        return
+        emit_error("invalid_input", str(exc))
 
     docs = payload.get("docs") or []
     query = payload.get("query", "")
     options = payload.get("options") or {}
 
     if not isinstance(docs, list):
-        emit(
-            {
-                "ok": False,
-                "error_code": "invalid_input",
-                "message": "docs must be a list of strings",
-            }
-        )
-        return
+        emit_error("invalid_input", "docs must be a list of strings")
 
     if not docs:
         emit({"ok": True, "optimized_context": "", "initial_size": 0, "final_size": 0})
         return
 
-    safe_docs = [doc for doc in docs if isinstance(doc, str)]
-    if not safe_docs:
-        emit({"ok": True, "optimized_context": "", "initial_size": 0, "final_size": 0})
-        return
+    if any(not isinstance(doc, str) for doc in docs):
+        emit_error("invalid_input", "docs must contain strings only")
+
+    safe_docs = docs
 
     initial_size = sum(len(doc) for doc in safe_docs)
 
@@ -67,25 +57,11 @@ def main() -> None:
     try:
         optimizer = ContextOptimizer(**options) if ContextOptimizer is not None else None
         if optimizer is None:
-            emit(
-                {
-                    "ok": False,
-                    "error_code": "dependency_missing",
-                    "message": "ContextOptimizer import unavailable",
-                }
-            )
-            return
+            emit_error("dependency_missing", "ContextOptimizer import unavailable")
 
         optimized = optimizer.optimize(query=query, graph_ctx=safe_docs, memory_ctx=[])
     except Exception as exc:
-        emit(
-            {
-                "ok": False,
-                "error_code": "runtime_error",
-                "message": str(exc),
-            }
-        )
-        return
+        emit_error("runtime_error", str(exc))
 
     emit(
         {

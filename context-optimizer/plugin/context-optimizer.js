@@ -176,7 +176,6 @@ export function applyOptimizedContext(output, result) {
       })()
 
   const nextContext = [statusLine]
-  if (summary) nextContext.push(summary)
   nextContext.push(`## Optimized Context\n\n${result.optimizedContext}`)
 
   output.context = nextContext

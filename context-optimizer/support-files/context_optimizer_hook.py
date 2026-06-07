@@ -21,6 +21,7 @@ def _get_optimizer():
         _optimizer = ContextOptimizer()
     except Exception:
         _init_failed = True
+        _optimizer = None
         return None
 
     return _optimizer
@@ -29,6 +30,7 @@ def _get_optimizer():
 def run(context):
     optimizer = _get_optimizer()
     if optimizer is None:
+        context["optimized_context_error"] = "optimizer initialization failed"
         return context
 
     query = context.get("query", "")
@@ -42,7 +44,9 @@ def run(context):
             memory_ctx=memory_ctx,
         )
     except Exception:
+        context["optimized_context_error"] = "optimizer optimization failed"
         return context
 
     context["optimized_context"] = optimized
+    context.pop("optimized_context_error", None)
     return context

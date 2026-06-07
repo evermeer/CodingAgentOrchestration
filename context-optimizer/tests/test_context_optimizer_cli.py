@@ -73,6 +73,7 @@ class ContextOptimizerCliTests(unittest.TestCase):
         data = json.loads(proc.stdout)
         self.assertFalse(data["ok"])
         self.assertEqual(data["error_code"], "invalid_input")
+        self.assertNotEqual(proc.returncode, 0)
 
     def test_cli_returns_empty_context_for_empty_docs(self):
         proc = run_cli_with_stub(
@@ -106,6 +107,25 @@ class ContextOptimizerCliTests(unittest.TestCase):
         data = json.loads(proc.stdout)
         self.assertFalse(data["ok"])
         self.assertEqual(data["error_code"], "invalid_input")
+        self.assertNotEqual(proc.returncode, 0)
+
+    def test_cli_rejects_mixed_docs_lists(self):
+        proc = run_cli_with_stub(
+            {"query": "hello", "docs": ["alpha", 123, None]},
+            """
+            class ContextOptimizer:
+                def __init__(self, **kwargs):
+                    pass
+
+                def optimize(self, query, graph_ctx=None, memory_ctx=None):
+                    return "stub"
+            """,
+        )
+
+        data = json.loads(proc.stdout)
+        self.assertFalse(data["ok"])
+        self.assertEqual(data["error_code"], "invalid_input")
+        self.assertNotEqual(proc.returncode, 0)
 
     def test_cli_uses_stubbed_optimizer_for_happy_path(self):
         proc = run_cli_with_stub(
@@ -125,6 +145,33 @@ class ContextOptimizerCliTests(unittest.TestCase):
         self.assertEqual(data["optimized_context"], "hello:alpha|beta:0.25")
         self.assertEqual(data["initial_size"], 9)
         self.assertEqual(data["final_size"], len("hello:alpha|beta:0.25"))
+        self.assertEqual(proc.returncode, 0)
+
+    def test_cli_returns_non_zero_for_runtime_error(self):
+        proc = run_cli_with_stub(
+            {"query": "hello", "docs": ["alpha"]},
+            """
+            class ContextOptimizer:
+                def __init__(self, **kwargs):
+                    pass
+
+                def optimize(self, query, graph_ctx=None, memory_ctx=None):
+                    raise RuntimeError("boom")
+            """,
+        )
+
+        data = json.loads(proc.stdout)
+        self.assertFalse(data["ok"])
+        self.assertEqual(data["error_code"], "runtime_error")
+        self.assertNotEqual(proc.returncode, 0)
+
+    def test_cli_returns_non_zero_when_dependency_is_missing(self):
+        proc = run_cli(
+            {"query": "hello", "docs": ["alpha"]},
+            cli_path=Path(tempfile.mkdtemp()) / "missing_cli.py",
+        )
+
+        self.assertNotEqual(proc.returncode, 0)
 
 
 if __name__ == "__main__":
