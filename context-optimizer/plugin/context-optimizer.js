@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process"
-import { existsSync } from "node:fs"
+import { appendFileSync, existsSync, mkdirSync } from "node:fs"
 import path from "node:path"
 import process from "node:process"
 import { fileURLToPath } from "node:url"
@@ -11,6 +11,21 @@ function dirnameFromMeta(metaUrl) {
   return path.dirname(fileURLToPath(metaUrl))
 }
 
+function resolveLogPath(metaUrl) {
+  const pluginDir = dirnameFromMeta(metaUrl)
+  return path.resolve(pluginDir, "..", "context-optimizer", "context-optimizer.log")
+}
+
+function writeLog(metaUrl, message) {
+  try {
+    const logPath = resolveLogPath(metaUrl)
+    mkdirSync(path.dirname(logPath), { recursive: true })
+    appendFileSync(logPath, `${new Date().toISOString()} ${message}\n`, "utf8")
+  } catch {
+    // Intentionally swallow logging failures; plugin behavior should not depend on file logging.
+  }
+}
+
 export function formatSizeSummary(initialSize, finalSize) {
   if (!Number.isFinite(initialSize) || !Number.isFinite(finalSize)) return ""
 
@@ -19,9 +34,9 @@ export function formatSizeSummary(initialSize, finalSize) {
   return `Initial size: ${initialSize} chars, final size: ${finalSize} chars, saved: ${saved} chars (${percent}%)`
 }
 
-export function logSizeSummary(result = {}) {
+export function logSizeSummary(result = {}, metaUrl = import.meta.url) {
   const summary = formatSizeSummary(result.initialSize, result.finalSize)
-  if (summary) console.log(`[context-optimizer] ${summary}`)
+  if (summary) writeLog(metaUrl, `[context-optimizer] ${summary}`)
   return summary
 }
 
@@ -96,11 +111,11 @@ export function resolvePythonCommand() {
   return ["python3"]
 }
 
-function warnOnce(sessionID, message) {
+function warnOnce(sessionID, message, metaUrl = import.meta.url) {
   const key = `${sessionID}:${message}`
   if (SESSION_WARNINGS.has(key)) return
   SESSION_WARNINGS.add(key)
-  console.warn(`[context-optimizer] ${message}`)
+  writeLog(metaUrl, `[context-optimizer] ${message}`)
 }
 
 export function createCliPath(metaUrl) {
@@ -122,13 +137,23 @@ export function applyOptimizedContext(output, result) {
 
   const nextContext = []
   const summary = formatSizeSummary(result.initialSize, result.finalSize)
-  if (summary) nextContext.push(summary)
+  const statusLine =
+    result?.status === "no_optimization"
+      ? `[context-optimizer] no optimization applied: ${result.reason || "the optimizer found no safer or smaller replacement for the current context."}`
+      : result?.status === "failed"
+        ? `[context-optimizer] optimization skipped: ${result.reason || result.message || "the optimizer could not complete."}`
+        : summary
+          ? `[context-optimizer] optimized context emitted. ${summary}`
+          : `[context-optimizer] optimization completed.`
+
+  nextContext.push(statusLine)
+  if (summary && result?.status !== "no_optimization" && result?.status !== "failed") nextContext.push(summary)
   nextContext.push(`## Optimized Context\n\n${result.optimizedContext}`)
 
   output.context = nextContext
 }
 
-export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = DEFAULT_TIMEOUT_MS }) {
+export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = DEFAULT_TIMEOUT_MS, metaUrl = import.meta.url }) {
   const python = resolvePythonCommand()
 
   return new Promise((resolve) => {
@@ -178,7 +203,7 @@ export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = DEFAULT_
     child.stdin.end()
   }).then((result) => {
     if (!result.ok) {
-      warnOnce(sessionID || "global", `${result.errorCode}: ${result.message}`)
+      warnOnce(sessionID || "global", `${result.errorCode}: ${result.message}`, metaUrl)
     }
     return result
   })
@@ -194,7 +219,7 @@ export const ContextOptimizerPlugin = async () => {
       "experimental.session.compacting": async (input, output) => {
         const payload = buildPayload(input, output)
         if (!payload.docs.length) {
-          console.log("[context-optimizer] no optimization applied: no compaction documents were provided.")
+          writeLog(import.meta.url, "[context-optimizer] no optimization applied: no compaction documents were provided.")
           return
         }
 
@@ -202,17 +227,19 @@ export const ContextOptimizerPlugin = async () => {
           payload,
           sessionID: input?.sessionID,
           cliPath,
+          metaUrl: import.meta.url,
         })
 
-        console.log(formatOutcomeMessage(result))
+        writeLog(import.meta.url, formatOutcomeMessage(result))
+        if (result?.optimizedContext || result?.status === "no_optimization" || result?.status === "failed") {
+          applyOptimizedContext(output, result)
+        }
 
         if (!result.ok || !result.optimizedContext) return
-
-        applyOptimizedContext(output, result)
       },
     }
   } catch (error) {
-    console.warn(`[context-optimizer] disabled during startup: ${error}`)
+    writeLog(import.meta.url, `[context-optimizer] disabled during startup: ${error}`)
     return {}
   }
 }

@@ -141,6 +141,8 @@ Copy the Python support files into a sibling support directory under the OpenCod
 
 The JS wrapper calls the Python bridge over stdin/stdout JSON and fails open if Python or its dependencies are unavailable.
 
+The plugin writes to `context-optimizer/context-optimizer.log` under the OpenCode config root (for example `~/.config/opencode/context-optimizer/context-optimizer.log` on macOS/Linux or `%USERPROFILE%\.config\opencode\context-optimizer\context-optimizer.log` on Windows).
+
 **Where is the global plugins folder?**
 
 | OS | Path |
@@ -313,6 +315,7 @@ mempalace.store(compressed)
 | `pip: command not found` | pip not installed / not on PATH | See [Install pip (one-liner)](#install-pip-one-liner) |
 | First message hangs for a long time | Models are downloading from Hugging Face | Wait for the one-time download to finish; see [What gets downloaded on first run](#what-gets-downloaded-on-first-run) |
 | Hook never runs / context unchanged | The JS wrapper was not loaded or compaction did not fire | Confirm `~/.config/opencode/plugins/context-optimizer.js` exists and trigger a session compaction |
+| You expect console output but see none | Logging was moved to `context-optimizer/context-optimizer.log` under the OpenCode config root | Check the `.log` file instead of the terminal |
 | You see a warning and no optimized context block | The wrapper fell back to no-op mode because Python, dependencies, or the bridge failed | Read the warning text, fix the Python issue, and retry |
 | Out-of-memory or very slow CPU | Reranker model is large | Switch `reranker_model` to `BAAI/bge-reranker-base` in `context_optimizer.py` |
 

@@ -58,12 +58,13 @@ test("applyOptimizedContext replaces source context", () => {
   })
 
   assert.deepEqual(output.context, [
+    "[context-optimizer] optimized context emitted. Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)",
     "Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)",
     "## Optimized Context\n\noptimized body",
   ])
 })
 
-test("logSizeSummary prints the savings line during normal use", () => {
+test("logSizeSummary returns a size summary", () => {
   const messages = []
   const originalLog = console.log
   console.log = (message) => {
@@ -73,7 +74,7 @@ test("logSizeSummary prints the savings line during normal use", () => {
   try {
     const summary = logSizeSummary({ initialSize: 20, finalSize: 5 })
     assert.equal(summary, "Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)")
-    assert.deepEqual(messages, ["Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)"])
+    assert.deepEqual(messages, [])
   } finally {
     console.log = originalLog
   }
