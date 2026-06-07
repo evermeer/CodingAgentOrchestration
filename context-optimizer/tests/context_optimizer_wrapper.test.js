@@ -46,6 +46,13 @@ test("buildPayload falls back to input prompt when output prompt is absent", () 
   assert.deepEqual(payload.docs, ["alpha"])
 })
 
+
+test("buildPayload includes the summed context size", () => {
+  const payload = buildPayload({}, { context: ["alpha", "beta"] })
+
+  assert.equal(payload.size, 9)
+})
+
 test("normalizePythonResult accepts success payload", () => {
   const result = normalizePythonResult('{"ok":true,"optimized_context":"hello","initial_size":10,"final_size":4}')
   assert.equal(result.ok, true)
@@ -260,7 +267,7 @@ test("runOptimizer reports stdin write failures to stderr", async () => {
     const result = await runOptimizer({
       payload: { query: "x", docs: ["a"] },
       sessionID: "test-session",
-      cliPath: path.join(process.cwd(), "context-optimizer", "missing_cli.py"),
+      cliPath: path.join(process.cwd(), "missing_cli.py"),
       timeoutMs: 1000,
     })
 
@@ -278,7 +285,7 @@ test("runOptimizer returns no-op friendly result for missing cli", async () => {
   const result = await runOptimizer({
     payload: { query: "x", docs: ["a"] },
     sessionID: "test-session",
-    cliPath: path.join(process.cwd(), "context-optimizer", "missing_cli.py"),
+    cliPath: path.join(process.cwd(), "missing_cli.py"),
     timeoutMs: 1000,
   })
 
@@ -318,6 +325,41 @@ test("runOptimizer parses size summary from a python bridge", async () => {
   assert.equal(result.finalSize, 13)
 })
 
+test("ContextOptimizerPlugin skips optimization below the minimum threshold", async () => {
+  const calls = []
+  const toasts = []
+  const previousMinChars = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+  process.env.CONTEXT_OPTIMIZER_MIN_CHARS = "1000"
+
+  try {
+    const pluginInstance = await ContextOptimizerPlugin({
+      runOptimizer: async (payload) => {
+        calls.push(payload)
+        throw new Error("runOptimizer should not be called below threshold")
+      },
+      client: {
+        tui: {
+          showToast: (payload) => toasts.push(payload),
+        },
+      },
+    })
+    const compacting = pluginInstance["experimental.session.compacting"]
+    const output = { context: ["tiny"] }
+
+    await compacting({ sessionID: "session-a", prompt: "hello" }, output)
+
+    assert.deepEqual(output.context, ["tiny"])
+    assert.deepEqual(calls, [])
+    assert.deepEqual(toasts, [])
+  } finally {
+    if (previousMinChars === undefined) {
+      delete process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+    } else {
+      process.env.CONTEXT_OPTIMIZER_MIN_CHARS = previousMinChars
+    }
+  }
+})
+
 test("ContextOptimizerPlugin rewrites output context when runOptimizer is stubbed", async () => {
   const stubRunOptimizer = async () => ({
     ok: true,
@@ -326,33 +368,43 @@ test("ContextOptimizerPlugin rewrites output context when runOptimizer is stubbe
     finalSize: 11,
   })
   const toasts = []
+  const previousMinChars = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+  process.env.CONTEXT_OPTIMIZER_MIN_CHARS = "1"
 
-  const pluginInstance = await ContextOptimizerPlugin({
-    runOptimizer: stubRunOptimizer,
-    client: {
-      tui: {
-        showToast: (payload) => toasts.push(payload),
+  try {
+    const pluginInstance = await ContextOptimizerPlugin({
+      runOptimizer: stubRunOptimizer,
+      client: {
+        tui: {
+          showToast: (payload) => toasts.push(payload),
+        },
       },
-    },
-  })
-  const compacting = pluginInstance["experimental.session.compacting"]
-  const output = { context: ["original source"] }
+    })
+    const compacting = pluginInstance["experimental.session.compacting"]
+    const output = { context: ["original source"] }
 
-  await compacting({ sessionID: "session-a", prompt: "hello" }, output)
+    await compacting({ sessionID: "session-a", prompt: "hello" }, output)
 
-  assert.deepEqual(output.context, [
-    "[context-optimizer] optimized context emitted. Initial size: 42 chars, final size: 11 chars, saved: 31 chars (74%)",
-    "## Optimized Context\n\nstubbed optimized context",
-  ])
+    assert.deepEqual(output.context, [
+      "[context-optimizer] optimized context emitted. Initial size: 42 chars, final size: 11 chars, saved: 31 chars (74%)",
+      "## Optimized Context\n\nstubbed optimized context",
+    ])
 
-  assert.deepEqual(toasts, [
-    {
-      body: {
-        message: "[context-optimizer] optimized 1 docs.",
-        variant: "default",
+    assert.deepEqual(toasts, [
+      {
+        body: {
+          message: "[context-optimizer] optimized 1 docs.",
+          variant: "default",
+        },
       },
-    },
-  ])
+    ])
+  } finally {
+    if (previousMinChars === undefined) {
+      delete process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+    } else {
+      process.env.CONTEXT_OPTIMIZER_MIN_CHARS = previousMinChars
+    }
+  }
 })
 
 test("ContextOptimizerPlugin leaves context untouched when the optimizer fails (fail open)", async () => {
@@ -364,29 +416,39 @@ test("ContextOptimizerPlugin leaves context untouched when the optimizer fails (
     reason: "missing dep",
   })
   const toasts = []
+  const previousMinChars = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+  process.env.CONTEXT_OPTIMIZER_MIN_CHARS = "1"
 
-  const pluginInstance = await ContextOptimizerPlugin({
-    runOptimizer: stubRunOptimizer,
-    client: {
-      tui: {
-        showToast: (payload) => toasts.push(payload),
+  try {
+    const pluginInstance = await ContextOptimizerPlugin({
+      runOptimizer: stubRunOptimizer,
+      client: {
+        tui: {
+          showToast: (payload) => toasts.push(payload),
+        },
       },
-    },
-  })
-  const compacting = pluginInstance["experimental.session.compacting"]
-  const output = { context: ["original source"] }
+    })
+    const compacting = pluginInstance["experimental.session.compacting"]
+    const output = { context: ["original source"] }
 
-  await compacting({ sessionID: "session-a", prompt: "hello" }, output)
+    await compacting({ sessionID: "session-a", prompt: "hello" }, output)
 
-  assert.deepEqual(output.context, ["original source"])
-  assert.deepEqual(toasts, [
-    {
-      body: {
-        message: "missing dep",
-        variant: "error",
+    assert.deepEqual(output.context, ["original source"])
+    assert.deepEqual(toasts, [
+      {
+        body: {
+          message: "missing dep",
+          variant: "error",
+        },
       },
-    },
-  ])
+    ])
+  } finally {
+    if (previousMinChars === undefined) {
+      delete process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+    } else {
+      process.env.CONTEXT_OPTIMIZER_MIN_CHARS = previousMinChars
+    }
+  }
 })
 
 test("ContextOptimizerPlugin reports toast failures to stderr", async () => {
@@ -394,24 +456,25 @@ test("ContextOptimizerPlugin reports toast failures to stderr", async () => {
   const installRoot = path.join(tempDir, "context-optimizer")
   const pluginDir = path.join(installRoot, "plugin")
   const supportDir = path.join(installRoot, "support-files")
+  const previousMinChars = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
 
   await mkdir(pluginDir, { recursive: true })
   await mkdir(supportDir, { recursive: true })
 
   await copyFile(
-    path.join(process.cwd(), "context-optimizer", "plugin", "context-optimizer.js"),
+    path.join(process.cwd(), "plugin", "context-optimizer.js"),
     path.join(pluginDir, "context-optimizer.js"),
   )
   await copyFile(
-    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer.py"),
+    path.join(process.cwd(), "support-files", "context_optimizer.py"),
     path.join(supportDir, "context_optimizer.py"),
   )
   await copyFile(
-    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_cli.py"),
+    path.join(process.cwd(), "support-files", "context_optimizer_cli.py"),
     path.join(supportDir, "context_optimizer_cli.py"),
   )
   await copyFile(
-    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_hook.py"),
+    path.join(process.cwd(), "support-files", "context_optimizer_hook.py"),
     path.join(supportDir, "context_optimizer_hook.py"),
   )
 
@@ -427,6 +490,7 @@ test("ContextOptimizerPlugin reports toast failures to stderr", async () => {
   }
 
   try {
+    process.env.CONTEXT_OPTIMIZER_MIN_CHARS = "1"
     const pluginInstance = await tempPlugin.ContextOptimizerPlugin({
       runOptimizer: async () => ({
         ok: true,
@@ -449,6 +513,11 @@ test("ContextOptimizerPlugin reports toast failures to stderr", async () => {
   } finally {
     fs.appendFileSync = originalAppendFileSync
     process.stderr.write = originalStderrWrite
+    if (previousMinChars === undefined) {
+      delete process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+    } else {
+      process.env.CONTEXT_OPTIMIZER_MIN_CHARS = previousMinChars
+    }
   }
 })
 
@@ -462,49 +531,60 @@ test("ContextOptimizerPlugin logs one savings summary during compaction", async 
   await mkdir(supportDir, { recursive: true })
 
   await copyFile(
-    path.join(process.cwd(), "context-optimizer", "plugin", "context-optimizer.js"),
+    path.join(process.cwd(), "plugin", "context-optimizer.js"),
     path.join(pluginDir, "context-optimizer.js"),
   )
   await copyFile(
-    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer.py"),
+    path.join(process.cwd(), "support-files", "context_optimizer.py"),
     path.join(supportDir, "context_optimizer.py"),
   )
   await copyFile(
-    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_cli.py"),
+    path.join(process.cwd(), "support-files", "context_optimizer_cli.py"),
     path.join(supportDir, "context_optimizer_cli.py"),
   )
   await copyFile(
-    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_hook.py"),
+    path.join(process.cwd(), "support-files", "context_optimizer_hook.py"),
     path.join(supportDir, "context_optimizer_hook.py"),
   )
 
+  const previousMinChars = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+  process.env.CONTEXT_OPTIMIZER_MIN_CHARS = "1"
+
   const tempPlugin = await import(pathToFileURL(path.join(pluginDir, "context-optimizer.js")).href)
-  const pluginInstance = await tempPlugin.ContextOptimizerPlugin({
-    runOptimizer: async () => ({
-      ok: true,
-      optimizedContext: "optimized body",
-      initialSize: 20,
-      finalSize: 5,
-    }),
-    client: {
-      tui: {
-        showToast: () => {},
+  try {
+    const pluginInstance = await tempPlugin.ContextOptimizerPlugin({
+      runOptimizer: async () => ({
+        ok: true,
+        optimizedContext: "optimized body",
+        initialSize: 20,
+        finalSize: 5,
+      }),
+      client: {
+        tui: {
+          showToast: () => {},
+        },
       },
-    },
-  })
+    })
 
-  await pluginInstance["experimental.session.compacting"](
-    { sessionID: "session-a", prompt: "hello" },
-    { context: ["first chunk", "second chunk"] },
-  )
+    await pluginInstance["experimental.session.compacting"](
+      { sessionID: "session-a", prompt: "hello" },
+      { context: ["first chunk", "second chunk"] },
+    )
 
-  const logPath = path.join(installRoot, "context-optimizer.log")
-  const logContent = await readFile(logPath, "utf8")
-  const lines = logContent.trim().split(/\r?\n/)
+    const logPath = path.join(installRoot, "context-optimizer.log")
+    const logContent = await readFile(logPath, "utf8")
+    const lines = logContent.trim().split(/\r?\n/)
 
-  assert.equal(lines.filter((line) => line.includes("outbound docs:")).length, 1)
-  assert.equal(lines.filter((line) => line.includes("optimized context emitted. Initial size:")).length, 1)
-  assert.equal(lines.filter((line) => line.includes("success: optimized context emitted")).length, 0)
-  assert.match(logContent, /outbound docs: 2/)
-  assert.doesNotMatch(logContent, /first chunk|second chunk/)
+    assert.equal(lines.filter((line) => line.includes("outbound docs:")).length, 1)
+    assert.equal(lines.filter((line) => line.includes("optimized context emitted. Initial size:")).length, 1)
+    assert.equal(lines.filter((line) => line.includes("success: optimized context emitted")).length, 0)
+    assert.match(logContent, /outbound docs: 2/)
+    assert.doesNotMatch(logContent, /first chunk|second chunk/)
+  } finally {
+    if (previousMinChars === undefined) {
+      delete process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+    } else {
+      process.env.CONTEXT_OPTIMIZER_MIN_CHARS = previousMinChars
+    }
+  }
 })

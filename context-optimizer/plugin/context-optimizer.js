@@ -5,11 +5,18 @@ import process from "node:process"
 import { fileURLToPath } from "node:url"
 
 const DEFAULT_TIMEOUT_MS = 120000
+const DEFAULT_MIN_COMPACTION_CHARS = 8000
 
 export function resolveTimeoutMs() {
   const raw = process.env.CONTEXT_OPTIMIZER_TIMEOUT_MS
   const parsed = raw ? Number.parseInt(raw, 10) : Number.NaN
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_TIMEOUT_MS
+}
+
+export function resolveMinCompactionChars() {
+  const raw = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+  const parsed = raw ? Number.parseInt(raw, 10) : Number.NaN
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_MIN_COMPACTION_CHARS
 }
 
 function dirnameFromMeta(metaUrl) {
@@ -87,6 +94,7 @@ export function buildPayload(input = {}, output = {}) {
   const context = Array.isArray(output.context)
     ? output.context.filter((value) => typeof value === "string" && value.trim())
     : []
+  const size = context.reduce((total, value) => total + value.length, 0)
 
   return {
     query:
@@ -94,6 +102,7 @@ export function buildPayload(input = {}, output = {}) {
       input.prompt ||
       "Optimize the most relevant context for compaction.",
     docs: context,
+    size,
   }
 }
 
@@ -299,15 +308,27 @@ export const ContextOptimizerPlugin = async (dependencies = {}) => {
       "experimental.session.compacting": async (input, output) => {
         const toast = resolveToastClient(dependencies, input, output)
         const payload = buildPayload(input, output)
+        const minChars = resolveMinCompactionChars()
         if (!payload.docs.length) {
           writeLog(import.meta.url, "[context-optimizer] no optimization applied: no compaction documents were provided.")
           return
         }
 
-        writeLog(import.meta.url, `[context-optimizer] outbound docs: ${payload.docs.length}`)
+        if (payload.size < minChars) {
+          writeLog(
+            import.meta.url,
+            `[context-optimizer] no optimization applied: context size ${payload.size} chars is below the threshold of ${minChars} chars.`,
+          )
+          return
+        }
+
+        writeLog(import.meta.url, `[context-optimizer] outbound docs: ${payload.docs.length} (size=${payload.size} chars, threshold=${minChars} chars)`)
 
         const result = await run({
-          payload,
+          payload: {
+            ...payload,
+            options: { min_input_size: minChars },
+          },
           sessionID: input?.sessionID,
           cliPath,
           metaUrl: import.meta.url,

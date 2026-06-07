@@ -284,7 +284,7 @@ embed_model    = "all-MiniLM-L6-v2"          # used for deduplication embeddings
 
 ### Process timeout and first-run warm-up
 
-The JS wrapper kills the Python bridge if it does not respond within a timeout (default **120000 ms / 2 minutes**). Override it with the `CONTEXT_OPTIMIZER_PYTHON` interpreter's environment, e.g.:
+The JS wrapper kills the Python bridge if it does not respond within a timeout (default **120000 ms / 2 minutes**). It also skips compaction below the minimum context threshold (default **8000 chars**, override with `CONTEXT_OPTIMIZER_MIN_CHARS`). Override the timeout with the `CONTEXT_OPTIMIZER_TIMEOUT_MS` environment, e.g.:
 
 ```bash
 # longer timeout for slow machines (milliseconds)

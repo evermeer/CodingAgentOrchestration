@@ -89,6 +89,7 @@ class ContextOptimizerCliTests(unittest.TestCase):
         )
         data = json.loads(proc.stdout)
         self.assertTrue(data["ok"])
+        self.assertEqual(data["status"], "no_optimization")
         self.assertEqual(data["optimized_context"], "")
 
     def test_cli_returns_structured_error_for_invalid_docs_type(self):
@@ -108,6 +109,28 @@ class ContextOptimizerCliTests(unittest.TestCase):
         self.assertFalse(data["ok"])
         self.assertEqual(data["error_code"], "invalid_input")
         self.assertNotEqual(proc.returncode, 0)
+
+    def test_cli_skips_optimization_below_threshold(self):
+        proc = run_cli_with_stub(
+            {"query": "hello", "docs": ["alpha", "beta"], "options": {"min_input_size": 100}},
+            """
+            class ContextOptimizer:
+                def __init__(self, **kwargs):
+                    self.kwargs = kwargs
+
+                def optimize(self, query, graph_ctx=None, memory_ctx=None):
+                    return "should not be called"
+            """,
+        )
+
+        data = json.loads(proc.stdout)
+        self.assertTrue(data["ok"])
+        self.assertEqual(data["status"], "no_optimization")
+        self.assertIn("below the threshold", data["reason"])
+        self.assertEqual(data["optimized_context"], "")
+        self.assertEqual(data["initial_size"], 9)
+        self.assertEqual(data["final_size"], 9)
+        self.assertEqual(proc.returncode, 0)
 
     def test_cli_rejects_mixed_docs_lists(self):
         proc = run_cli_with_stub(

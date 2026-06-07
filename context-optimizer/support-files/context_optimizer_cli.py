@@ -43,7 +43,7 @@ def main() -> None:
         emit_error("invalid_input", "docs must be a list of strings")
 
     if not docs:
-        emit({"ok": True, "optimized_context": "", "initial_size": 0, "final_size": 0})
+        emit({"ok": True, "status": "no_optimization", "reason": "no compaction documents were provided.", "optimized_context": "", "initial_size": 0, "final_size": 0})
         return
 
     if any(not isinstance(doc, str) for doc in docs):
@@ -52,6 +52,19 @@ def main() -> None:
     safe_docs = docs
 
     initial_size = sum(len(doc) for doc in safe_docs)
+    min_input_size = options.get("min_input_size")
+    if isinstance(min_input_size, int) and min_input_size > 0 and initial_size < min_input_size:
+        emit(
+            {
+                "ok": True,
+                "status": "no_optimization",
+                "reason": f"context size {initial_size} chars is below the threshold of {min_input_size} chars.",
+                "optimized_context": "",
+                "initial_size": initial_size,
+                "final_size": initial_size,
+            }
+        )
+        return
 
     optimized = ""
     try:
