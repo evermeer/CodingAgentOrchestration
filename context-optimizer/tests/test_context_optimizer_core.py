@@ -133,6 +133,18 @@ class ContextOptimizerCoreTests(unittest.TestCase):
 
         self.assertEqual(optimizer.optimize(query="anything"), "")
 
+    def test_optimize_normalizes_tuple_docs_with_three_values(self):
+        module = load_core_module()
+        optimizer = module.ContextOptimizer(compression_rate=0.5, max_chunks=6)
+
+        result = optimizer.optimize(
+            query="best chunk",
+            graph_ctx=cast(list[Any], [("graph", "alpha", "source-a")]),
+            memory_ctx=cast(list[Any], [("memory", "beta", "source-b")]),
+        )
+
+        self.assertEqual(result, "graph alpha source-a\n\nmemory beta source-b [rate=0.5]")
+
 
 class ContextOptimizerHookTests(unittest.TestCase):
     def test_run_attaches_optimized_context(self):

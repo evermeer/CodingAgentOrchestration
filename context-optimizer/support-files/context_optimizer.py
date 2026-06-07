@@ -39,6 +39,16 @@ class ContextOptimizer:
         ranked = [doc for _, doc in sorted(zip(scores, docs), key=lambda x: x[0], reverse=True)]
         return ranked[: self.max_chunks]
 
+    def _normalize_doc(self, doc):
+        if isinstance(doc, str):
+            return doc.strip()
+
+        if isinstance(doc, (list, tuple)):
+            parts = [str(part).strip() for part in doc if part is not None and str(part).strip()]
+            return " ".join(parts).strip()
+
+        return str(doc).strip()
+
     def dedupe(self, docs):
         if not docs:
             return docs
@@ -79,7 +89,11 @@ class ContextOptimizer:
         graph_ctx = graph_ctx or []
         memory_ctx = memory_ctx or []
 
-        combined = graph_ctx + memory_ctx
+        combined = [
+            normalized
+            for normalized in (self._normalize_doc(doc) for doc in graph_ctx + memory_ctx)
+            if normalized
+        ]
 
         if not combined:
             return ""
