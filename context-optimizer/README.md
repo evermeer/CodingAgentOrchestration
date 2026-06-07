@@ -97,10 +97,10 @@ This plugin plugs into the oh-my-openagent pipeline. If you haven't set those up
 > In practice this means:
 >
 > - ✅ Install the Python packages.
-> - ✅ Keep the Python optimizer files outside the OpenCode plugins directory.
+> - ✅ Keep the plugin as one self-contained folder.
 > - ✅ Keep the JS wrapper implementation in `context-optimizer/plugin/context-optimizer.js`.
-> - ✅ Install that JS file into your global OpenCode plugin directory.
-> - ✅ Let that JS plugin call `context-optimizer/support-files/context_optimizer_cli.py` in this repo, or `~/.config/opencode/context-optimizer/context_optimizer_cli.py` after installation.
+> - ✅ Install that folder into your global OpenCode plugin directory.
+> - ✅ Let that JS plugin call the Python bridge from the sibling `support-files/` directory.
 
 ### 1. Install dependencies
 
@@ -127,11 +127,9 @@ If this prints `ok`, the dependencies are ready. If you see `ModuleNotFoundError
 
 #### Tiny install checklist
 
- - **Windows:** copy `context-optimizer\plugin\context-optimizer.js` to `%USERPROFILE%\.config\opencode\plugins\`, then copy `context-optimizer\support-files\context_optimizer.py`, `context-optimizer\support-files\context_optimizer_cli.py`, and `context-optimizer\support-files\context_optimizer_hook.py` to `%USERPROFILE%\.config\opencode\context-optimizer\`.
- - **macOS / Linux:** copy `context-optimizer/plugin/context-optimizer.js` to `~/.config/opencode/plugins/`, then copy `context-optimizer/support-files/context_optimizer.py`, `context-optimizer/support-files/context_optimizer_cli.py`, and `context-optimizer/support-files/context_optimizer_hook.py` to `~/.config/opencode/context-optimizer/`.
-- **All platforms:** do **not** copy `tests/` or any `__pycache__/` folder into the OpenCode plugins directory.
+**All platforms:** do **not** copy `tests/` or any `__pycache__/` folder into the OpenCode plugins directory.
 
-Copy only the JavaScript plugin file into your OpenCode global plugins folder:
+Copy the JS plugin file into your OpenCode global plugins folder:
 
 - `context-optimizer/plugin/context-optimizer.js`
 
@@ -150,7 +148,7 @@ The JS wrapper calls the Python bridge over stdin/stdout JSON and fails open if 
 | macOS / Linux | `~/.config/opencode/plugins/` |
 | Windows | `%USERPROFILE%\.config\opencode\plugins\` |
 
-Create the folder if it does not exist, then copy the files:
+Create the folders if they do not exist, then copy the files:
 
 ```bash
 # macOS / Linux
@@ -194,13 +192,13 @@ Use the JSON/JSONC files to:
 
 For the current setup, activation is handled by the global OpenCode plugin loader after you copy the source files out of this repository.
 
-1. Ensure these files exist in your project:
+1. Ensure these files exist in your install location:
 
 ```text
 %USERPROFILE%\.config\opencode\plugins\context-optimizer.js
-%USERPROFILE%\.config\opencode\plugins\context-optimizer.js
 %USERPROFILE%\.config\opencode\context-optimizer\context_optimizer.py
 %USERPROFILE%\.config\opencode\context-optimizer\context_optimizer_cli.py
+%USERPROFILE%\.config\opencode\context-optimizer\context_optimizer_hook.py
 ```
 
 2. Start OpenCode normally.
@@ -219,7 +217,7 @@ For the current setup, activation is handled by the global OpenCode plugin loade
 **Verify the plugin loads:** confirm that `~/.config/opencode/plugins/context-optimizer.js` is present and that the compaction hook can call the Python bridge successfully.
 
 > [!CAUTION]
-> Do not copy `tests/`, `__pycache__/`, or any Python support files into `~/.config/opencode/plugins/`. OpenCode scans that folder for loadable plugins, so only `context-optimizer.js` should live there.
+> Do not copy `tests/` or any `__pycache__/` folder into `~/.config/opencode/plugins/`. Keep the JS plugin separate from the Python support directory.
 
 ---
 
@@ -311,10 +309,10 @@ mempalace.store(compressed)
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
 | `ModuleNotFoundError: sentence_transformers` or `llmlingua` | Packages installed into a different Python than OpenCode uses | Re-install with `python -m pip install sentence-transformers llmlingua`, or activate the same virtual environment before launching OpenCode |
-| `ImportError: cannot import name 'ContextOptimizer'` | The Python bridge cannot import the core optimizer | Make sure `context-optimizer/support-files/context_optimizer.py` and `context-optimizer/support-files/context_optimizer_cli.py` stay together in the repo, and that the installed copies stay together in `~/.config/opencode/context-optimizer/` |
+| `ImportError: cannot import name 'ContextOptimizer'` | The Python bridge cannot import the core optimizer | Make sure `context-optimizer/support-files/context_optimizer.py` and `context-optimizer/support-files/context_optimizer_cli.py` stay together in the repo, and that the installed copies stay together inside `~/.config/opencode/context-optimizer/` |
 | `pip: command not found` | pip not installed / not on PATH | See [Install pip (one-liner)](#install-pip-one-liner) |
 | First message hangs for a long time | Models are downloading from Hugging Face | Wait for the one-time download to finish; see [What gets downloaded on first run](#what-gets-downloaded-on-first-run) |
-| Hook never runs / context unchanged | The JS wrapper was not loaded or compaction did not fire | Confirm `~/.config/opencode/plugins/context-optimizer.js` exists, that `~/.config/opencode/context-optimizer/context_optimizer_cli.py` exists, and trigger a session compaction |
+| Hook never runs / context unchanged | The JS wrapper was not loaded or compaction did not fire | Confirm `~/.config/opencode/plugins/context-optimizer.js` exists and trigger a session compaction |
 | You see a warning and no optimized context block | The wrapper fell back to no-op mode because Python, dependencies, or the bridge failed | Read the warning text, fix the Python issue, and retry |
 | Out-of-memory or very slow CPU | Reranker model is large | Switch `reranker_model` to `BAAI/bge-reranker-base` in `context_optimizer.py` |
 

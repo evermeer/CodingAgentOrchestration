@@ -156,25 +156,34 @@ export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = DEFAULT_
   })
 }
 
+export const id = "context-optimizer"
+
 export const ContextOptimizerPlugin = async () => {
-  const cliPath = createCliPath(import.meta.url)
+  try {
+    const cliPath = createCliPath(import.meta.url)
 
-  return {
-    "experimental.session.compacting": async (input, output) => {
-      const payload = buildPayload(input, output)
-      if (!payload.docs.length) return
+    return {
+      "experimental.session.compacting": async (input, output) => {
+        const payload = buildPayload(input, output)
+        if (!payload.docs.length) return
 
-      const result = await runOptimizer({
-        payload,
-        sessionID: input?.sessionID,
-        cliPath,
-      })
+        const result = await runOptimizer({
+          payload,
+          sessionID: input?.sessionID,
+          cliPath,
+        })
 
-      if (!result.ok || !result.optimizedContext) return
+        if (!result.ok || !result.optimizedContext) return
 
-      applyOptimizedContext(output, result)
-    },
+        applyOptimizedContext(output, result)
+      },
+    }
+  } catch (error) {
+    console.warn(`[context-optimizer] disabled during startup: ${error}`)
+    return {}
   }
 }
 
-export default ContextOptimizerPlugin
+export const server = ContextOptimizerPlugin
+
+export default { id, server }

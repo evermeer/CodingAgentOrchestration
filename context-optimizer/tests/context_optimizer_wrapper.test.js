@@ -4,6 +4,8 @@ import { mkdtemp, writeFile } from "node:fs/promises"
 import os from "node:os"
 import path from "node:path"
 
+import * as plugin from "../plugin/context-optimizer.js"
+
 import {
   buildPayload,
   createCliPath,
@@ -13,6 +15,12 @@ import {
   resolvePythonCommand,
   runOptimizer,
 } from "../plugin/context-optimizer.js"
+
+test("plugin exports OpenCode loader shape", () => {
+  assert.equal(plugin.id, "context-optimizer")
+  assert.equal(typeof plugin.server, "function")
+  assert.deepEqual(plugin.default, { id: "context-optimizer", server: plugin.server })
+})
 
 test("buildPayload flattens context strings", () => {
   const payload = buildPayload(
