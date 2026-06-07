@@ -55,7 +55,7 @@ Suggested reading paths:
 
 ## [The context-optimizer plugin](context-optimizer/README.md)
 
-There is software for content reranking, deduplication, and compression but i could not find a good existing plugin for [OpenCode](https://github.com/anomalyco/opencode). I created the [context-optimizer plugin](context-optimizer/README.md) to fill this gap but you do have to be aware that it's optimised for this default setup. The plugin uses [Huggingface SentenceTransformers](https://github.com/huggingface/sentence-transformers/) (for reranking and deduplication) and [Microsoft LLMLingua](https://github.com/microsoft/LLMLingua) (for compression). The installation is part of [Part 2: A default setup](docs/part-2-default-setup.md).
+There is software for content reranking, deduplication, and compression but i could not find a good existing plugin for [OpenCode](https://github.com/anomalyco/opencode). I created the [context-optimizer plugin](context-optimizer/README.md) to fill this gap but you do have to be aware that it's optimised for this default setup. The plugin uses [Huggingface SentenceTransformers](https://github.com/huggingface/sentence-transformers/) (for reranking and deduplication) and [Microsoft LLMLingua](https://github.com/microsoft/LLMLingua) (for compression). On CPU-only Windows installs, follow the CPU PyTorch instructions in the plugin README; the optimizer now falls back to a CPU-safe compression model instead of loading the LLMLingua-2 CUDA path. The installation is part of [Part 2: A default setup](docs/part-2-default-setup.md).
 
 ## Contribution
 

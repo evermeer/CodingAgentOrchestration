@@ -110,6 +110,18 @@ Install the two Python packages (PyTorch is pulled in automatically):
 pip install sentence-transformers llmlingua
 ```
 
+If you're on **Windows CPU-only** (or any machine without CUDA), install the CPU wheel for PyTorch first so the optimizer doesn't try to load a CUDA build:
+
+```powershell
+python -m pip install --upgrade --index-url https://download.pytorch.org/whl/cpu torch torchvision torchaudio
+python -m pip install sentence-transformers llmlingua
+```
+
+If you do have an NVIDIA GPU, use the official PyTorch installer selector to pick the matching CUDA wheel for your machine instead.
+
+> [!NOTE]
+> On CPU-only Windows installs, the optimizer automatically falls back to a CPU-safe compression model so it does not try to load the LLMLingua-2 CUDA path.
+
 > [!NOTE]
 > This is a sizeable download (PyTorch alone is several hundred MB). On a slow connection this step can take a few minutes.
 

@@ -1,6 +1,11 @@
 from sentence_transformers import CrossEncoder, SentenceTransformer, util
 from llmlingua import PromptCompressor
 
+try:
+    import torch
+except Exception:
+    torch = None
+
 class ContextOptimizer:
     def __init__(
         self,
@@ -10,10 +15,18 @@ class ContextOptimizer:
         max_chunks=6,
         dedupe_threshold=0.9,
     ):
-        self.reranker = CrossEncoder(reranker_model)
-        self.embedder = SentenceTransformer(embed_model)
+        device = "cuda" if torch is not None and torch.cuda.is_available() else "cpu"
+        compressor_model = (
+            "microsoft/llmlingua-2-xlm-roberta-large-meetingbank"
+            if device == "cuda"
+            else "openai-community/gpt2"
+        )
+
+        self.reranker = CrossEncoder(reranker_model, device=device)
+        self.embedder = SentenceTransformer(embed_model, device=device)
         self.compressor = PromptCompressor(
-            model_name="microsoft/llmlingua-2-xlm-roberta-large-meetingbank"
+            model_name=compressor_model,
+            device_map=device,
         )
 
         self.compression_rate = compression_rate

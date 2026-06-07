@@ -23,8 +23,9 @@ def load_core_module():
     fake_sentence_transformers = cast(Any, types.ModuleType("sentence_transformers"))
 
     class FakeCrossEncoder:
-        def __init__(self, model_name):
+        def __init__(self, model_name, **kwargs):
             self.model_name = model_name
+            self.kwargs = kwargs
 
         def predict(self, pairs):
             score_map = {
@@ -35,8 +36,9 @@ def load_core_module():
             return [score_map.get(doc, 0) for _, doc in pairs]
 
     class FakeSentenceTransformer:
-        def __init__(self, model_name):
+        def __init__(self, model_name, **kwargs):
             self.model_name = model_name
+            self.kwargs = kwargs
 
         def encode(self, docs, convert_to_tensor=True):
             return list(docs)
@@ -51,8 +53,9 @@ def load_core_module():
     fake_llmlingua = cast(Any, types.ModuleType("llmlingua"))
 
     class FakePromptCompressor:
-        def __init__(self, model_name):
+        def __init__(self, model_name, **kwargs):
             self.model_name = model_name
+            self.kwargs = kwargs
 
         def compress_prompt(self, combined, rate):
             return {"compressed_prompt": f"{combined} [rate={rate}]"}
