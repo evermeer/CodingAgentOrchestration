@@ -1,7 +1,8 @@
 import assert from "node:assert/strict"
-import { mkdtemp, writeFile } from "node:fs/promises"
+import { copyFile, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises"
 import os from "node:os"
 import path from "node:path"
+import { pathToFileURL } from "node:url"
 import test from "node:test"
 
 import plugin, {
@@ -254,8 +255,7 @@ test("ContextOptimizerPlugin rewrites output context when runOptimizer is stubbe
   assert.deepEqual(toasts, [
     {
       body: {
-        message:
-          "[context-optimizer] optimized context emitted. Initial size: 42 chars, final size: 11 chars, saved: 31 chars (74%)",
+        message: "[context-optimizer] optimized 1 docs.",
         variant: "default",
       },
     },
@@ -294,4 +294,59 @@ test("ContextOptimizerPlugin leaves context untouched when the optimizer fails (
       },
     },
   ])
+})
+
+test("ContextOptimizerPlugin logs outbound doc count during compaction", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "context-optimizer-plugin-"))
+  const installRoot = path.join(tempDir, "context-optimizer")
+  const pluginDir = path.join(installRoot, "plugin")
+  const supportDir = path.join(installRoot, "support-files")
+
+  await mkdir(pluginDir, { recursive: true })
+  await mkdir(supportDir, { recursive: true })
+
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "plugin", "context-optimizer.js"),
+    path.join(pluginDir, "context-optimizer.js"),
+  )
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer.py"),
+    path.join(supportDir, "context_optimizer.py"),
+  )
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_cli.py"),
+    path.join(supportDir, "context_optimizer_cli.py"),
+  )
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_hook.py"),
+    path.join(supportDir, "context_optimizer_hook.py"),
+  )
+
+  const tempPlugin = await import(pathToFileURL(path.join(pluginDir, "context-optimizer.js")).href)
+  const pluginInstance = await tempPlugin.ContextOptimizerPlugin({
+    runOptimizer: async () => ({
+      ok: true,
+      optimizedContext: "optimized body",
+      initialSize: 20,
+      finalSize: 5,
+    }),
+    client: {
+      tui: {
+        showToast: () => {},
+      },
+    },
+  })
+
+  await pluginInstance["experimental.session.compacting"](
+    { sessionID: "session-a", prompt: "hello" },
+    { context: ["first chunk", "second chunk"] },
+  )
+
+  const logPath = path.join(installRoot, "context-optimizer.log")
+  const logContent = await readFile(logPath, "utf8")
+  const lines = logContent.trim().split(/\r?\n/)
+
+  assert.equal(lines.filter((line) => line.includes("outbound docs:")).length, 1)
+  assert.match(logContent, /outbound docs: 2/)
+  assert.doesNotMatch(logContent, /first chunk|second chunk/)
 })

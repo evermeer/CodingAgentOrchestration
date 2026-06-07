@@ -302,6 +302,8 @@ export const ContextOptimizerPlugin = async (dependencies = {}) => {
           return
         }
 
+        writeLog(import.meta.url, `[context-optimizer] outbound docs: ${payload.docs.length}`)
+
         const result = await run({
           payload,
           sessionID: input?.sessionID,
@@ -316,7 +318,7 @@ export const ContextOptimizerPlugin = async (dependencies = {}) => {
         applyOptimizedContext(output, result)
 
         if (result?.ok && result?.optimizedContext) {
-          await showToast(toast, formatOutcomeMessage(result), "default")
+          await showToast(toast, `[context-optimizer] optimized ${payload.docs.length} docs.`, "default")
         } else if (!result?.ok) {
           await showToast(
             toast,
