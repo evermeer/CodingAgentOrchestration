@@ -220,6 +220,8 @@ The Python core returns:
 context["optimized_context"]
 ```
 
+The JS wrapper also adds a size summary line with the initial size, final size, and percentage saved.
+
 The JS wrapper then appends that result to the OpenCode compaction context as:
 
 ```markdown

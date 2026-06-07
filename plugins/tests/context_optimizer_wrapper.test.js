@@ -5,6 +5,7 @@ import path from "node:path"
 import {
   buildPayload,
   createCliPath,
+  formatSizeSummary,
   normalizePythonResult,
   resolvePythonCommand,
   runOptimizer,
@@ -21,9 +22,18 @@ test("buildPayload flattens context strings", () => {
 })
 
 test("normalizePythonResult accepts success payload", () => {
-  const result = normalizePythonResult('{"ok":true,"optimized_context":"hello"}')
+  const result = normalizePythonResult('{"ok":true,"optimized_context":"hello","initial_size":10,"final_size":4}')
   assert.equal(result.ok, true)
   assert.equal(result.optimizedContext, "hello")
+  assert.equal(result.initialSize, 10)
+  assert.equal(result.finalSize, 4)
+})
+
+test("formatSizeSummary renders savings line", () => {
+  assert.equal(
+    formatSizeSummary(10, 4),
+    "Initial size: 10 chars, final size: 4 chars, saved: 6 chars (60%)",
+  )
 })
 
 test("resolvePythonCommand respects override", () => {

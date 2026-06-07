@@ -10,6 +10,14 @@ function dirnameFromMeta(metaUrl) {
   return path.dirname(fileURLToPath(metaUrl))
 }
 
+export function formatSizeSummary(initialSize, finalSize) {
+  if (!Number.isFinite(initialSize) || !Number.isFinite(finalSize)) return ""
+
+  const saved = initialSize - finalSize
+  const percent = initialSize > 0 ? Math.round((saved / initialSize) * 100) : 0
+  return `Initial size: ${initialSize} chars, final size: ${finalSize} chars, saved: ${saved} chars (${percent}%)`
+}
+
 export function buildPayload(input = {}, output = {}) {
   const context = Array.isArray(output.context)
     ? output.context.filter((value) => typeof value === "string" && value.trim())
@@ -32,7 +40,12 @@ export function buildPayload(input = {}, output = {}) {
 export function normalizePythonResult(stdout) {
   const parsed = JSON.parse(stdout)
   if (parsed.ok) {
-    return { ok: true, optimizedContext: parsed.optimized_context || "" }
+    return {
+      ok: true,
+      optimizedContext: parsed.optimized_context || "",
+      initialSize: parsed.initial_size,
+      finalSize: parsed.final_size,
+    }
   }
 
   return {
