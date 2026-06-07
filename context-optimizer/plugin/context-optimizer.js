@@ -55,6 +55,14 @@ export function formatOutcomeMessage(result = {}) {
     return `[context-optimizer] optimization skipped: ${result.reason || result.message || "the optimizer could not complete."}`
   }
 
+  if (result?.ok === true) {
+    const parts = []
+    if (!Number.isFinite(result.initialSize)) parts.push(`initial_size=${String(result.initialSize)}`)
+    if (!Number.isFinite(result.finalSize)) parts.push(`final_size=${String(result.finalSize)}`)
+    const detail = parts.length ? ` (${parts.join(", ")})` : ""
+    return `[context-optimizer] optimization completed, but savings summary was unavailable because size metadata was missing or non-numeric.${detail}`
+  }
+
   return `[context-optimizer] optimization completed without a measurable savings summary.`
 }
 
@@ -144,7 +152,13 @@ export function applyOptimizedContext(output, result) {
         ? `[context-optimizer] optimization skipped: ${result.reason || result.message || "the optimizer could not complete."}`
         : summary
           ? `[context-optimizer] optimized context emitted. ${summary}`
-          : `[context-optimizer] optimization completed.`
+          : (() => {
+              const parts = []
+              if (!Number.isFinite(result.initialSize)) parts.push(`initial_size=${String(result.initialSize)}`)
+              if (!Number.isFinite(result.finalSize)) parts.push(`final_size=${String(result.finalSize)}`)
+              const detail = parts.length ? ` (${parts.join(", ")})` : ""
+              return `[context-optimizer] optimization completed, but savings summary was unavailable because size metadata was missing or non-numeric.${detail}`
+            })()
 
   nextContext.push(statusLine)
   if (summary && result?.status !== "no_optimization" && result?.status !== "failed") nextContext.push(summary)

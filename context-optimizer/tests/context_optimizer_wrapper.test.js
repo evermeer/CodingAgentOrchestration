@@ -10,6 +10,7 @@ import {
   buildPayload,
   createCliPath,
   applyOptimizedContext,
+  formatOutcomeMessage,
   formatSizeSummary,
   logSizeSummary,
   normalizePythonResult,
@@ -60,6 +61,29 @@ test("applyOptimizedContext replaces source context", () => {
   assert.deepEqual(output.context, [
     "[context-optimizer] optimized context emitted. Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)",
     "Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)",
+    "## Optimized Context\n\noptimized body",
+  ])
+})
+
+test("formatOutcomeMessage reports missing size metadata details", () => {
+  assert.equal(
+    formatOutcomeMessage({ ok: true, optimizedContext: "x", initialSize: undefined, finalSize: 5 }),
+    "[context-optimizer] optimization completed, but savings summary was unavailable because size metadata was missing or non-numeric. (initial_size=undefined)",
+  )
+})
+
+test("applyOptimizedContext reports missing size metadata details", () => {
+  const output = { context: ["source one"] }
+
+  applyOptimizedContext(output, {
+    ok: true,
+    optimizedContext: "optimized body",
+    initialSize: 20,
+    finalSize: undefined,
+  })
+
+  assert.deepEqual(output.context, [
+    "[context-optimizer] optimization completed, but savings summary was unavailable because size metadata was missing or non-numeric. (final_size=undefined)",
     "## Optimized Context\n\noptimized body",
   ])
 })
