@@ -141,7 +141,7 @@ export function createCliPath(metaUrl) {
 }
 
 export function applyOptimizedContext(output, result) {
-  if (!output || !result?.optimizedContext) return
+  if (!output || (!result?.optimizedContext && result?.status !== "no_optimization" && result?.status !== "failed")) return
 
   const nextContext = []
   const summary = formatSizeSummary(result.initialSize, result.finalSize)
@@ -162,7 +162,7 @@ export function applyOptimizedContext(output, result) {
 
   nextContext.push(statusLine)
   if (summary && result?.status !== "no_optimization" && result?.status !== "failed") nextContext.push(summary)
-  nextContext.push(`## Optimized Context\n\n${result.optimizedContext}`)
+  nextContext.push(`## Optimized Context\n\n${result.optimizedContext || ""}`)
 
   output.context = nextContext
 }

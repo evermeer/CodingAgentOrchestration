@@ -2,6 +2,9 @@ import json
 import subprocess
 import sys
 import unittest
+import tempfile
+import shutil
+import textwrap
 from pathlib import Path
 
 
@@ -9,9 +12,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 CLI = REPO_ROOT / "context-optimizer" / "support-files" / "context_optimizer_cli.py"
 
 
-def run_cli(payload):
+def run_cli(payload, cli_path=CLI):
     return subprocess.run(
-        [sys.executable, str(CLI)],
+        [sys.executable, str(cli_path)],
         input=json.dumps(payload),
         text=True,
         capture_output=True,
@@ -19,14 +22,52 @@ def run_cli(payload):
     )
 
 
+def run_cli_raw(raw_input, cli_path=CLI):
+    return subprocess.run(
+        [sys.executable, str(cli_path)],
+        input=raw_input,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+
+def run_cli_with_stub(payload, stub_source):
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+        temp_cli = temp_path / "context_optimizer_cli.py"
+        temp_module = temp_path / "context_optimizer.py"
+
+        shutil.copy2(CLI, temp_cli)
+        temp_module.write_text(textwrap.dedent(stub_source), encoding="utf-8")
+
+        return run_cli(payload, cli_path=temp_cli)
+
+
+def run_cli_raw_with_stub(raw_input, stub_source):
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+        temp_cli = temp_path / "context_optimizer_cli.py"
+        temp_module = temp_path / "context_optimizer.py"
+
+        shutil.copy2(CLI, temp_cli)
+        temp_module.write_text(textwrap.dedent(stub_source), encoding="utf-8")
+
+        return run_cli_raw(raw_input, cli_path=temp_cli)
+
+
 class ContextOptimizerCliTests(unittest.TestCase):
     def test_cli_returns_structured_error_for_invalid_json(self):
-        proc = subprocess.run(
-            [sys.executable, str(CLI)],
-            input="{not-json}",
-            text=True,
-            capture_output=True,
-            check=False,
+        proc = run_cli_raw_with_stub(
+            "{not-json}",
+            """
+            class ContextOptimizer:
+                def __init__(self, **kwargs):
+                    pass
+
+                def optimize(self, query, graph_ctx=None, memory_ctx=None):
+                    return "stub"
+            """,
         )
 
         data = json.loads(proc.stdout)
@@ -34,10 +75,56 @@ class ContextOptimizerCliTests(unittest.TestCase):
         self.assertEqual(data["error_code"], "invalid_input")
 
     def test_cli_returns_empty_context_for_empty_docs(self):
-        proc = run_cli({"query": "hello", "docs": []})
+        proc = run_cli_with_stub(
+            {"query": "hello", "docs": []},
+            """
+            class ContextOptimizer:
+                def __init__(self, **kwargs):
+                    pass
+
+                def optimize(self, query, graph_ctx=None, memory_ctx=None):
+                    return "stub"
+            """,
+        )
         data = json.loads(proc.stdout)
         self.assertTrue(data["ok"])
         self.assertEqual(data["optimized_context"], "")
+
+    def test_cli_returns_structured_error_for_invalid_docs_type(self):
+        proc = run_cli_with_stub(
+            {"query": "hello", "docs": "not-a-list"},
+            """
+            class ContextOptimizer:
+                def __init__(self, **kwargs):
+                    pass
+
+                def optimize(self, query, graph_ctx=None, memory_ctx=None):
+                    return "stub"
+            """,
+        )
+
+        data = json.loads(proc.stdout)
+        self.assertFalse(data["ok"])
+        self.assertEqual(data["error_code"], "invalid_input")
+
+    def test_cli_uses_stubbed_optimizer_for_happy_path(self):
+        proc = run_cli_with_stub(
+            {"query": "hello", "docs": ["alpha", "beta"], "options": {"compression_rate": 0.25}},
+            """
+            class ContextOptimizer:
+                def __init__(self, **kwargs):
+                    self.kwargs = kwargs
+
+                def optimize(self, query, graph_ctx=None, memory_ctx=None):
+                    return f"{query}:{'|'.join(graph_ctx)}:{self.kwargs['compression_rate']}"
+            """,
+        )
+
+        data = json.loads(proc.stdout)
+        self.assertTrue(data["ok"])
+        self.assertEqual(data["optimized_context"], "hello:alpha|beta:0.25")
+        self.assertEqual(data["initial_size"], 9)
+        self.assertEqual(data["final_size"], len("hello:alpha|beta:0.25"))
 
 
 if __name__ == "__main__":

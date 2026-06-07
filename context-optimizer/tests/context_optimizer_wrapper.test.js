@@ -34,6 +34,16 @@ test("buildPayload flattens context strings", () => {
   assert.equal(payload.query, "summarize")
 })
 
+test("buildPayload falls back to input prompt when output prompt is absent", () => {
+  const payload = buildPayload(
+    { prompt: "use input prompt" },
+    { context: ["alpha", null, "  ", 42] },
+  )
+
+  assert.equal(payload.query, "use input prompt")
+  assert.deepEqual(payload.docs, ["alpha"])
+})
+
 test("normalizePythonResult accepts success payload", () => {
   const result = normalizePythonResult('{"ok":true,"optimized_context":"hello","initial_size":10,"final_size":4}')
   assert.equal(result.ok, true)
@@ -42,10 +52,31 @@ test("normalizePythonResult accepts success payload", () => {
   assert.equal(result.finalSize, 4)
 })
 
+test("normalizePythonResult accepts failure payload", () => {
+  const result = normalizePythonResult('{"ok":false,"error_code":"dependency_missing","message":"missing dep"}')
+
+  assert.equal(result.ok, false)
+  assert.equal(result.errorCode, "dependency_missing")
+  assert.equal(result.message, "missing dep")
+  assert.equal(result.status, "failed")
+})
+
 test("formatSizeSummary renders savings line", () => {
   assert.equal(
     formatSizeSummary(10, 4),
     "Initial size: 10 chars, final size: 4 chars, saved: 6 chars (60%)",
+  )
+})
+
+test("formatOutcomeMessage handles no optimization and failure states", () => {
+  assert.equal(
+    formatOutcomeMessage({ status: "no_optimization", reason: "nothing safer" }),
+    "[context-optimizer] no optimization applied: nothing safer",
+  )
+
+  assert.equal(
+    formatOutcomeMessage({ status: "failed", message: "boom" }),
+    "[context-optimizer] optimization skipped: boom",
   )
 })
 
@@ -62,6 +93,55 @@ test("applyOptimizedContext replaces source context", () => {
     "[context-optimizer] optimized context emitted. Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)",
     "Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)",
     "## Optimized Context\n\noptimized body",
+  ])
+})
+
+test("applyOptimizedContext leaves output untouched when there is no optimized context", () => {
+  const output = { context: ["source one"] }
+
+  applyOptimizedContext(output, {
+    ok: true,
+    optimizedContext: "",
+    initialSize: 10,
+    finalSize: 10,
+  })
+
+  assert.deepEqual(output.context, ["source one"])
+})
+
+test("applyOptimizedContext emits status-only no-optimization results", () => {
+  const output = { context: ["source one"] }
+
+  applyOptimizedContext(output, {
+    ok: true,
+    optimizedContext: "",
+    status: "no_optimization",
+    reason: "nothing safer",
+    initialSize: 20,
+    finalSize: 20,
+  })
+
+  assert.deepEqual(output.context, [
+    "[context-optimizer] no optimization applied: nothing safer",
+    "## Optimized Context\n\n",
+  ])
+})
+
+test("applyOptimizedContext emits status-only failed results", () => {
+  const output = { context: ["source one"] }
+
+  applyOptimizedContext(output, {
+    ok: false,
+    optimizedContext: "",
+    status: "failed",
+    message: "boom",
+    initialSize: 20,
+    finalSize: 20,
+  })
+
+  assert.deepEqual(output.context, [
+    "[context-optimizer] optimization skipped: boom",
+    "## Optimized Context\n\n",
   ])
 })
 
