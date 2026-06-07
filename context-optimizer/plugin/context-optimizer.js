@@ -5,7 +5,6 @@ import process from "node:process"
 import { fileURLToPath } from "node:url"
 
 const DEFAULT_TIMEOUT_MS = 30000
-const SESSION_WARNINGS = new Set()
 
 function dirnameFromMeta(metaUrl) {
   return path.dirname(fileURLToPath(metaUrl))
@@ -119,11 +118,25 @@ export function resolvePythonCommand() {
   return ["python3"]
 }
 
-function warnOnce(sessionID, message, metaUrl = import.meta.url) {
-  const key = `${sessionID}:${message}`
-  if (SESSION_WARNINGS.has(key)) return
-  SESSION_WARNINGS.add(key)
-  writeLog(metaUrl, `[context-optimizer] ${message}`)
+export function createSessionWarningTracker() {
+  let currentSessionID = null
+  let currentWarnings = new Set()
+
+  return {
+    warnOnce(sessionID, message, metaUrl = import.meta.url) {
+      const activeSessionID = sessionID || "global"
+      if (activeSessionID !== currentSessionID) {
+        currentSessionID = activeSessionID
+        currentWarnings = new Set()
+      }
+
+      if (currentWarnings.has(message)) return false
+
+      currentWarnings.add(message)
+      writeLog(metaUrl, `[context-optimizer] ${message}`)
+      return true
+    },
+  }
 }
 
 export function createCliPath(metaUrl) {
@@ -169,6 +182,7 @@ export function applyOptimizedContext(output, result) {
 
 export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = DEFAULT_TIMEOUT_MS, metaUrl = import.meta.url }) {
   const python = resolvePythonCommand()
+  const tracker = createSessionWarningTracker()
 
   return new Promise((resolve) => {
     const child = spawn(python[0], [cliPath], { stdio: ["pipe", "pipe", "pipe"] })
@@ -217,7 +231,7 @@ export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = DEFAULT_
     child.stdin.end()
   }).then((result) => {
     if (!result.ok) {
-      warnOnce(sessionID || "global", `${result.errorCode}: ${result.message}`, metaUrl)
+      tracker.warnOnce(sessionID || "global", `${result.errorCode}: ${result.message}`, metaUrl)
     }
     return result
   })
@@ -225,9 +239,10 @@ export function runOptimizer({ payload, sessionID, cliPath, timeoutMs = DEFAULT_
 
 export const id = "context-optimizer"
 
-export const ContextOptimizerPlugin = async () => {
+export const ContextOptimizerPlugin = async (dependencies = {}) => {
   try {
     const cliPath = createCliPath(import.meta.url)
+    const run = dependencies.runOptimizer || runOptimizer
 
     return {
       "experimental.session.compacting": async (input, output) => {
@@ -237,7 +252,7 @@ export const ContextOptimizerPlugin = async () => {
           return
         }
 
-        const result = await runOptimizer({
+        const result = await run({
           payload,
           sessionID: input?.sessionID,
           cliPath,

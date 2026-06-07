@@ -53,7 +53,7 @@ Before you start, make sure the following are in place. If you already run OpenC
 | Disk space | ~3–5 GB free (for the models) | — |
 
 > [!TIP]
-> On Windows, `python` and `pip` may be `py` and `py -m pip`. On macOS/Linux they may be `python3` and `pip3`. Use whichever resolves on your machine.
+> On Windows, `pip` may need to be invoked through the same Python interpreter you used for installation. On macOS/Linux it may be `pip3`. Use whichever resolves on your machine.
 
 ### Install Python
 

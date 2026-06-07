@@ -1,15 +1,15 @@
 import assert from "node:assert/strict"
-import test from "node:test"
 import { mkdtemp, writeFile } from "node:fs/promises"
 import os from "node:os"
 import path from "node:path"
+import test from "node:test"
 
-import * as plugin from "../plugin/context-optimizer.js"
-
-import {
-  buildPayload,
-  createCliPath,
+import plugin, {
   applyOptimizedContext,
+  buildPayload,
+  ContextOptimizerPlugin,
+  createCliPath,
+  createSessionWarningTracker,
   formatOutcomeMessage,
   formatSizeSummary,
   logSizeSummary,
@@ -21,7 +21,7 @@ import {
 test("plugin exports OpenCode loader shape", () => {
   assert.equal(plugin.id, "context-optimizer")
   assert.equal(typeof plugin.server, "function")
-  assert.deepEqual(plugin.default, { id: "context-optimizer", server: plugin.server })
+  assert.deepEqual(plugin, { id: "context-optimizer", server: plugin.server })
 })
 
 test("buildPayload flattens context strings", () => {
@@ -196,6 +196,14 @@ test("createCliPath points at python bridge", () => {
   assert.equal(path.dirname(cliPath).endsWith(path.join("support-files")), true)
 })
 
+test("createSessionWarningTracker scopes warnings to the active session", () => {
+  const tracker = createSessionWarningTracker()
+
+  assert.equal(tracker.warnOnce("session-a", "python_missing: missing python"), true)
+  assert.equal(tracker.warnOnce("session-a", "python_missing: missing python"), false)
+  assert.equal(tracker.warnOnce("session-b", "python_missing: missing python"), true)
+})
+
 test("runOptimizer returns no-op friendly result for missing cli", async () => {
   const result = await runOptimizer({
     payload: { query: "x", docs: ["a"] },
@@ -238,4 +246,25 @@ test("runOptimizer parses size summary from a python bridge", async () => {
   assert.equal(result.optimizedContext, "bridge output")
   assert.equal(result.initialSize, 11)
   assert.equal(result.finalSize, 13)
+})
+
+test("ContextOptimizerPlugin rewrites output context when runOptimizer is stubbed", async () => {
+  const stubRunOptimizer = async () => ({
+    ok: true,
+    optimizedContext: "stubbed optimized context",
+    initialSize: 42,
+    finalSize: 11,
+  })
+
+  const pluginInstance = await ContextOptimizerPlugin({ runOptimizer: stubRunOptimizer })
+  const compacting = pluginInstance["experimental.session.compacting"]
+  const output = { context: ["original source"] }
+
+  await compacting({ sessionID: "session-a", prompt: "hello" }, output)
+
+  assert.deepEqual(output.context, [
+    "[context-optimizer] optimized context emitted. Initial size: 42 chars, final size: 11 chars, saved: 31 chars (74%)",
+    "Initial size: 42 chars, final size: 11 chars, saved: 31 chars (74%)",
+    "## Optimized Context\n\nstubbed optimized context",
+  ])
 })
