@@ -164,7 +164,6 @@ export function applyOptimizedContext(output, result) {
   if (!output || !result?.optimizedContext) return
 
   const summary = formatSizeSummary(result.initialSize, result.finalSize)
-  const savingsText = summary || ""
   const statusLine = summary
     ? `[context-optimizer] optimized context emitted. ${summary}`
     : (() => {
@@ -179,11 +178,6 @@ export function applyOptimizedContext(output, result) {
   nextContext.push(`## Optimized Context\n\n${result.optimizedContext}`)
 
   output.context = nextContext
-
-  writeLog(
-    import.meta.url,
-    `[context-optimizer] success: optimized context emitted${savingsText ? `. ${savingsText}` : "."}`,
-  )
 }
 
 function resolveToastClient(dependencies = {}, input = {}, output = {}) {

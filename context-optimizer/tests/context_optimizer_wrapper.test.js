@@ -296,7 +296,7 @@ test("ContextOptimizerPlugin leaves context untouched when the optimizer fails (
   ])
 })
 
-test("ContextOptimizerPlugin logs outbound doc count during compaction", async () => {
+test("ContextOptimizerPlugin logs one savings summary during compaction", async () => {
   const tempDir = await mkdtemp(path.join(os.tmpdir(), "context-optimizer-plugin-"))
   const installRoot = path.join(tempDir, "context-optimizer")
   const pluginDir = path.join(installRoot, "plugin")
@@ -306,19 +306,19 @@ test("ContextOptimizerPlugin logs outbound doc count during compaction", async (
   await mkdir(supportDir, { recursive: true })
 
   await copyFile(
-    path.join(process.cwd(), "context-optimizer", "plugin", "context-optimizer.js"),
+    path.join(process.cwd(), "plugin", "context-optimizer.js"),
     path.join(pluginDir, "context-optimizer.js"),
   )
   await copyFile(
-    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer.py"),
+    path.join(process.cwd(), "support-files", "context_optimizer.py"),
     path.join(supportDir, "context_optimizer.py"),
   )
   await copyFile(
-    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_cli.py"),
+    path.join(process.cwd(), "support-files", "context_optimizer_cli.py"),
     path.join(supportDir, "context_optimizer_cli.py"),
   )
   await copyFile(
-    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_hook.py"),
+    path.join(process.cwd(), "support-files", "context_optimizer_hook.py"),
     path.join(supportDir, "context_optimizer_hook.py"),
   )
 
@@ -347,6 +347,8 @@ test("ContextOptimizerPlugin logs outbound doc count during compaction", async (
   const lines = logContent.trim().split(/\r?\n/)
 
   assert.equal(lines.filter((line) => line.includes("outbound docs:")).length, 1)
+  assert.equal(lines.filter((line) => line.includes("optimized context emitted. Initial size:")).length, 1)
+  assert.equal(lines.filter((line) => line.includes("success: optimized context emitted")).length, 0)
   assert.match(logContent, /outbound docs: 2/)
   assert.doesNotMatch(logContent, /first chunk|second chunk/)
 })
