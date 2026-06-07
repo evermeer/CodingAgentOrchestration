@@ -77,8 +77,11 @@ function warnOnce(sessionID, message) {
 
 export function createCliPath(metaUrl) {
   const pluginDir = dirnameFromMeta(metaUrl)
-  const preferred = path.resolve(pluginDir, "..", "context-optimizer", "context_optimizer_cli.py")
+  const preferred = path.resolve(pluginDir, "..", "support-files", "context_optimizer_cli.py")
   if (existsSync(preferred)) return preferred
+
+  const installed = path.resolve(pluginDir, "..", "context-optimizer", "context_optimizer_cli.py")
+  if (existsSync(installed)) return installed
 
   const legacy = path.resolve(pluginDir, "context_optimizer_cli.py")
   if (existsSync(legacy)) return legacy

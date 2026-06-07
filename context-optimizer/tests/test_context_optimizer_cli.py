@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-CLI = REPO_ROOT / "context-optimizer" / "context_optimizer_cli.py"
+CLI = REPO_ROOT / "context-optimizer" / "support-files" / "context_optimizer_cli.py"
 
 
 def run_cli(payload):

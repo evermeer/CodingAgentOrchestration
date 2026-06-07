@@ -98,8 +98,8 @@ Instructions:
 
 #### Tiny install checklist
 
-- **Windows:** copy `plugins\\context-optimizer.js` to `%USERPROFILE%\\.config\\opencode\\plugins\\`, then copy `context-optimizer\\context_optimizer.py` and `context-optimizer\\context_optimizer_cli.py` to `%USERPROFILE%\\.config\\opencode\\context-optimizer\\`.
-- **macOS / Linux:** copy `plugins/context-optimizer.js` to `~/.config/opencode/plugins/`, then copy `context-optimizer/context_optimizer.py` and `context-optimizer/context_optimizer_cli.py` to `~/.config/opencode/context-optimizer/`.
+- **Windows:** copy `context-optimizer\\plugin\\context-optimizer.js` to `%USERPROFILE%\\.config\\opencode\\plugins\\`, then copy `context-optimizer\\context_optimizer.py` and `context-optimizer\\context_optimizer_cli.py` to `%USERPROFILE%\\.config\\opencode\\context-optimizer\\`.
+- **macOS / Linux:** copy `context-optimizer/plugin/context-optimizer.js` to `~/.config/opencode/plugins/`, then copy `context-optimizer/support-files/context_optimizer.py` and `context-optimizer/support-files/context_optimizer_cli.py` to `~/.config/opencode/context-optimizer/`.
 - **All platforms:** do **not** copy `tests/` or any `__pycache__/` folder into the OpenCode plugins directory.
 
 **After installation:**
@@ -208,21 +208,21 @@ Here is a short overview of the differences between MemPalace and Graphify:
 | Best for         | *Why we decided something*             | *How the system is structured*                |
 
 ### Step 5.3: Context optimization plugin
-The [content-optimizer plugin](docs/context-optimizer-plugin.md) is a tool for optimizing the content that goes into your agent's context. It can do things like reranking, deduplication, and compression to make sure the most relevant information is prioritized and the overall content size stays within limits.
+The [context-optimizer plugin](../context-optimizer/README.md) is a tool for optimizing the content that goes into your agent's context. It can do things like reranking, deduplication, and compression to make sure the most relevant information is prioritized and the overall content size stays within limits.
 
 This plugin will give you a 70–90% token reduction, faster responses, cleaner, higher-quality context, scales with long conversations and less context noise from Graphify + MemPalace.
 
 **Prompt for OpenCode:**
 
 ```
-Goal: Install the content-optimizer plugin globally for OpenCode.
+Goal: Install the context-optimizer plugin globally for OpenCode.
 
 Instructions:
-1. Install the content-optimizer plugin globally (user-scope) following the latest instructions at:
-   https://github.com/evermeer/CodingAgentOrchestration/blob/main/docs/context-optimizer-plugin.md
+1. Install the context-optimizer plugin globally (user-scope) following the latest instructions at:
+   https://github.com/evermeer/CodingAgentOrchestration/blob/main/context-optimizer/README.md
    Detect my OS and use the matching commands.
-2. Copy only `plugins/context-optimizer.js` into my global OpenCode plugin folder, and copy the Python support files (`context_optimizer.py`, `context_optimizer_cli.py`, and `context_optimizer_hook.py`) into `~/.config/opencode/context-optimizer/` (or `%USERPROFILE%\.config\opencode\context-optimizer\` on Windows).
-3. On any step failure, print the exact error plus proposed fix before retrying.
+2. Copy only `context-optimizer/plugin/context-optimizer.js` into my global OpenCode plugin folder, and copy the Python support files (`context-optimizer/support-files/context_optimizer.py`, `context-optimizer/support-files/context_optimizer_cli.py`, and `context-optimizer/support-files/context_optimizer_hook.py`) into `~/.config/opencode/context-optimizer/` (or `%USERPROFILE%\.config\opencode\context-optimizer\` on Windows).
+   3. On any step failure, print the exact error plus proposed fix before retrying.
 4. Print the installed versions, install path, and config files changed.
 5. Verify that `~/.config/opencode/plugins/context-optimizer.js` is present, that the Python support files exist in `~/.config/opencode/context-optimizer/`, and that the Python bridge can be called successfully.
 6. If the wrapper falls back to no-op mode, report the exact warning and the fix.
