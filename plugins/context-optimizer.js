@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process"
+import { existsSync } from "node:fs"
 import path from "node:path"
 import process from "node:process"
 import { fileURLToPath } from "node:url"
@@ -76,7 +77,13 @@ function warnOnce(sessionID, message) {
 
 export function createCliPath(metaUrl) {
   const pluginDir = dirnameFromMeta(metaUrl)
-  return path.resolve(pluginDir, "context_optimizer_cli.py")
+  const preferred = path.resolve(pluginDir, "..", "context-optimizer", "context_optimizer_cli.py")
+  if (existsSync(preferred)) return preferred
+
+  const legacy = path.resolve(pluginDir, "context_optimizer_cli.py")
+  if (existsSync(legacy)) return legacy
+
+  return preferred
 }
 
 export function applyOptimizedContext(output, result) {

@@ -96,6 +96,12 @@ Instructions:
 6. Verify by listing the available agents in OpenCode and confirming Sisyphus is selectable.
 ```
 
+#### Tiny install checklist
+
+- **Windows:** copy `plugins\\context-optimizer.js` to `%USERPROFILE%\\.config\\opencode\\plugins\\`, then copy `context-optimizer\\context_optimizer.py` and `context-optimizer\\context_optimizer_cli.py` to `%USERPROFILE%\\.config\\opencode\\context-optimizer\\`.
+- **macOS / Linux:** copy `plugins/context-optimizer.js` to `~/.config/opencode/plugins/`, then copy `context-optimizer/context_optimizer.py` and `context-optimizer/context_optimizer_cli.py` to `~/.config/opencode/context-optimizer/`.
+- **All platforms:** do **not** copy `tests/` or any `__pycache__/` folder into the OpenCode plugins directory.
+
 **After installation:**
 1. Close OpenCode Desktop and start OpenCode CLI.
 2. Activate the Sisyphus Agent (oh-my-opencode) with GPT 5.4 or later or Claude Opus 4.6 or later if reasoning is your major task.
@@ -215,10 +221,10 @@ Instructions:
 1. Install the content-optimizer plugin globally (user-scope) following the latest instructions at:
    https://github.com/evermeer/CodingAgentOrchestration/blob/main/docs/context-optimizer-plugin.md
    Detect my OS and use the matching commands.
-2. Copy the source files from the repo `plugins/` folder into my global OpenCode plugin folder. 
+2. Copy only `plugins/context-optimizer.js` into my global OpenCode plugin folder, and copy the Python support files (`context_optimizer.py`, `context_optimizer_cli.py`, and `context_optimizer_hook.py`) into `~/.config/opencode/context-optimizer/` (or `%USERPROFILE%\.config\opencode\context-optimizer\` on Windows).
 3. On any step failure, print the exact error plus proposed fix before retrying.
 4. Print the installed versions, install path, and config files changed.
-5. Verify that `~/.config/opencode/plugins/context-optimizer.js` is present and that the Python bridge can be called successfully.
+5. Verify that `~/.config/opencode/plugins/context-optimizer.js` is present, that the Python support files exist in `~/.config/opencode/context-optimizer/`, and that the Python bridge can be called successfully.
 6. If the wrapper falls back to no-op mode, report the exact warning and the fix.
 ```
 

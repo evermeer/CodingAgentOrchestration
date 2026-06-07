@@ -12,7 +12,7 @@ import {
   normalizePythonResult,
   resolvePythonCommand,
   runOptimizer,
-} from "../context-optimizer.js"
+} from "../../plugins/context-optimizer.js"
 
 test("buildPayload flattens context strings", () => {
   const payload = buildPayload(
@@ -63,6 +63,7 @@ test("resolvePythonCommand respects override", () => {
 test("createCliPath points at python bridge", () => {
   const cliPath = createCliPath(import.meta.url)
   assert.equal(path.basename(cliPath), "context_optimizer_cli.py")
+  assert.equal(path.dirname(cliPath).endsWith(path.join("context-optimizer")), true)
 })
 
 test("runOptimizer returns no-op friendly result for missing cli", async () => {
