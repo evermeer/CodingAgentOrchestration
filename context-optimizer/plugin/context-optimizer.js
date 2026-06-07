@@ -19,6 +19,30 @@ export function formatSizeSummary(initialSize, finalSize) {
   return `Initial size: ${initialSize} chars, final size: ${finalSize} chars, saved: ${saved} chars (${percent}%)`
 }
 
+export function logSizeSummary(result = {}) {
+  const summary = formatSizeSummary(result.initialSize, result.finalSize)
+  if (summary) console.log(`[context-optimizer] ${summary}`)
+  return summary
+}
+
+export function formatOutcomeMessage(result = {}) {
+  const summary = formatSizeSummary(result.initialSize, result.finalSize)
+
+  if (summary) {
+    return `[context-optimizer] optimized context emitted. ${summary}`
+  }
+
+  if (result?.status === "no_optimization") {
+    return `[context-optimizer] no optimization applied: ${result.reason || "the optimizer found no safer or smaller replacement for the current context."}`
+  }
+
+  if (result?.status === "failed") {
+    return `[context-optimizer] optimization skipped: ${result.reason || result.message || "the optimizer could not complete."}`
+  }
+
+  return `[context-optimizer] optimization completed without a measurable savings summary.`
+}
+
 export function buildPayload(input = {}, output = {}) {
   const context = Array.isArray(output.context)
     ? output.context.filter((value) => typeof value === "string" && value.trim())
@@ -46,6 +70,8 @@ export function normalizePythonResult(stdout) {
       optimizedContext: parsed.optimized_context || "",
       initialSize: parsed.initial_size,
       finalSize: parsed.final_size,
+      status: parsed.status || (parsed.optimized_context ? "optimized" : "no_optimization"),
+      reason: parsed.reason || "",
     }
   }
 
@@ -53,6 +79,8 @@ export function normalizePythonResult(stdout) {
     ok: false,
     errorCode: parsed.error_code || "runtime_error",
     message: parsed.message || "Unknown error",
+    status: "failed",
+    reason: parsed.reason || parsed.message || "Unknown error",
   }
 }
 
@@ -165,13 +193,18 @@ export const ContextOptimizerPlugin = async () => {
     return {
       "experimental.session.compacting": async (input, output) => {
         const payload = buildPayload(input, output)
-        if (!payload.docs.length) return
+        if (!payload.docs.length) {
+          console.log("[context-optimizer] no optimization applied: no compaction documents were provided.")
+          return
+        }
 
         const result = await runOptimizer({
           payload,
           sessionID: input?.sessionID,
           cliPath,
         })
+
+        console.log(formatOutcomeMessage(result))
 
         if (!result.ok || !result.optimizedContext) return
 

@@ -11,6 +11,7 @@ import {
   createCliPath,
   applyOptimizedContext,
   formatSizeSummary,
+  logSizeSummary,
   normalizePythonResult,
   resolvePythonCommand,
   runOptimizer,
@@ -60,6 +61,22 @@ test("applyOptimizedContext replaces source context", () => {
     "Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)",
     "## Optimized Context\n\noptimized body",
   ])
+})
+
+test("logSizeSummary prints the savings line during normal use", () => {
+  const messages = []
+  const originalLog = console.log
+  console.log = (message) => {
+    messages.push(message)
+  }
+
+  try {
+    const summary = logSizeSummary({ initialSize: 20, finalSize: 5 })
+    assert.equal(summary, "Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)")
+    assert.deepEqual(messages, ["Initial size: 20 chars, final size: 5 chars, saved: 15 chars (75%)"])
+  } finally {
+    console.log = originalLog
+  }
 })
 
 test("resolvePythonCommand respects override", () => {
