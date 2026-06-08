@@ -167,19 +167,25 @@ class ContextOptimizerHookTests(unittest.TestCase):
         core = load_core_module()
 
         class StubOptimizer:
-            def optimize(self, query, graph_ctx=None, memory_ctx=None):
+            def optimize(self, query, graph_ctx=None, memory_ctx=None, docs=None):
                 graph_items = cast(list[str], graph_ctx or [])
                 memory_items = cast(list[str], memory_ctx or [])
-                return f"{query}:{'|'.join(graph_items)}:{'|'.join(memory_items)}"
+                doc_items = cast(list[str], docs or [])
+                return f"{query}:{'|'.join(graph_items)}:{'|'.join(memory_items)}:{'|'.join(doc_items)}"
 
         setattr(core, "ContextOptimizer", lambda: StubOptimizer())
         hook = load_hook_module(core)
 
-        context = cast(dict[str, Any], {"query": "hello", "graph_ctx": ["g1"], "memory_ctx": ["m1"]})
+        context = cast(dict[str, Any], {
+            "query": "hello",
+            "graph_ctx": ["g1"],
+            "memory_ctx": ["m1"],
+            "docs": ["d1"],
+        })
         result = hook.run(context)
 
         self.assertIs(result, context)
-        self.assertEqual(result["optimized_context"], "hello:g1:m1")
+        self.assertEqual(result["optimized_context"], "hello:g1:m1:d1")
 
     def test_run_returns_original_context_when_optimizer_cannot_initialize(self):
         core = load_core_module()
@@ -221,7 +227,7 @@ class ContextOptimizerHookTests(unittest.TestCase):
         core = load_core_module()
 
         class StubOptimizer:
-            def optimize(self, query, graph_ctx=None, memory_ctx=None):
+            def optimize(self, query, graph_ctx=None, memory_ctx=None, docs=None):
                 raise RuntimeError("boom")
 
         setattr(core, "ContextOptimizer", lambda: StubOptimizer())
@@ -238,7 +244,7 @@ class ContextOptimizerHookTests(unittest.TestCase):
         core = load_core_module()
 
         class StubOptimizer:
-            def optimize(self, query, graph_ctx=None, memory_ctx=None):
+            def optimize(self, query, graph_ctx=None, memory_ctx=None, docs=None):
                 raise RuntimeError("boom")
 
         setattr(core, "ContextOptimizer", lambda: StubOptimizer())

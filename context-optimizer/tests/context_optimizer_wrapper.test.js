@@ -407,6 +407,25 @@ test("ContextOptimizerPlugin rewrites output context when runOptimizer is stubbe
   }
 })
 
+test("ContextOptimizerPlugin exposes experimental.response.cleanup hook", async () => {
+  const pluginInstance = await ContextOptimizerPlugin({
+    runOptimizer: async () => ({
+      ok: true,
+      optimizedContext: "stubbed optimized context",
+      initialSize: 42,
+      finalSize: 11,
+    }),
+    client: {
+      tui: {
+        showToast: () => {},
+      },
+    },
+  })
+
+  assert.equal(typeof pluginInstance["experimental.session.compacting"], "function")
+  assert.equal(typeof pluginInstance["experimental.response.cleanup"], "function")
+})
+
 test("ContextOptimizerPlugin leaves context untouched when the optimizer fails (fail open)", async () => {
   const stubRunOptimizer = async () => ({
     ok: false,

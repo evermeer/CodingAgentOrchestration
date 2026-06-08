@@ -47,12 +47,14 @@ def run(context):
     query = context.get("query", "")
     graph_ctx = context.get("graph_ctx", [])
     memory_ctx = context.get("memory_ctx", [])
+    docs = context.get("docs", [])
 
     try:
         optimized = optimizer.optimize(
             query=query,
             graph_ctx=graph_ctx,
             memory_ctx=memory_ctx,
+            docs=docs,
         )
     except Exception as exc:
         _log(f"optimizer optimization failed: {type(exc).__name__}: {exc}")

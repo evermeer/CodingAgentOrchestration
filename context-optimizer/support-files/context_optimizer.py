@@ -104,13 +104,14 @@ class ContextOptimizer:
 
         return compressed["compressed_prompt"]
 
-    def optimize(self, query, graph_ctx=None, memory_ctx=None):
+    def optimize(self, query, graph_ctx=None, memory_ctx=None, docs=None):
         graph_ctx = graph_ctx or []
         memory_ctx = memory_ctx or []
+        docs = docs or []
 
         combined = [
             normalized
-            for normalized in (self._normalize_doc(doc) for doc in graph_ctx + memory_ctx)
+            for normalized in (self._normalize_doc(doc) for doc in graph_ctx + memory_ctx + docs)
             if normalized
         ]
 

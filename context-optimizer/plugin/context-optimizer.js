@@ -128,33 +128,12 @@ export function normalizePythonResult(stdout) {
   }
 }
 
-function commandExists(cmd, args = ["--version"]) {
-    const result = childProcess(cmd, args, { stdio: "ignore" });
-    return result.status === 0;
-}
-
 export function resolvePythonCommand() {
-    if (process.env.CONTEXT_OPTIMIZER_PYTHON) {
-        return [process.env.CONTEXT_OPTIMIZER_PYTHON];
-    }
+  if (process.env.CONTEXT_OPTIMIZER_PYTHON) {
+    return [process.env.CONTEXT_OPTIMIZER_PYTHON]
+  }
 
-    const candidates = [];
-
-    if (process.platform === "win32") {
-        candidates.push(["py", "-3"]);
-        candidates.push(["python"]);
-    } else {
-        candidates.push(["python3"]);
-        candidates.push(["python"]);
-    }
-
-    for (const cmd of candidates) {
-        if (commandExists(cmd[0], cmd.slice(1))) {
-            return cmd;
-        }
-    }
-
-    throw new Error("No suitable Python interpreter found");
+  return process.platform === "win32" ? ["py", "-3"] : ["python3"]
 }
 
 export function createSessionWarningTracker() {
@@ -320,53 +299,55 @@ export const ContextOptimizerPlugin = async (dependencies = {}) => {
     const cliPath = createCliPath(import.meta.url)
     const run = dependencies.runOptimizer || runOptimizer
     const tracker = createSessionWarningTracker()
+    const optimizeContext = async (input, output) => {
+      const toast = resolveToastClient(dependencies, input, output)
+      const payload = buildPayload(input, output)
+      const minChars = resolveMinCompactionChars()
+      if (!payload.docs.length) {
+        writeLog(import.meta.url, "[context-optimizer] no optimization applied: no compaction documents were provided.")
+        return
+      }
+
+      if (payload.size < minChars) {
+        writeLog(
+          import.meta.url,
+          `[context-optimizer] no optimization applied: context size ${payload.size} chars is below the threshold of ${minChars} chars.`,
+        )
+        return
+      }
+
+      writeLog(import.meta.url, `[context-optimizer] outbound docs: ${payload.docs.length} (size=${payload.size} chars, threshold=${minChars} chars)`)
+
+      const result = await run({
+        payload: {
+          ...payload,
+          options: { min_input_size: minChars },
+        },
+        sessionID: input?.sessionID,
+        cliPath,
+        metaUrl: import.meta.url,
+        tracker,
+      })
+
+      writeLog(import.meta.url, formatOutcomeMessage(result))
+      // applyOptimizedContext is fail-open: it only rewrites output.context
+      // when the optimizer returned real optimized content.
+      applyOptimizedContext(output, result)
+
+      if (result?.ok && result?.optimizedContext) {
+        await showToast(toast, `[context-optimizer] optimized ${payload.docs.length} docs.`, "default")
+      } else if (!result?.ok) {
+        await showToast(
+          toast,
+          result?.reason || result?.message || result?.errorCode || "Context optimization failed.",
+          "error",
+        )
+      }
+    }
 
     return {
-      "experimental.session.compacting": async (input, output) => {
-        const toast = resolveToastClient(dependencies, input, output)
-        const payload = buildPayload(input, output)
-        const minChars = resolveMinCompactionChars()
-        if (!payload.docs.length) {
-          writeLog(import.meta.url, "[context-optimizer] no optimization applied: no compaction documents were provided.")
-          return
-        }
-
-        if (payload.size < minChars) {
-          writeLog(
-            import.meta.url,
-            `[context-optimizer] no optimization applied: context size ${payload.size} chars is below the threshold of ${minChars} chars.`,
-          )
-          return
-        }
-
-        writeLog(import.meta.url, `[context-optimizer] outbound docs: ${payload.docs.length} (size=${payload.size} chars, threshold=${minChars} chars)`)
-
-        const result = await run({
-          payload: {
-            ...payload,
-            options: { min_input_size: minChars },
-          },
-          sessionID: input?.sessionID,
-          cliPath,
-          metaUrl: import.meta.url,
-          tracker,
-        })
-
-        writeLog(import.meta.url, formatOutcomeMessage(result))
-        // applyOptimizedContext is fail-open: it only rewrites output.context
-        // when the optimizer returned real optimized content.
-        applyOptimizedContext(output, result)
-
-        if (result?.ok && result?.optimizedContext) {
-          await showToast(toast, `[context-optimizer] optimized ${payload.docs.length} docs.`, "default")
-        } else if (!result?.ok) {
-          await showToast(
-            toast,
-            result?.reason || result?.message || result?.errorCode || "Context optimization failed.",
-            "error",
-          )
-        }
-      },
+      "experimental.session.compacting": optimizeContext,
+      "experimental.response.cleanup": optimizeContext,
     }
   } catch (error) {
     writeLog(import.meta.url, `[context-optimizer] disabled during startup: ${error}`)
