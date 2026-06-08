@@ -175,10 +175,11 @@
 </g>
 
 <!-- Build / Test (top, next to Workspace FS) -->
-<rect x="900" y="110" width="120" height="42" rx="6" stroke="#a78bfa" fill="none" stroke-width="1.2"/>
-<text x="960" y="135" fill="#a78bfa" text-anchor="middle" font-family="monospace" font-size="11">Build / Test</text>
+<rect x="900" y="110" width="160" height="42" rx="6" stroke="#a78bfa" fill="none" stroke-width="1.2"/>
+<text x="980" y="128" fill="#a78bfa" text-anchor="middle" font-family="monospace" font-size="11">Rerank / Deduplicate</text>
+<text x="980" y="142" fill="#a78bfa" text-anchor="middle" font-family="monospace" font-size="11">/ Compress</text>
 
-<g>
+	<g>
   <line x1="960" y1="152" x2="803" y2="271" stroke="#a78bfa" stroke-width="1.2" stroke-dasharray="4 3">
     <animate attributeName="stroke" values="#a78bfa;#e9ddff;#a78bfa" keyTimes="0;0.045;1" dur="7.7s" begin="0.6s" repeatCount="indefinite"/>
     <animate attributeName="stroke-width" values="1.2;2.1;1.2" keyTimes="0;0.045;1" dur="7.7s" begin="0.6s" repeatCount="indefinite"/>
