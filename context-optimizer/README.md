@@ -287,7 +287,7 @@ embed_model    = "all-MiniLM-L6-v2"          # used for deduplication embeddings
 
 ### Process timeout and first-run warm-up
 
-The JS wrapper kills the Python bridge if it does not respond within a timeout (default **120000 ms / 2 minutes**). It also skips compaction below the minimum context threshold (default **5000 chars**, override with `CONTEXT_OPTIMIZER_MIN_CHARS`). Override the timeout with the `CONTEXT_OPTIMIZER_TIMEOUT_MS` environment, e.g.:
+The JS wrapper kills the Python bridge if it does not respond within a timeout (default **120000 ms / 2 minutes**). It also skips compaction below the minimum context threshold (default **5000 chars**, override with `CONTEXT_OPTIMIZER_MIN_CHARS`). When compaction is skipped, the wrapper still writes a log entry with the skipped context size so you can tell why it did not run. Override the timeout with the `CONTEXT_OPTIMIZER_TIMEOUT_MS` environment, e.g.:
 
 ```bash
 # longer timeout for slow machines (milliseconds)
@@ -347,6 +347,7 @@ mempalace.store(compressed)
 | First message hangs for a long time | Models are downloading from Hugging Face | Wait for the one-time download to finish; see [What gets downloaded on first run](#what-gets-downloaded-on-first-run). Warm the cache once (see [Process timeout and first-run warm-up](#process-timeout-and-first-run-warm-up)) and/or raise `CONTEXT_OPTIMIZER_TIMEOUT_MS` |
 | Hook never runs / context unchanged | The JS wrapper was not loaded or compaction did not fire | Confirm `~/.config/opencode/plugins/context-optimizer.js` exists and trigger a session compaction |
 | You expect console output but see none | Logging was moved to `context-optimizer/context-optimizer.log` under the OpenCode config root | Check the `.log` file instead of the terminal |
+| Compaction was skipped | The wrapper still logs skipped compactions with the context size and document count | Check `context-optimizer/context-optimizer.log` for the skip reason and size details |
 | You see a warning and no optimized context block | The wrapper fell back to no-op mode because Python, dependencies, or the bridge failed | Read the warning text, fix the Python issue, and retry |
 | Out-of-memory or very slow CPU | Reranker model is large | Switch `reranker_model` to `BAAI/bge-reranker-base` in `context_optimizer.py` |
 
