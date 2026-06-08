@@ -64,6 +64,15 @@ export function formatSizeSummary(initialSize, finalSize) {
   return `Initial size: ${initialSize} chars, final size: ${finalSize} chars, saved: ${saved} chars (${percent}%)`
 }
 
+function formatSkippedOptimizationMessage({ reason, size, threshold, docsCount }) {
+  const details = []
+  if (Number.isFinite(size)) details.push(`size=${size} chars`)
+  if (Number.isFinite(threshold)) details.push(`threshold=${threshold} chars`)
+  if (Number.isFinite(docsCount)) details.push(`docs=${docsCount}`)
+  const detailText = details.length ? ` (${details.join(", ")})` : ""
+  return `[context-optimizer] optimization skipped: ${reason}${detailText}`
+}
+
 export function formatOutcomeMessage(result = {}) {
   const summary = formatSizeSummary(result.initialSize, result.finalSize)
 
@@ -76,7 +85,11 @@ export function formatOutcomeMessage(result = {}) {
   }
 
   if (result?.status === "failed") {
-    return `[context-optimizer] optimization skipped: ${result.reason || result.message || "the optimizer could not complete."}`
+    return formatSkippedOptimizationMessage({
+      reason: result.reason || result.message || "the optimizer could not complete.",
+      size: result.initialSize,
+      threshold: result.finalSize,
+    })
   }
 
   if (result?.ok === true) {
@@ -89,6 +102,7 @@ export function formatOutcomeMessage(result = {}) {
 
   return `[context-optimizer] optimization completed without a measurable savings summary.`
 }
+
 
 export function buildPayload(input = {}, output = {}) {
   const context = Array.isArray(output.context)
@@ -304,14 +318,17 @@ export const ContextOptimizerPlugin = async (dependencies = {}) => {
       const payload = buildPayload(input, output)
       const minChars = resolveMinCompactionChars()
       if (!payload.docs.length) {
-        writeLog(import.meta.url, "[context-optimizer] no optimization applied: no compaction documents were provided.")
-        return
-      }
+              writeLog(
+                import.meta.url,
+                `[context-optimizer] optimization skipped: no compaction documents were provided (size=${payload.size} chars, docs=${payload.docs.length}).`,
+              )
+              return
+            }
 
       if (payload.size < minChars) {
         writeLog(
           import.meta.url,
-          `[context-optimizer] no optimization applied: context size ${payload.size} chars is below the threshold of ${minChars} chars.`,
+        `[context-optimizer] optimization skipped: context size ${payload.size} chars is below the threshold of ${minChars} chars (docs=${payload.docs.length}).`,
         )
         return
       }

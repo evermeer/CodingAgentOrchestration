@@ -125,30 +125,60 @@ class ContextOptimizer:
             ],
         }
 
-        pruned = []
-        remaining = self.total_prune_budget_chars
+        bucket_stats = {}
 
-        for bucket_name in ("graph_ctx", "memory_ctx", "docs"):
-            bucket = buckets[bucket_name]
-            if not bucket or remaining <= 0:
+        for bucket_name, bucket in buckets.items():
+            if not bucket:
                 continue
-
-            bucket_budget = min(self._budget_for_bucket(bucket_name), remaining)
-            bucket_total = 0
 
             ranked_with_scores = sorted(
                 zip(self.reranker.predict([(query, doc) for doc in bucket]), bucket),
                 key=lambda x: x[0],
                 reverse=True,
             )
-            ranked = self.dedupe([doc for _, doc in ranked_with_scores])
+            ranked_docs = self.dedupe([doc for _, doc in ranked_with_scores])
             score_for_doc = {}
 
             for score, doc in ranked_with_scores:
                 score_for_doc.setdefault(doc, score)
 
-            for doc in ranked:
-                score = score_for_doc.get(doc, 0)
+            total_score = sum(max(score_for_doc.get(doc, 0), 0) for doc in ranked_docs)
+            total_chars = sum(len(doc) for doc in ranked_docs)
+
+            bucket_stats[bucket_name] = {
+                "ranked": ranked_docs,
+                "scores": score_for_doc,
+                "total_score": total_score,
+                "total_chars": total_chars,
+            }
+
+        pruned = []
+        remaining = self.total_prune_budget_chars
+        active_buckets = [name for name in ("graph_ctx", "memory_ctx", "docs") if name in bucket_stats]
+
+        if not active_buckets or remaining <= 0:
+            return pruned
+
+        ordered_buckets = sorted(
+            active_buckets,
+            key=lambda name: (
+                bucket_stats[name]["total_score"] / max(bucket_stats[name]["total_chars"], 1),
+                bucket_stats[name]["total_score"],
+                -bucket_stats[name]["total_chars"],
+            ),
+            reverse=True,
+        )
+
+        for bucket_name in ordered_buckets:
+            stats = bucket_stats.get(bucket_name)
+            if stats is None or remaining <= 0:
+                continue
+
+            bucket_budget = remaining
+            bucket_total = 0
+
+            for doc in stats["ranked"]:
+                score = stats["scores"].get(doc, 0)
                 doc_len = len(doc)
                 if doc_len > bucket_budget:
                     if bucket_total == 0 and score > 0:

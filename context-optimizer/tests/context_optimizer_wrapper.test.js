@@ -328,8 +328,14 @@ test("runOptimizer parses size summary from a python bridge", async () => {
 test("ContextOptimizerPlugin skips optimization below the minimum threshold", async () => {
   const calls = []
   const toasts = []
+  const originalAppendFileSync = fs.appendFileSync
+  const logLines = []
   const previousMinChars = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
   process.env.CONTEXT_OPTIMIZER_MIN_CHARS = "1000"
+
+  fs.appendFileSync = (_path, content) => {
+    logLines.push(String(content))
+  }
 
   try {
     const pluginInstance = await ContextOptimizerPlugin({
@@ -351,7 +357,58 @@ test("ContextOptimizerPlugin skips optimization below the minimum threshold", as
     assert.deepEqual(output.context, ["tiny"])
     assert.deepEqual(calls, [])
     assert.deepEqual(toasts, [])
+    assert.match(
+      logLines.join("\n"),
+      /optimization skipped: context size 4 chars is below the threshold of 1000 chars \(docs=1\)\./,
+    )
   } finally {
+    fs.appendFileSync = originalAppendFileSync
+    if (previousMinChars === undefined) {
+      delete process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+    } else {
+      process.env.CONTEXT_OPTIMIZER_MIN_CHARS = previousMinChars
+    }
+  }
+})
+
+test("ContextOptimizerPlugin logs skipped optimization when no compaction docs are provided", async () => {
+  const calls = []
+  const toasts = []
+  const originalAppendFileSync = fs.appendFileSync
+  const logLines = []
+  const previousMinChars = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+  process.env.CONTEXT_OPTIMIZER_MIN_CHARS = "1000"
+
+  fs.appendFileSync = (_path, content) => {
+    logLines.push(String(content))
+  }
+
+  try {
+    const pluginInstance = await ContextOptimizerPlugin({
+      runOptimizer: async (payload) => {
+        calls.push(payload)
+        throw new Error("runOptimizer should not be called when there are no docs")
+      },
+      client: {
+        tui: {
+          showToast: (payload) => toasts.push(payload),
+        },
+      },
+    })
+    const compacting = pluginInstance["experimental.session.compacting"]
+    const output = { context: [] }
+
+    await compacting({ sessionID: "session-a", prompt: "hello" }, output)
+
+    assert.deepEqual(output.context, [])
+    assert.deepEqual(calls, [])
+    assert.deepEqual(toasts, [])
+    assert.match(
+      logLines.join("\n"),
+      /optimization skipped: no compaction documents were provided \(size=0 chars, docs=0\)\./,
+    )
+  } finally {
+    fs.appendFileSync = originalAppendFileSync
     if (previousMinChars === undefined) {
       delete process.env.CONTEXT_OPTIMIZER_MIN_CHARS
     } else {
@@ -368,6 +425,111 @@ test("ContextOptimizerPlugin rewrites output context when runOptimizer is stubbe
     finalSize: 11,
   })
   const toasts = []
+  const originalAppendFileSync = fs.appendFileSync
+  const logLines = []
+  const previousMinChars = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+  process.env.CONTEXT_OPTIMIZER_MIN_CHARS = "1"
+
+  fs.appendFileSync = (_path, content) => {
+    logLines.push(String(content))
+  }
+
+  try {
+    const pluginInstance = await ContextOptimizerPlugin({
+      runOptimizer: stubRunOptimizer,
+      client: {
+        tui: {
+          showToast: (payload) => toasts.push(payload),
+        },
+      },
+    })
+    const compacting = pluginInstance["experimental.session.compacting"]
+    const output = { context: ["original source"] }
+
+    await compacting({ sessionID: "session-a", prompt: "hello" }, output)
+
+    assert.deepEqual(output.context, [
+      "[context-optimizer] optimized context emitted. Initial size: 42 chars, final size: 11 chars, saved: 31 chars (74%)",
+      "## Optimized Context\n\nstubbed optimized context",
+    ])
+
+    assert.deepEqual(toasts, [
+      {
+        body: {
+          message: "[context-optimizer] optimized 1 docs.",
+          variant: "default",
+        },
+      },
+    ])
+  } finally {
+    fs.appendFileSync = originalAppendFileSync
+    if (previousMinChars === undefined) {
+      delete process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+    } else {
+      process.env.CONTEXT_OPTIMIZER_MIN_CHARS = previousMinChars
+    }
+  }
+})
+
+test("ContextOptimizerPlugin logs skipped optimization when no compaction docs are provided", async () => {
+  const calls = []
+  const toasts = []
+  const originalAppendFileSync = fs.appendFileSync
+  const logLines = []
+  const previousMinChars = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+  process.env.CONTEXT_OPTIMIZER_MIN_CHARS = "1000"
+
+  fs.appendFileSync = (_path, content) => {
+    logLines.push(String(content))
+  }
+
+  try {
+    const pluginInstance = await ContextOptimizerPlugin({
+      runOptimizer: async (payload) => {
+        calls.push(payload)
+        throw new Error("runOptimizer should not be called when there are no docs")
+      },
+      client: {
+        tui: {
+          showToast: (payload) => toasts.push(payload),
+        },
+      },
+    })
+    const compacting = pluginInstance["experimental.session.compacting"]
+    const output = { context: [] }
+
+    await compacting({ sessionID: "session-a", prompt: "hello" }, output)
+
+    assert.deepEqual(output.context, [])
+    assert.deepEqual(calls, [])
+    assert.deepEqual(toasts, [])
+    assert.match(
+      logLines.join("\n"),
+      /optimization skipped: no compaction documents were provided \(size=0 chars, docs=0\)\./,
+    )
+  } finally {
+    fs.appendFileSync = originalAppendFileSync
+    if (previousMinChars === undefined) {
+      delete process.env.CONTEXT_OPTIMIZER_MIN_CHARS
+    } else {
+      process.env.CONTEXT_OPTIMIZER_MIN_CHARS = previousMinChars
+    }
+  }
+})
+
+test("ContextOptimizerPlugin rewrites output context when runOptimizer is stubbed", async () => {
+  const stubRunOptimizer = async () => ({
+    ok: true,
+    optimizedContext: "stubbed optimized context",
+    initialSize: 42,
+    finalSize: 11,
+  })
+  const toasts = []
+    const originalAppendFileSync = fs.appendFileSync
+    const logLines = []
+    fs.appendFileSync = (_path, content) => {
+      logLines.push(String(content))
+    }
   const previousMinChars = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
   process.env.CONTEXT_OPTIMIZER_MIN_CHARS = "1"
 
@@ -435,6 +597,11 @@ test("ContextOptimizerPlugin leaves context untouched when the optimizer fails (
     reason: "missing dep",
   })
   const toasts = []
+    const originalAppendFileSync = fs.appendFileSync
+    const logLines = []
+    fs.appendFileSync = (_path, content) => {
+      logLines.push(String(content))
+    }
   const previousMinChars = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
   process.env.CONTEXT_OPTIMIZER_MIN_CHARS = "1"
 
@@ -541,37 +708,17 @@ test("ContextOptimizerPlugin reports toast failures to stderr", async () => {
 })
 
 test("ContextOptimizerPlugin logs one savings summary during compaction", async () => {
-  const tempDir = await mkdtemp(path.join(os.tmpdir(), "context-optimizer-plugin-"))
-  const installRoot = path.join(tempDir, "context-optimizer")
-  const pluginDir = path.join(installRoot, "plugin")
-  const supportDir = path.join(installRoot, "support-files")
-
-  await mkdir(pluginDir, { recursive: true })
-  await mkdir(supportDir, { recursive: true })
-
-  await copyFile(
-    path.join(process.cwd(), "plugin", "context-optimizer.js"),
-    path.join(pluginDir, "context-optimizer.js"),
-  )
-  await copyFile(
-    path.join(process.cwd(), "support-files", "context_optimizer.py"),
-    path.join(supportDir, "context_optimizer.py"),
-  )
-  await copyFile(
-    path.join(process.cwd(), "support-files", "context_optimizer_cli.py"),
-    path.join(supportDir, "context_optimizer_cli.py"),
-  )
-  await copyFile(
-    path.join(process.cwd(), "support-files", "context_optimizer_hook.py"),
-    path.join(supportDir, "context_optimizer_hook.py"),
-  )
-
+  const originalAppendFileSync = fs.appendFileSync
+  const logLines = []
   const previousMinChars = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
   process.env.CONTEXT_OPTIMIZER_MIN_CHARS = "1"
 
-  const tempPlugin = await import(pathToFileURL(path.join(pluginDir, "context-optimizer.js")).href)
+  fs.appendFileSync = (_path, content) => {
+    logLines.push(String(content))
+  }
+
   try {
-    const pluginInstance = await tempPlugin.ContextOptimizerPlugin({
+    const pluginInstance = await ContextOptimizerPlugin({
       runOptimizer: async () => ({
         ok: true,
         optimizedContext: "optimized body",
@@ -590,8 +737,7 @@ test("ContextOptimizerPlugin logs one savings summary during compaction", async 
       { context: ["first chunk", "second chunk"] },
     )
 
-    const logPath = path.join(installRoot, "context-optimizer.log")
-    const logContent = await readFile(logPath, "utf8")
+    const logContent = logLines.join("\n")
     const lines = logContent.trim().split(/\r?\n/)
 
     assert.equal(lines.filter((line) => line.includes("outbound docs:")).length, 1)
@@ -600,6 +746,7 @@ test("ContextOptimizerPlugin logs one savings summary during compaction", async 
     assert.match(logContent, /outbound docs: 2/)
     assert.doesNotMatch(logContent, /first chunk|second chunk/)
   } finally {
+    fs.appendFileSync = originalAppendFileSync
     if (previousMinChars === undefined) {
       delete process.env.CONTEXT_OPTIMIZER_MIN_CHARS
     } else {

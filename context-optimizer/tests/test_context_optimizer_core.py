@@ -202,6 +202,32 @@ class ContextOptimizerCoreTests(unittest.TestCase):
 
         self.assertIn("alpha", result)
 
+    def test_optimize_borrows_budget_toward_high_density_docs_bucket(self):
+        module = load_core_module()
+        optimizer = module.ContextOptimizer(
+            compression_rate=0.5,
+            max_chunks=6,
+            graph_budget_chars=10,
+            memory_budget_chars=10,
+            docs_budget_chars=10,
+            total_prune_budget_chars=8,
+        )
+        optimizer.reranker = types.SimpleNamespace(
+            predict=lambda pairs: [10 if doc.startswith("d") else 1 for _, doc in pairs]
+        )
+
+        result = optimizer.optimize(
+            query="best chunk",
+            graph_ctx=cast(list[str], ["g01", "g02"]),
+            memory_ctx=cast(list[str], ["m01"]),
+            docs=cast(list[str], ["d1", "d2", "d3"]),
+        )
+
+        self.assertIn("d1", result)
+        self.assertIn("d2", result)
+        self.assertIn("d3", result)
+        self.assertLess(result.index("d1"), result.index("g01"))
+
 
 class ContextOptimizerHookTests(unittest.TestCase):
     def test_run_attaches_optimized_context(self):
