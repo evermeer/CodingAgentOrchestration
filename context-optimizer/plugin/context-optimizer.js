@@ -5,7 +5,7 @@ import process from "node:process"
 import { fileURLToPath } from "node:url"
 
 const DEFAULT_TIMEOUT_MS = 120000
-const DEFAULT_MIN_COMPACTION_CHARS = 8000
+const DEFAULT_MIN_COMPACTION_CHARS = 5000
 
 export function resolveTimeoutMs() {
   const raw = process.env.CONTEXT_OPTIMIZER_TIMEOUT_MS
@@ -128,16 +128,33 @@ export function normalizePythonResult(stdout) {
   }
 }
 
+function commandExists(cmd, args = ["--version"]) {
+    const result = childProcess(cmd, args, { stdio: "ignore" });
+    return result.status === 0;
+}
+
 export function resolvePythonCommand() {
-  if (process.env.CONTEXT_OPTIMIZER_PYTHON) {
-    return [process.env.CONTEXT_OPTIMIZER_PYTHON]
-  }
+    if (process.env.CONTEXT_OPTIMIZER_PYTHON) {
+        return [process.env.CONTEXT_OPTIMIZER_PYTHON];
+    }
 
-  if (process.platform === "win32") {
-    return ["python"]
-  }
+    const candidates = [];
 
-  return ["python3"]
+    if (process.platform === "win32") {
+        candidates.push(["py", "-3"]);
+        candidates.push(["python"]);
+    } else {
+        candidates.push(["python3"]);
+        candidates.push(["python"]);
+    }
+
+    for (const cmd of candidates) {
+        if (commandExists(cmd[0], cmd.slice(1))) {
+            return cmd;
+        }
+    }
+
+    throw new Error("No suitable Python interpreter found");
 }
 
 export function createSessionWarningTracker() {
