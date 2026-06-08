@@ -210,7 +210,7 @@ Here is a short overview of the differences between MemPalace and Graphify:
 ### Step 5.3: Context optimization plugin
 The [context-optimizer plugin](../context-optimizer/README.md) is a tool for optimizing the content that goes into your agent's context. It can do things like reranking, deduplication, and compression to make sure the most relevant information is prioritized and the overall content size stays within limits.
 
-This plugin will give you a 70–90% token reduction, faster responses, cleaner, higher-quality context, scales with long conversations and less context noise from Graphify + MemPalace.
+This plugin will give you a 30–40% token reduction, faster responses, cleaner, higher-quality context, scales with long conversations and less context noise from Graphify + MemPalace.
 
 **Prompt for OpenCode:**
 

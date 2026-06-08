@@ -1,6 +1,9 @@
 
 # OpenCode Context Optimizer Plugin
 
+> [!WARNING]
+> This plugin is still experimental. (It works on my machine)
+
 ## Overview
 This plugin adds token reduction to your OpenCode setup.
 
@@ -17,7 +20,7 @@ This plugin adds token reduction to your OpenCode setup.
 
 #### 🚀 What You’ll Notice Immediately:
 
-- 🔥 70–90% token reduction
+- 🔥 30–40% token reduction
 - ⚡ Faster responses
 - 🧠 Cleaner, higher-quality context
 - 🔁 Scales with long conversations
@@ -252,7 +255,7 @@ context["optimized_context"]
 
 The JS wrapper also adds a size summary line with the initial size, final size, and percentage saved.
 
-The JS wrapper then appends that result to the OpenCode compaction context as:
+The JS wrapper then replaces that result into the OpenCode compaction context as:
 
 ```markdown
 ## Optimized Context
@@ -284,7 +287,7 @@ embed_model    = "all-MiniLM-L6-v2"          # used for deduplication embeddings
 
 ### Process timeout and first-run warm-up
 
-The JS wrapper kills the Python bridge if it does not respond within a timeout (default **120000 ms / 2 minutes**). It also skips compaction below the minimum context threshold (default **8000 chars**, override with `CONTEXT_OPTIMIZER_MIN_CHARS`). Override the timeout with the `CONTEXT_OPTIMIZER_TIMEOUT_MS` environment, e.g.:
+The JS wrapper kills the Python bridge if it does not respond within a timeout (default **120000 ms / 2 minutes**). It also skips compaction below the minimum context threshold (default **5000 chars**, override with `CONTEXT_OPTIMIZER_MIN_CHARS`). Override the timeout with the `CONTEXT_OPTIMIZER_TIMEOUT_MS` environment, e.g.:
 
 ```bash
 # longer timeout for slow machines (milliseconds)
@@ -317,7 +320,7 @@ This download happens **once** and only needs network access the first time. Exp
 
 ## Expected Results
 
-- 70–90% token reduction
+- 30–40% token reduction
 - Faster responses
 - Cleaner prompts
 
