@@ -23,6 +23,10 @@ class ContextOptimizer:
         compression_rate=0.5,
         max_chunks=6,
         dedupe_threshold=0.9,
+        graph_budget_chars=1200,
+        memory_budget_chars=1200,
+        docs_budget_chars=1600,
+        total_prune_budget_chars=4000,
     ): 
         device = "cuda" if torch is not None and torch.cuda.is_available() else "cpu"
         # Keep the LLMLingua-2 algorithm on both devices; on CPU use the smaller
@@ -49,6 +53,10 @@ class ContextOptimizer:
         self.compression_rate = compression_rate
         self.max_chunks = max_chunks
         self.dedupe_threshold = dedupe_threshold
+        self.graph_budget_chars = graph_budget_chars
+        self.memory_budget_chars = memory_budget_chars
+        self.docs_budget_chars = docs_budget_chars
+        self.total_prune_budget_chars = total_prune_budget_chars
 
         log("optimizer initialized")
 
@@ -91,14 +99,87 @@ class ContextOptimizer:
 
         return unique_docs
 
+    def _budget_for_bucket(self, bucket_name):
+        if bucket_name == "graph_ctx":
+            return self.graph_budget_chars
+        if bucket_name == "memory_ctx":
+            return self.memory_budget_chars
+        return self.docs_budget_chars
+
+    def _pre_prune(self, query, graph_ctx, memory_ctx, docs):
+        buckets = {
+            "graph_ctx": [
+                normalized
+                for normalized in (self._normalize_doc(doc) for doc in graph_ctx)
+                if normalized
+            ],
+            "memory_ctx": [
+                normalized
+                for normalized in (self._normalize_doc(doc) for doc in memory_ctx)
+                if normalized
+            ],
+            "docs": [
+                normalized
+                for normalized in (self._normalize_doc(doc) for doc in docs)
+                if normalized
+            ],
+        }
+
+        pruned = []
+        remaining = self.total_prune_budget_chars
+
+        for bucket_name in ("graph_ctx", "memory_ctx", "docs"):
+            bucket = buckets[bucket_name]
+            if not bucket or remaining <= 0:
+                continue
+
+            bucket_budget = min(self._budget_for_bucket(bucket_name), remaining)
+            bucket_total = 0
+
+            ranked_with_scores = sorted(
+                zip(self.reranker.predict([(query, doc) for doc in bucket]), bucket),
+                key=lambda x: x[0],
+                reverse=True,
+            )
+            ranked = self.dedupe([doc for _, doc in ranked_with_scores])
+            score_for_doc = {}
+
+            for score, doc in ranked_with_scores:
+                score_for_doc.setdefault(doc, score)
+
+            for doc in ranked:
+                score = score_for_doc.get(doc, 0)
+                doc_len = len(doc)
+                if doc_len > bucket_budget:
+                    if bucket_total == 0 and score > 0:
+                        pruned.append(doc)
+                        remaining -= doc_len
+
+                        if remaining <= 0:
+                            return pruned
+
+                        break
+
+                    continue
+
+                if bucket_total + doc_len > bucket_budget:
+                    continue
+
+                pruned.append(doc)
+                bucket_total += doc_len
+                remaining -= doc_len
+
+                if remaining <= 0:
+                    return pruned
+
+        return pruned
+
     def compress(self, docs):
         if not docs:
             return ""
 
-        combined = "\n\n".join(docs)
-
         compressed = self.compressor.compress_prompt(
-            combined,
+            docs,
             rate=self.compression_rate,
         )
 
@@ -109,11 +190,7 @@ class ContextOptimizer:
         memory_ctx = memory_ctx or []
         docs = docs or []
 
-        combined = [
-            normalized
-            for normalized in (self._normalize_doc(doc) for doc in graph_ctx + memory_ctx + docs)
-            if normalized
-        ]
+        combined = self._pre_prune(query, graph_ctx, memory_ctx, docs)
 
         if not combined:
             return ""

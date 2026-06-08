@@ -60,7 +60,7 @@ def load_core_module():
             self.kwargs = kwargs
 
         def compress_prompt(self, combined, rate):
-            return {"compressed_prompt": f"{combined} [rate={rate}]"}
+            return {"compressed_prompt": f"{'\n\n'.join(combined)} [rate={rate}]"}
 
     setattr(fake_llmlingua, "PromptCompressor", FakePromptCompressor)
 
@@ -161,6 +161,47 @@ class ContextOptimizerCoreTests(unittest.TestCase):
 
         self.assertEqual(result, "graph alpha source-a\n\nmemory beta source-b [rate=0.5]")
 
+    def test_optimize_pre_prunes_low_value_docs_before_rerank_and_compress(self):
+        module = load_core_module()
+        optimizer = module.ContextOptimizer(
+            compression_rate=0.5,
+            max_chunks=6,
+            graph_budget_chars=5,
+            memory_budget_chars=5,
+            docs_budget_chars=5,
+            total_prune_budget_chars=10,
+        )
+
+        result = optimizer.optimize(
+            query="best chunk",
+            graph_ctx=cast(list[str], ["alpha", "gamma"]),
+            memory_ctx=cast(list[str], ["beta"]),
+            docs=cast(list[str], ["low-value docs"]),
+        )
+
+        self.assertIn("beta", result)
+        self.assertNotIn("low-value docs", result)
+
+    def test_optimize_keeps_high_value_chunk_even_when_it_exceeds_bucket_budget(self):
+        module = load_core_module()
+        optimizer = module.ContextOptimizer(
+            compression_rate=0.5,
+            max_chunks=6,
+            graph_budget_chars=3,
+            memory_budget_chars=3,
+            docs_budget_chars=3,
+            total_prune_budget_chars=10,
+        )
+
+        result = optimizer.optimize(
+            query="best chunk",
+            graph_ctx=cast(list[str], ["alpha"]),
+            memory_ctx=cast(list[str], []),
+            docs=cast(list[str], []),
+        )
+
+        self.assertIn("alpha", result)
+
 
 class ContextOptimizerHookTests(unittest.TestCase):
     def test_run_attaches_optimized_context(self):
@@ -182,6 +223,31 @@ class ContextOptimizerHookTests(unittest.TestCase):
             "memory_ctx": ["m1"],
             "docs": ["d1"],
         })
+        result = hook.run(context)
+
+        self.assertIs(result, context)
+        self.assertEqual(result["optimized_context"], "hello:g1:m1:d1")
+
+    def test_run_passes_docs_through_to_optimizer(self):
+        core = load_core_module()
+
+        class StubOptimizer:
+            def optimize(self, query, graph_ctx=None, memory_ctx=None, docs=None):
+                graph_items = cast(list[str], graph_ctx or [])
+                memory_items = cast(list[str], memory_ctx or [])
+                doc_items = cast(list[str], docs or [])
+                return f"{query}:{'|'.join(graph_items)}:{'|'.join(memory_items)}:{'|'.join(doc_items)}"
+
+        setattr(core, "ContextOptimizer", lambda: StubOptimizer())
+        hook = load_hook_module(core)
+
+        context = cast(dict[str, Any], {
+            "query": "hello",
+            "graph_ctx": ["g1"],
+            "memory_ctx": ["m1"],
+            "docs": ["d1"],
+        })
+
         result = hook.run(context)
 
         self.assertIs(result, context)
