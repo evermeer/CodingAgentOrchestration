@@ -950,18 +950,45 @@ test("ContextOptimizerPlugin command context reports the current breakdown", asy
 })
 
 test("ContextOptimizerPlugin command stats reports cumulative pruning numbers", async () => {
-  const pluginInstance = await ContextOptimizerPlugin({
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "context-optimizer-stats-legacy-"))
+  const installRoot = path.join(tempDir, "context-optimizer")
+  const pluginDir = path.join(installRoot, "plugin")
+  const supportDir = path.join(installRoot, "support-files")
+
+  await mkdir(pluginDir, { recursive: true })
+  await mkdir(supportDir, { recursive: true })
+
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "plugin", "context-optimizer.js"),
+    path.join(pluginDir, "context-optimizer.js"),
+  )
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer.py"),
+    path.join(supportDir, "context_optimizer.py"),
+  )
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_cli.py"),
+    path.join(supportDir, "context_optimizer_cli.py"),
+  )
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_hook.py"),
+    path.join(supportDir, "context_optimizer_hook.py"),
+  )
+
+  await writeFile(
+    path.join(installRoot, "stats.json"),
+    JSON.stringify({ totalPrunedChars: 1234, totalOptimizations: 9, sessions: { "session-a": true, "session-b": true, "session-c": true, "session-d": true, "session-e": true, "session-f": true, "session-g": true } }, null, 2),
+    "utf8",
+  )
+
+  const tempPlugin = await import(pathToFileURL(path.join(pluginDir, "context-optimizer.js")).href)
+  const pluginInstance = await tempPlugin.ContextOptimizerPlugin({
     runOptimizer: async () => ({
       ok: true,
       optimizedContext: "stubbed optimized context",
       initialSize: 42,
       finalSize: 11,
     }),
-    stats: {
-      totalSessions: 7,
-      totalPrunedChars: 1234,
-      totalOptimizations: 9,
-    },
     client: {
       tui: {
         showToast: () => {},
@@ -977,6 +1004,59 @@ test("ContextOptimizerPlugin command stats reports cumulative pruning numbers", 
   assert.match(output.parts[0].text, /"totalSessions": 7/)
   assert.match(output.parts[0].text, /"totalPrunedChars": 1234/)
   assert.match(output.parts[0].text, /"totalOptimizations": 9/)
+})
+
+test("ContextOptimizerPlugin command stats reads persisted stats", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "context-optimizer-stats-"))
+  const installRoot = path.join(tempDir, "context-optimizer")
+  const pluginDir = path.join(installRoot, "plugin")
+  const supportDir = path.join(installRoot, "support-files")
+
+  await mkdir(pluginDir, { recursive: true })
+  await mkdir(supportDir, { recursive: true })
+
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "plugin", "context-optimizer.js"),
+    path.join(pluginDir, "context-optimizer.js"),
+  )
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer.py"),
+    path.join(supportDir, "context_optimizer.py"),
+  )
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_cli.py"),
+    path.join(supportDir, "context_optimizer_cli.py"),
+  )
+  await copyFile(
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_hook.py"),
+    path.join(supportDir, "context_optimizer_hook.py"),
+  )
+
+  const statsFile = path.join(installRoot, "stats.json")
+  await writeFile(
+    statsFile,
+    JSON.stringify({ totalPrunedChars: 42, totalOptimizations: 3, sessions: { "session-a": true } }, null, 2),
+    "utf8",
+  )
+
+  const tempPlugin = await import(pathToFileURL(path.join(pluginDir, "context-optimizer.js")).href)
+  const pluginInstance = await tempPlugin.ContextOptimizerPlugin({
+    runOptimizer: async () => ({ ok: true, optimizedContext: "x", initialSize: 10, finalSize: 4 }),
+    stats: {
+      totalSessions: 99,
+      totalPrunedChars: 999,
+      totalOptimizations: 999,
+    },
+    client: { tui: { showToast: () => {} } },
+  })
+
+  const output = {}
+  await pluginInstance["command.execute.before"]({ command: "/context-optimizer stats", sessionID: "session-b" }, output)
+
+  assert.equal(output.noReply, true)
+  assert.match(output.parts[0].text, /"totalSessions": 1/)
+  assert.match(output.parts[0].text, /"totalPrunedChars": 42/)
+  assert.match(output.parts[0].text, /"totalOptimizations": 3/)
 })
 
 test("ContextOptimizerPlugin command compress runs one compression pass", async () => {

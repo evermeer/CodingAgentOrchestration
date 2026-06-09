@@ -156,6 +156,7 @@ Copy the Python support files into a sibling support directory under the OpenCod
 The JS wrapper calls the Python bridge over stdin/stdout JSON and fails open if Python or its dependencies are unavailable.
 
 The plugin writes to `context-optimizer/context-optimizer.log` under the OpenCode config root (for example `~/.config/opencode/context-optimizer/context-optimizer.log` on macOS/Linux or `%USERPROFILE%\.config\opencode\context-optimizer\context-optimizer.log` on Windows).
+It also persists cumulative slash-command and compaction stats to `context-optimizer/stats.json` in the same folder.
 
 **Where is the global plugins folder?**
 
@@ -271,7 +272,7 @@ The plugin exposes these slash commands:
 | --- | --- |
 | `/context-optimizer` | Show help and the available command surface |
 | `/context-optimizer context` | Show the current session context breakdown |
-| `/context-optimizer stats` | Show cumulative pruning and compaction stats |
+| `/context-optimizer stats` | Show cumulative pruning and compaction stats from `stats.json` |
 | `/context-optimizer compress` | Run one compression pass immediately |
 | `/context-optimizer config` | Show the current effective settings |
 | `/context-optimizer config get <key>` | Show one safe setting |
@@ -402,6 +403,7 @@ mempalace.store(compressed)
 | First message hangs for a long time | Models are downloading from Hugging Face | Wait for the one-time download to finish; see [What gets downloaded on first run](#what-gets-downloaded-on-first-run). Warm the cache once (see [Process timeout and first-run warm-up](#process-timeout-and-first-run-warm-up)) and/or raise `CONTEXT_OPTIMIZER_TIMEOUT_MS` |
 | Hook never runs / context unchanged | The JS wrapper was not loaded or compaction did not fire | Confirm `~/.config/opencode/plugins/context-optimizer.js` exists and trigger a session compaction |
 | You expect console output but see none | Logging was moved to `context-optimizer/context-optimizer.log` under the OpenCode config root | Check the `.log` file instead of the terminal |
+| `/context-optimizer stats` shows zeros | Stats are read from `context-optimizer/stats.json` under the OpenCode config root | Make sure the plugin has run at least one successful optimization and that the stats file is writable |
 | Compaction was skipped | The wrapper still logs skipped compactions with the context size and document count | Check `context-optimizer/context-optimizer.log` for the skip reason and size details |
 | You see a warning and no optimized context block | The wrapper fell back to no-op mode because Python, dependencies, or the bridge failed | Read the warning text, fix the Python issue, and retry |
 | Out-of-memory or very slow CPU | Reranker model is large | Switch `reranker_model` to `BAAI/bge-reranker-base` in `context_optimizer.py` |

@@ -60,6 +60,10 @@ function resolveConfigPath(metaUrl) {
   return path.join(path.dirname(resolveLogPath(metaUrl)), "config.json")
 }
 
+function resolveStatsPath(metaUrl) {
+  return path.join(path.dirname(resolveLogPath(metaUrl)), "stats.json")
+}
+
 function readStoredConfig(metaUrl) {
   try {
     return parseJsonEnv(fs.readFileSync(resolveConfigPath(metaUrl), "utf8"), {})
@@ -89,6 +93,38 @@ function removeStoredConfig(metaUrl) {
   } catch {
     // Best effort reset.
   }
+}
+
+function readStoredStats(metaUrl) {
+  try {
+    const parsed = parseJsonEnv(fs.readFileSync(resolveStatsPath(metaUrl), "utf8"), {})
+    const sessions = parsed.sessions && typeof parsed.sessions === "object" ? parsed.sessions : {}
+
+    return {
+      totalPrunedChars: parseNumeric(parsed.totalPrunedChars, 0),
+      totalOptimizations: parseNumeric(parsed.totalOptimizations, 0),
+      sessions,
+    }
+  } catch {
+    return { totalPrunedChars: 0, totalOptimizations: 0, sessions: {} }
+  }
+}
+
+function writeStoredStats(metaUrl, stats) {
+  const statsPath = resolveStatsPath(metaUrl)
+  fs.mkdirSync(path.dirname(statsPath), { recursive: true })
+  fs.writeFileSync(statsPath, `${JSON.stringify(stats, null, 2)}\n`, "utf8")
+}
+
+function recordOptimizationStats(metaUrl, sessionID, result) {
+  const stats = readStoredStats(metaUrl)
+  const prunedChars = Math.max(0, parseNumeric(result?.initialSize, 0) - parseNumeric(result?.finalSize, 0))
+
+  stats.totalPrunedChars += prunedChars
+  stats.totalOptimizations += 1
+  stats.sessions[sessionID || "global"] = true
+
+  writeStoredStats(metaUrl, stats)
 }
 
 function writeDiagnostic(message) {
@@ -501,6 +537,9 @@ export const ContextOptimizerPlugin = async (dependencies = {}) => {
       })
 
       writeLog(import.meta.url, formatOutcomeMessage(result))
+      if (result?.ok && result?.optimizedContext) {
+        recordOptimizationStats(import.meta.url, input?.sessionID, result)
+      }
       // applyOptimizedContext is fail-open: it only rewrites output.context
       // when the optimizer returned real optimized content.
       applyOptimizedContext(output, result)
@@ -550,10 +589,11 @@ export const ContextOptimizerPlugin = async (dependencies = {}) => {
       }
 
       if (commandArgs === "stats") {
+        const storedStats = readStoredStats(import.meta.url)
         const stats = {
-          totalSessions: parseNumeric(dependencies.stats?.totalSessions, 0),
-          totalPrunedChars: parseNumeric(dependencies.stats?.totalPrunedChars, 0),
-          totalOptimizations: parseNumeric(dependencies.stats?.totalOptimizations, 0),
+          totalSessions: Object.keys(storedStats.sessions).length,
+          totalPrunedChars: storedStats.totalPrunedChars,
+          totalOptimizations: storedStats.totalOptimizations,
         }
         output.parts = [
           {

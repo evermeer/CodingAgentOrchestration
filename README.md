@@ -53,10 +53,6 @@ Suggested reading paths:
 4. [Part 4: Optimisation](docs/part-4-optimisation.md)  
    This part describes a couple of post install optimisations that you could do for eliminating overlap in skill packs and MCP servers, orchestration layers. There is also a section about optimising your model routing strategy and budget management.
 
-## [The context-optimizer plugin](context-optimizer/README.md)
-
-There is software for content reranking, deduplication, and compression but i could not find a good existing plugin for [OpenCode](https://github.com/anomalyco/opencode). I created the [context-optimizer plugin](context-optimizer/README.md) to fill this gap but you do have to be aware that it's optimised for this default setup. The plugin uses [Huggingface SentenceTransformers](https://github.com/huggingface/sentence-transformers/) (for reranking and deduplication) and [Microsoft LLMLingua](https://github.com/microsoft/LLMLingua) (for compression). On CPU-only Windows installs, follow the CPU PyTorch instructions in the plugin README; the optimizer automatically selects a smaller, CPU-friendly LLMLingua-2 model instead of the larger CUDA-oriented one. The installation is part of [Part 2: A default setup](docs/part-2-default-setup.md).
-
 ## Contribution
 
 Questions, corrections, and suggestions are welcome. Open an issue at [CodingAgentOrchestration issues](https://github.com/evermeer/CodingAgentOrchestration/issues/) or contribute with a [pull request](https://github.com/evermeer/CodingAgentOrchestration/pulls).
