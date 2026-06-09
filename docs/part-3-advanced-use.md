@@ -178,13 +178,27 @@ Instructions:
 
 ## Python LSP
 
+Install and configure the Static Type Checker [basepyright](https://github.com/DetachHead/basedpyright) for Python.
+
 **Prompt for OpenCode:**
 ```
-I would like to global install LSP tool biome so that i can use it here
-I would like to global install lsp_diagnostics tool basedpyright for Python
+Goal: Install and configure basedpyright for OpenCode, so any `.py` file in any repository gets hover, completion, and diagnostics.
+
+I would like to global install LSP tool basedpyright so that i can use it here
+Also wire lsp_diagnostics to use it for Python files
 ```
 
+## Web Tooling LSP
 
+Install and configure Biome, the performant toolchain for web projects. Biome includes an LSP server that provides diagnostics, hover info, and code actions for JavaScript, TypeScript, JSON, CSS, and more.
+
+**Prompt for OpenCode:**
+```
+Goal: Install and configure Biome for OpenCode, so any web project file in any repository gets hover, completion, and diagnostics.
+
+I would like to global install LSP tool biome so that i can use it here
+Also wire lsp_diagnostics to use it for web project files
+```
 
 ### [Azure DevOps MCP server](https://github.com/microsoft/azure-devops-mcp)
 
