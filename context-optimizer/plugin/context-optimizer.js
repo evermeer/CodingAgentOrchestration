@@ -5,7 +5,26 @@ import process from "node:process"
 import { fileURLToPath } from "node:url"
 
 const DEFAULT_TIMEOUT_MS = 120000
-const DEFAULT_MIN_COMPACTION_CHARS = 5000
+const DEFAULT_MIN_COMPACTION_CHARS = 2000
+const DEFAULT_ERROR_PREFIXES = ["[error]", "[context-optimizer] error"]
+const DEFAULT_PROTECTED_PREFIXES = ["protected:"]
+const DEFAULT_MODEL_LIMITS = Object.freeze({})
+const AUTO_COMPRESSION_THRESHOLD_CHARS = 4000
+
+function parseJsonEnv(raw, fallback = {}) {
+  if (!raw) return fallback
+
+  try {
+    const parsed = JSON.parse(raw)
+    return parsed && typeof parsed === "object" ? parsed : fallback
+  } catch {
+    return fallback
+  }
+}
+
+function matchesPrefix(value, prefixes) {
+  return prefixes.some((prefix) => value.toLowerCase().startsWith(prefix.toLowerCase()))
+}
 
 export function resolveTimeoutMs() {
   const raw = process.env.CONTEXT_OPTIMIZER_TIMEOUT_MS
@@ -105,18 +124,38 @@ export function formatOutcomeMessage(result = {}) {
 
 
 export function buildPayload(input = {}, output = {}) {
+  const model = input.model || output.model || ""
+  const options = {
+    ...(input.options && typeof input.options === "object" ? input.options : {}),
+    ...(output.options && typeof output.options === "object" ? output.options : {}),
+  }
   const context = Array.isArray(output.context)
     ? output.context.filter((value) => typeof value === "string" && value.trim())
     : []
   const size = context.reduce((total, value) => total + value.length, 0)
+  const errorDocs = context.filter((value) => matchesPrefix(value.trim(), DEFAULT_ERROR_PREFIXES))
+  const protectedDocs = context.filter((value) => matchesPrefix(value.trim(), DEFAULT_PROTECTED_PREFIXES))
+  const docs = context.filter((value) => !matchesPrefix(value.trim(), DEFAULT_ERROR_PREFIXES) && !matchesPrefix(value.trim(), DEFAULT_PROTECTED_PREFIXES))
+  const modelLimits = parseJsonEnv(process.env.CONTEXT_OPTIMIZER_MODEL_LIMITS, DEFAULT_MODEL_LIMITS)
+  const modelLimit = model && modelLimits && typeof modelLimits === "object" ? modelLimits[model] : null
+
+  if (size >= AUTO_COMPRESSION_THRESHOLD_CHARS && modelLimit && typeof modelLimit === "object") {
+    for (const [key, value] of Object.entries(modelLimit)) {
+      options[key] = value
+    }
+  }
 
   return {
+    model,
     query:
       output.prompt ||
       input.prompt ||
       "Optimize the most relevant context for compaction.",
-    docs: context,
+    docs,
+    errorDocs,
+    protectedDocs,
     size,
+    options,
   }
 }
 
@@ -338,7 +377,7 @@ export const ContextOptimizerPlugin = async (dependencies = {}) => {
       const result = await run({
         payload: {
           ...payload,
-          options: { min_input_size: minChars },
+          options: { min_input_size: minChars, ...payload.options },
         },
         sessionID: input?.sessionID,
         cliPath,

@@ -265,29 +265,57 @@ The JS wrapper then replaces that result into the OpenCode compaction context as
 
 ---
 
-## Recommended Settings
+## Configuration
 
-All tuning lives in the `ContextOptimizer.__init__` constructor in `context_optimizer.py`. The most useful knobs:
+The plugin has two layers of configuration:
+
+1. **Wrapper settings** in `context-optimizer/plugin/context-optimizer.js` control when compaction runs.
+2. **Optimizer settings** in `context-optimizer/support-files/context_optimizer.py` control how text is filtered, ranked, and compressed.
+
+### Wrapper settings
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| `CONTEXT_OPTIMIZER_TIMEOUT_MS` | `120000` | How long the JS wrapper waits for the Python bridge before failing open. |
+| `CONTEXT_OPTIMIZER_MIN_CHARS` | `2000` | Minimum context size before compaction starts. |
+
+If compaction is skipped, the wrapper still logs the skipped context size so you can see why it did not run.
+
+### Optimizer settings
+
+These defaults live in `ContextOptimizer.__init__`:
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| `compression_rate` | `0.5` | Fraction of tokens to keep during compression. Raise it to preserve more context. |
+| `max_chunks` | `6` | Maximum number of top-ranked chunks kept after reranking. |
+| `dedupe_threshold` | `0.9` | Cosine similarity above which two chunks count as duplicates. |
+| `reranker_model` | `BAAI/bge-reranker-large` | Model used for reranking chunks. |
+| `embed_model` | `all-MiniLM-L6-v2` | Model used for deduplication embeddings. |
+| `graph_budget_chars` | `1200` | Pre-prune budget for graph context. |
+| `memory_budget_chars` | `1200` | Pre-prune budget for memory context. |
+| `docs_budget_chars` | `1600` | Pre-prune budget for document context. |
+| `total_prune_budget_chars` | `4000` | Total character budget shared across buckets before compression. |
+| `error_prefixes` | `"[error]", "[context-optimizer] error"` | Documents with these prefixes are purged before pruning. |
+| `protected_prefixes` | `"protected:"` | Documents with these prefixes are kept out of the error purge path. |
+
+### Model-specific limits
+
+You can override the optimizer per model with `model_limits`. The core checks the explicit `model` argument first, then falls back to `options["model"]`, then `default`.
 
 ```python
-compression_rate = 0.5    # fraction of tokens to keep (0.5 = ~50%); lower = more aggressive
-max_chunks       = 6      # how many top-ranked chunks to keep after reranking
-dedupe_threshold = 0.9    # cosine similarity above which two chunks count as duplicates
-```
-
-You can also swap the models if you need a different speed/quality trade-off:
-
-```python
-reranker_model = "BAAI/bge-reranker-large"   # smaller alternative: BAAI/bge-reranker-base
-embed_model    = "all-MiniLM-L6-v2"          # used for deduplication embeddings
+model_limits = {
+    "default": {"compression_rate": 0.5, "max_chunks": 6},
+    "gpt-4.1": {"compression_rate": 0.65, "max_chunks": 8},
+}
 ```
 
 > [!TIP]
-> Start with the defaults. If responses lose important detail, raise `compression_rate` (keep more) or `max_chunks`. If prompts are still too large, lower them.
+> Start with the defaults. If responses lose important detail, raise `compression_rate` or `max_chunks`. If prompts are still too large, lower them.
 
 ### Process timeout and first-run warm-up
 
-The JS wrapper kills the Python bridge if it does not respond within a timeout (default **120000 ms / 2 minutes**). It also skips compaction below the minimum context threshold (default **5000 chars**, override with `CONTEXT_OPTIMIZER_MIN_CHARS`). When compaction is skipped, the wrapper still writes a log entry with the skipped context size so you can tell why it did not run. Override the timeout with the `CONTEXT_OPTIMIZER_TIMEOUT_MS` environment, e.g.:
+The first run downloads several GB of models and will almost certainly exceed any practical timeout. Warm the cache **once** before relying on the plugin so the first real compaction loads from disk. Override the wrapper timeout with `CONTEXT_OPTIMIZER_TIMEOUT_MS`, e.g.:
 
 ```bash
 # longer timeout for slow machines (milliseconds)

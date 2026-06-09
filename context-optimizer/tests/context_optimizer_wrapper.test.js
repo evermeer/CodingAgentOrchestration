@@ -53,6 +53,52 @@ test("buildPayload includes the summed context size", () => {
   assert.equal(payload.size, 9)
 })
 
+test("buildPayload purges error docs and preserves protected docs", () => {
+  const payload = buildPayload(
+    { model: "gpt-4o-mini" },
+    {
+      context: [
+        "[error] failed tool output",
+        "keep this",
+        "protected: secret",
+        "another keep",
+      ],
+    },
+  )
+
+  assert.deepEqual(payload.docs, ["keep this", "another keep"])
+  assert.deepEqual(payload.errorDocs, ["[error] failed tool output"])
+  assert.deepEqual(payload.protectedDocs, ["protected: secret"])
+})
+
+test("buildPayload applies model limits and auto compression for large payloads", () => {
+  const previousModelLimits = process.env.CONTEXT_OPTIMIZER_MODEL_LIMITS
+  process.env.CONTEXT_OPTIMIZER_MODEL_LIMITS = JSON.stringify({
+    "gpt-4o-mini": {
+      compression_rate: 0.2,
+      max_chunks: 3,
+    },
+  })
+
+  try {
+    const payload = buildPayload(
+      { model: "gpt-4o-mini" },
+      {
+        context: ["x".repeat(3000), "y".repeat(3000)],
+      },
+    )
+
+    assert.equal(payload.options.compression_rate, 0.2)
+    assert.equal(payload.options.max_chunks, 3)
+  } finally {
+    if (previousModelLimits === undefined) {
+      delete process.env.CONTEXT_OPTIMIZER_MODEL_LIMITS
+    } else {
+      process.env.CONTEXT_OPTIMIZER_MODEL_LIMITS = previousModelLimits
+    }
+  }
+})
+
 test("normalizePythonResult accepts success payload", () => {
   const result = normalizePythonResult('{"ok":true,"optimized_context":"hello","initial_size":10,"final_size":4}')
   assert.equal(result.ok, true)

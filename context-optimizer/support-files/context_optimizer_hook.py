@@ -1,4 +1,5 @@
 import sys
+import inspect
 
 try:
     from context_optimizer import ContextOptimizer
@@ -48,13 +49,28 @@ def run(context):
     graph_ctx = context.get("graph_ctx", [])
     memory_ctx = context.get("memory_ctx", [])
     docs = context.get("docs", [])
+    model = context.get("model", "")
+    options = context.get("options", {})
 
     try:
+        optimize_kwargs = {
+            "query": query,
+            "graph_ctx": graph_ctx,
+            "memory_ctx": memory_ctx,
+            "docs": docs,
+        }
+        try:
+            signature = inspect.signature(optimizer.optimize)
+            if "model" in signature.parameters:
+                optimize_kwargs["model"] = model
+            if "options" in signature.parameters:
+                optimize_kwargs["options"] = options
+        except (TypeError, ValueError):
+            optimize_kwargs["model"] = model
+            optimize_kwargs["options"] = options
+
         optimized = optimizer.optimize(
-            query=query,
-            graph_ctx=graph_ctx,
-            memory_ctx=memory_ctx,
-            docs=docs,
+            **optimize_kwargs,
         )
     except Exception as exc:
         _log(f"optimizer optimization failed: {type(exc).__name__}: {exc}")

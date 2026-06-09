@@ -149,6 +149,53 @@ class ContextOptimizerCoreTests(unittest.TestCase):
 
         self.assertEqual(optimizer.optimize(query="anything"), "")
 
+    def test_optimize_drops_error_chunks_before_pruning(self):
+        module = load_core_module()
+        optimizer = module.ContextOptimizer(compression_rate=0.5, max_chunks=6)
+
+        result = optimizer.optimize(
+            query="best chunk",
+            graph_ctx=cast(list[str], ["[error] broken tool output", "alpha"]),
+            memory_ctx=cast(list[str], []),
+        )
+
+        self.assertNotIn("[error] broken tool output", result)
+        self.assertIn("alpha", result)
+
+    def test_optimize_preserves_protected_docs_over_error_purge(self):
+        module = load_core_module()
+        optimizer = module.ContextOptimizer(compression_rate=0.5, max_chunks=6)
+
+        result = optimizer.optimize(
+            query="best chunk",
+            graph_ctx=cast(list[str], ["protected: keep this", "[error] broken tool output"]),
+            memory_ctx=cast(list[str], []),
+        )
+
+        self.assertIn("protected: keep this", result)
+        self.assertNotIn("[error] broken tool output", result)
+
+    def test_optimize_applies_model_specific_limits(self):
+        module = load_core_module()
+        optimizer = module.ContextOptimizer(
+            compression_rate=0.5,
+            max_chunks=6,
+        )
+
+        optimizer.model_limits = {
+            "gpt-4o-mini": {"compression_rate": 0.2, "max_chunks": 2},
+        }
+
+        result = optimizer.optimize(
+            query="best chunk",
+            graph_ctx=cast(list[str], ["alpha", "beta", "gamma"]),
+            memory_ctx=cast(list[str], []),
+            docs=cast(list[str], ["delta"]),
+            model="gpt-4o-mini",
+        )
+
+        self.assertIn("[rate=0.2]", result)
+
     def test_optimize_normalizes_tuple_docs_with_three_values(self):
         module = load_core_module()
         optimizer = module.ContextOptimizer(compression_rate=0.5, max_chunks=6)
@@ -350,6 +397,43 @@ class ContextOptimizerHookTests(unittest.TestCase):
 
         self.assertIs(result, context)
         self.assertIn("optimizer optimization failed", stderr.getvalue())
+
+    def test_run_preserves_model_and_policy_options(self):
+        core = load_core_module()
+
+        class StubOptimizer:
+            def __init__(self):
+                self.calls = []
+
+            def optimize(self, query, graph_ctx=None, memory_ctx=None, docs=None, model=None, options=None):
+                self.calls.append({
+                    "query": query,
+                    "graph_ctx": list(graph_ctx or []),
+                    "memory_ctx": list(memory_ctx or []),
+                    "docs": list(docs or []),
+                    "model": model,
+                    "options": options,
+                })
+                return "optimized"
+
+        stub = StubOptimizer()
+        setattr(core, "ContextOptimizer", lambda: stub)
+        hook = load_hook_module(core)
+
+        context = cast(dict[str, Any], {
+            "query": "hello",
+            "graph_ctx": ["g1"],
+            "memory_ctx": ["m1"],
+            "docs": ["d1"],
+            "model": "gpt-4o-mini",
+            "options": {"compression_rate": 0.2},
+        })
+
+        result = hook.run(context)
+
+        self.assertIs(result, context)
+        self.assertEqual(stub.calls[0]["model"], "gpt-4o-mini")
+        self.assertEqual(stub.calls[0]["options"], {"compression_rate": 0.2})
 
 
 if __name__ == "__main__":

@@ -175,6 +175,17 @@ Instructions:
     - Print the expected vs actual result.
 ```
 
+
+## Python LSP
+
+**Prompt for OpenCode:**
+```
+I would like to global install LSP tool biome so that i can use it here
+I would like to global install lsp_diagnostics tool basedpyright for Python
+```
+
+
+
 ### [Azure DevOps MCP server](https://github.com/microsoft/azure-devops-mcp)
 
 The [Azure DevOps MCP server](https://github.com/microsoft/azure-devops-mcp) brings the power of Azure DevOps directly to your agents.

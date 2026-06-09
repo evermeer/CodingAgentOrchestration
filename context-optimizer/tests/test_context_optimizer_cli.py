@@ -170,6 +170,29 @@ class ContextOptimizerCliTests(unittest.TestCase):
         self.assertEqual(data["final_size"], len("hello:alpha|beta:0.25"))
         self.assertEqual(proc.returncode, 0)
 
+    def test_cli_exposes_model_and_policy_inputs_to_optimizer(self):
+        proc = run_cli_with_stub(
+            {
+                "query": "hello",
+                "docs": ["alpha", "beta"],
+                "model": "gpt-4o-mini",
+                "options": {"compression_rate": 0.25, "protected_prefixes": ["protected:"]},
+            },
+            """
+            class ContextOptimizer:
+                def __init__(self, **kwargs):
+                    self.kwargs = kwargs
+
+                def optimize(self, query, graph_ctx=None, memory_ctx=None, docs=None, model=None, options=None):
+                    return f"{model}:{options['compression_rate']}:{options['protected_prefixes'][0]}"
+            """,
+        )
+
+        data = json.loads(proc.stdout)
+        self.assertTrue(data["ok"])
+        self.assertEqual(data["optimized_context"], "gpt-4o-mini:0.25:protected:")
+        self.assertEqual(proc.returncode, 0)
+
     def test_cli_returns_non_zero_for_runtime_error(self):
         proc = run_cli_with_stub(
             {"query": "hello", "docs": ["alpha"]},

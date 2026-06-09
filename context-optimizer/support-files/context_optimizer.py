@@ -27,6 +27,9 @@ class ContextOptimizer:
         memory_budget_chars=1200,
         docs_budget_chars=1600,
         total_prune_budget_chars=4000,
+        model_limits=None,
+        error_prefixes=None,
+        protected_prefixes=None,
     ): 
         device = "cuda" if torch is not None and torch.cuda.is_available() else "cpu"
         # Keep the LLMLingua-2 algorithm on both devices; on CPU use the smaller
@@ -57,6 +60,9 @@ class ContextOptimizer:
         self.memory_budget_chars = memory_budget_chars
         self.docs_budget_chars = docs_budget_chars
         self.total_prune_budget_chars = total_prune_budget_chars
+        self.model_limits = model_limits or {}
+        self.error_prefixes = tuple(error_prefixes or ("[error]", "[context-optimizer] error"))
+        self.protected_prefixes = tuple(protected_prefixes or ("protected:",))
 
         log("optimizer initialized")
 
@@ -75,6 +81,13 @@ class ContextOptimizer:
             return " ".join(parts).strip()
 
         return str(doc).strip()
+
+    def _is_prefixed(self, doc, prefixes):
+        lowered = doc.lower()
+        return any(lowered.startswith(prefix.lower()) for prefix in prefixes)
+
+    def _purge_error_docs(self, docs):
+        return [doc for doc in docs if not self._is_prefixed(doc, self.error_prefixes)]
 
     def dedupe(self, docs):
         if not docs:
@@ -215,10 +228,36 @@ class ContextOptimizer:
 
         return compressed["compressed_prompt"]
 
-    def optimize(self, query, graph_ctx=None, memory_ctx=None, docs=None):
+    def optimize(self, query, graph_ctx=None, memory_ctx=None, docs=None, model=None, options=None):
         graph_ctx = graph_ctx or []
         memory_ctx = memory_ctx or []
         docs = docs or []
+        options = options or {}
+
+        # Protect tagged docs from the error purge / pre-prune path while still
+        # allowing the normal rerank/compress flow to act on them.
+        graph_ctx = [doc for doc in graph_ctx if self._normalize_doc(doc)]
+        memory_ctx = [doc for doc in memory_ctx if self._normalize_doc(doc)]
+        docs = [doc for doc in docs if self._normalize_doc(doc)]
+
+        graph_ctx = self._purge_error_docs([self._normalize_doc(doc) for doc in graph_ctx])
+        memory_ctx = self._purge_error_docs([self._normalize_doc(doc) for doc in memory_ctx])
+        docs = self._purge_error_docs([self._normalize_doc(doc) for doc in docs])
+
+        effective_compression_rate = self.compression_rate
+        effective_max_chunks = self.max_chunks
+
+        limit = None
+        if isinstance(model, str) and model:
+            limit = self.model_limits.get(model)
+        if limit is None:
+            limit = self.model_limits.get(options.get("model") or "default")
+
+        if isinstance(limit, dict):
+            if isinstance(limit.get("compression_rate"), (int, float)):
+                effective_compression_rate = limit["compression_rate"]
+            if isinstance(limit.get("max_chunks"), int):
+                effective_max_chunks = limit["max_chunks"]
 
         combined = self._pre_prune(query, graph_ctx, memory_ctx, docs)
 
@@ -228,7 +267,15 @@ class ContextOptimizer:
         # Deduplicate before reranking so duplicate chunks do not consume the
         # limited max_chunks budget that rerank applies.
         unique = self.dedupe(combined)
-        ranked = self.rerank(query, unique)
-        compressed = self.compress(ranked)
+        original_max_chunks = self.max_chunks
+        original_compression_rate = self.compression_rate
+        try:
+            self.max_chunks = effective_max_chunks
+            self.compression_rate = effective_compression_rate
+            ranked = self.rerank(query, unique)
+            compressed = self.compress(ranked)
+        finally:
+            self.max_chunks = original_max_chunks
+            self.compression_rate = original_compression_rate
 
         return compressed
