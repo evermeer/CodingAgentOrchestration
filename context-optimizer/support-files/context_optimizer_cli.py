@@ -1,5 +1,6 @@
 import json
 import inspect
+import importlib
 import sys
 from typing import Any, Dict, NoReturn
 
@@ -23,7 +24,10 @@ def emit_error(error_code: str, message: str, exit_code: int = 1) -> NoReturn:
 
 ContextOptimizer: Any = None
 try:
-    from context_optimizer import ContextOptimizer
+    if __package__:
+        ContextOptimizer = importlib.import_module(".context_optimizer", __package__).ContextOptimizer
+    else:
+        ContextOptimizer = importlib.import_module("context_optimizer").ContextOptimizer
 except ModuleNotFoundError as exc:
     emit_error("dependency_missing", str(exc))
 
@@ -70,7 +74,9 @@ def main() -> None:
 
     optimized = ""
     try:
-        optimizer = ContextOptimizer(**options) if ContextOptimizer is not None else None
+        optimizer_options = dict(options)
+        min_input_size = optimizer_options.pop("min_input_size", None)
+        optimizer = ContextOptimizer(**optimizer_options) if ContextOptimizer is not None else None
         if optimizer is None:
             emit_error("dependency_missing", "ContextOptimizer import unavailable")
 

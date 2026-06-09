@@ -263,6 +263,21 @@ The JS wrapper then replaces that result into the OpenCode compaction context as
 ...
 ```
 
+### Slash commands
+
+The plugin exposes these slash commands:
+
+| Command | What it does |
+| --- | --- |
+| `/context-optimizer` | Show help and the available command surface |
+| `/context-optimizer context` | Show the current session context breakdown |
+| `/context-optimizer stats` | Show cumulative pruning and compaction stats |
+| `/context-optimizer compress` | Run one compression pass immediately |
+| `/context-optimizer config` | Show the current effective settings |
+| `/context-optimizer config get <key>` | Show one safe setting |
+| `/context-optimizer config set <key> <value>` | Update one safe setting |
+| `/context-optimizer config reset` | Clear saved settings |
+
 ---
 
 ## Configuration
@@ -280,6 +295,18 @@ The plugin has two layers of configuration:
 | `CONTEXT_OPTIMIZER_MIN_CHARS` | `2000` | Minimum context size before compaction starts. |
 
 If compaction is skipped, the wrapper still logs the skipped context size so you can see why it did not run.
+
+### Safe config commands
+
+Only these keys are writable:
+
+- `timeout_ms`
+- `min_chars`
+- `model_limits`
+
+Env vars still win at startup, so they act as overrides over any saved config file.
+The plugin stores saved values in `context-optimizer/config.json` under the OpenCode config root.
+Anything outside that whitelist stays read-only.
 
 ### Optimizer settings
 

@@ -170,6 +170,24 @@ class ContextOptimizerCliTests(unittest.TestCase):
         self.assertEqual(data["final_size"], len("hello:alpha|beta:0.25"))
         self.assertEqual(proc.returncode, 0)
 
+    def test_cli_does_not_forward_min_input_size_to_constructor(self):
+        proc = run_cli_with_stub(
+            {"query": "hello", "docs": ["alpha" * 300, "beta" * 300], "options": {"min_input_size": 100, "compression_rate": 0.25}},
+            """
+            class ContextOptimizer:
+                def __init__(self, **kwargs):
+                    self.kwargs = kwargs
+
+                def optimize(self, query, graph_ctx=None, memory_ctx=None, docs=None, model=None, options=None):
+                    return f"{self.kwargs.get('min_input_size')}:{options['compression_rate']}"
+            """,
+        )
+
+        data = json.loads(proc.stdout)
+        self.assertTrue(data["ok"])
+        self.assertEqual(data["optimized_context"], "None:0.25")
+        self.assertEqual(proc.returncode, 0)
+
     def test_cli_exposes_model_and_policy_inputs_to_optimizer(self):
         proc = run_cli_with_stub(
             {

@@ -4,8 +4,8 @@ import fs from "node:fs"
 import { copyFile, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises"
 import os from "node:os"
 import path from "node:path"
-import { pathToFileURL } from "node:url"
 import test from "node:test"
+import { pathToFileURL } from "node:url"
 
 import plugin, {
   applyOptimizedContext,
@@ -571,11 +571,11 @@ test("ContextOptimizerPlugin rewrites output context when runOptimizer is stubbe
     finalSize: 11,
   })
   const toasts = []
-    const originalAppendFileSync = fs.appendFileSync
-    const logLines = []
-    fs.appendFileSync = (_path, content) => {
-      logLines.push(String(content))
-    }
+  const originalAppendFileSync = fs.appendFileSync
+  const logLines = []
+  fs.appendFileSync = (_path, content) => {
+    logLines.push(String(content))
+  }
   const previousMinChars = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
   process.env.CONTEXT_OPTIMIZER_MIN_CHARS = "1"
 
@@ -607,6 +607,7 @@ test("ContextOptimizerPlugin rewrites output context when runOptimizer is stubbe
       },
     ])
   } finally {
+    fs.appendFileSync = originalAppendFileSync
     if (previousMinChars === undefined) {
       delete process.env.CONTEXT_OPTIMIZER_MIN_CHARS
     } else {
@@ -643,11 +644,11 @@ test("ContextOptimizerPlugin leaves context untouched when the optimizer fails (
     reason: "missing dep",
   })
   const toasts = []
-    const originalAppendFileSync = fs.appendFileSync
-    const logLines = []
-    fs.appendFileSync = (_path, content) => {
-      logLines.push(String(content))
-    }
+  const originalAppendFileSync = fs.appendFileSync
+  const logLines = []
+  fs.appendFileSync = (_path, content) => {
+    logLines.push(String(content))
+  }
   const previousMinChars = process.env.CONTEXT_OPTIMIZER_MIN_CHARS
   process.env.CONTEXT_OPTIMIZER_MIN_CHARS = "1"
 
@@ -675,6 +676,7 @@ test("ContextOptimizerPlugin leaves context untouched when the optimizer fails (
       },
     ])
   } finally {
+    fs.appendFileSync = originalAppendFileSync
     if (previousMinChars === undefined) {
       delete process.env.CONTEXT_OPTIMIZER_MIN_CHARS
     } else {
@@ -694,19 +696,19 @@ test("ContextOptimizerPlugin reports toast failures to stderr", async () => {
   await mkdir(supportDir, { recursive: true })
 
   await copyFile(
-    path.join(process.cwd(), "plugin", "context-optimizer.js"),
+    path.join(process.cwd(), "context-optimizer", "plugin", "context-optimizer.js"),
     path.join(pluginDir, "context-optimizer.js"),
   )
   await copyFile(
-    path.join(process.cwd(), "support-files", "context_optimizer.py"),
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer.py"),
     path.join(supportDir, "context_optimizer.py"),
   )
   await copyFile(
-    path.join(process.cwd(), "support-files", "context_optimizer_cli.py"),
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_cli.py"),
     path.join(supportDir, "context_optimizer_cli.py"),
   )
   await copyFile(
-    path.join(process.cwd(), "support-files", "context_optimizer_hook.py"),
+    path.join(process.cwd(), "context-optimizer", "support-files", "context_optimizer_hook.py"),
     path.join(supportDir, "context_optimizer_hook.py"),
   )
 
@@ -799,4 +801,214 @@ test("ContextOptimizerPlugin logs one savings summary during compaction", async 
       process.env.CONTEXT_OPTIMIZER_MIN_CHARS = previousMinChars
     }
   }
+})
+
+test("ContextOptimizerPlugin exposes slash commands and help output", async () => {
+  const pluginInstance = await ContextOptimizerPlugin({
+    runOptimizer: async () => ({
+      ok: true,
+      optimizedContext: "stubbed optimized context",
+      initialSize: 42,
+      finalSize: 11,
+    }),
+    stats: {
+      totalSessions: 7,
+      totalPrunedChars: 1234,
+      totalOptimizations: 9,
+    },
+    client: {
+      tui: {
+        showToast: () => {},
+      },
+    },
+  })
+
+  assert.equal(typeof pluginInstance.command, "object")
+  assert.equal(typeof pluginInstance.command["context-optimizer"], "object")
+  assert.equal(typeof pluginInstance.command["context-optimizer context"], "object")
+  assert.equal(typeof pluginInstance.command["context-optimizer stats"], "object")
+  assert.equal(typeof pluginInstance.command["context-optimizer compress"], "object")
+  assert.equal(typeof pluginInstance.command["context-optimizer config"], "object")
+
+  const output = {}
+  await pluginInstance["command.execute.before"]({ command: "/context-optimizer", sessionID: "session-a" }, output)
+
+  assert.equal(output.noReply, true)
+  assert.match(output.parts[0].text, /available commands/i)
+  assert.match(output.parts[0].text, /\/context-optimizer context/i)
+  assert.match(output.parts[0].text, /\/context-optimizer config/i)
+})
+
+test("ContextOptimizerPlugin ignores unrelated slash commands", async () => {
+  const pluginInstance = await ContextOptimizerPlugin({
+    runOptimizer: async () => ({
+      ok: true,
+      optimizedContext: "stubbed optimized context",
+      initialSize: 42,
+      finalSize: 11,
+    }),
+    client: {
+      tui: {
+        showToast: () => {},
+      },
+    },
+  })
+
+  const output = {}
+  await pluginInstance["command.execute.before"]({ command: "/help", sessionID: "session-a" }, output)
+
+  assert.deepEqual(output, {})
+})
+
+test("ContextOptimizerPlugin config commands show, get, set, and reset safe settings", async () => {
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), "context-optimizer-config-"))
+  const installRoot = path.join(tempDir, "context-optimizer")
+  const pluginDir = path.join(installRoot, "plugin")
+  const supportDir = path.join(installRoot, "support-files")
+  const originalCwd = process.cwd()
+
+  await mkdir(pluginDir, { recursive: true })
+  await mkdir(supportDir, { recursive: true })
+
+  await copyFile(
+    path.join(originalCwd, "context-optimizer", "plugin", "context-optimizer.js"),
+    path.join(pluginDir, "context-optimizer.js"),
+  )
+  await copyFile(
+    path.join(originalCwd, "context-optimizer", "support-files", "context_optimizer.py"),
+    path.join(supportDir, "context_optimizer.py"),
+  )
+  await copyFile(
+    path.join(originalCwd, "context-optimizer", "support-files", "context_optimizer_cli.py"),
+    path.join(supportDir, "context_optimizer_cli.py"),
+  )
+  await copyFile(
+    path.join(originalCwd, "context-optimizer", "support-files", "context_optimizer_hook.py"),
+    path.join(supportDir, "context_optimizer_hook.py"),
+  )
+
+  const tempPlugin = await import(pathToFileURL(path.join(pluginDir, "context-optimizer.js")).href)
+  const pluginInstance = await tempPlugin.ContextOptimizerPlugin({
+    runOptimizer: async () => ({ ok: true, optimizedContext: "x", initialSize: 1, finalSize: 1 }),
+    client: { tui: { showToast: () => {} } },
+  })
+
+  const configFile = path.join(installRoot, "config.json")
+
+  const showOutput = {}
+  await pluginInstance["command.execute.before"]({ command: "/context-optimizer config", sessionID: "session-a" }, showOutput)
+  assert.equal(showOutput.noReply, true)
+  assert.match(showOutput.parts[0].text, /current settings/i)
+
+  const getOutput = {}
+  await pluginInstance["command.execute.before"]({ command: "/context-optimizer config get min_chars", sessionID: "session-a" }, getOutput)
+  assert.match(getOutput.parts[0].text, /"min_chars"/)
+
+  const setOutput = {}
+  await pluginInstance["command.execute.before"]({ command: "/context-optimizer config set min_chars 2500", sessionID: "session-a" }, setOutput)
+  assert.match(setOutput.parts[0].text, /config updated/i)
+  assert.equal(JSON.parse(await readFile(configFile, "utf8")).min_chars, 2500)
+
+  const resetOutput = {}
+  await pluginInstance["command.execute.before"]({ command: "/context-optimizer config reset", sessionID: "session-a" }, resetOutput)
+  assert.match(resetOutput.parts[0].text, /saved settings cleared/i)
+  assert.equal(fs.existsSync(configFile), false)
+
+  const invalidOutput = {}
+  await pluginInstance["command.execute.before"]({ command: "/context-optimizer config set python custom", sessionID: "session-a" }, invalidOutput)
+  assert.match(invalidOutput.parts[0].text, /config commands/i)
+})
+
+test("ContextOptimizerPlugin command context reports the current breakdown", async () => {
+  const pluginInstance = await ContextOptimizerPlugin({
+    runOptimizer: async () => ({
+      ok: true,
+      optimizedContext: "stubbed optimized context",
+      initialSize: 42,
+      finalSize: 11,
+    }),
+    stats: {
+      totalSessions: 7,
+      totalPrunedChars: 1234,
+      totalOptimizations: 9,
+    },
+    client: {
+      tui: {
+        showToast: () => {},
+      },
+    },
+  })
+
+  const output = { context: ["alpha", "beta", "protected: gamma", "[error] skip"] }
+  await pluginInstance["command.execute.before"]({ command: "/context-optimizer context", sessionID: "session-a" }, output)
+
+  assert.equal(output.noReply, true)
+  assert.match(output.parts[0].text, /current session context/i)
+  assert.match(output.parts[0].text, /"docs": 2/)
+  assert.match(output.parts[0].text, /"errorDocs": 1/)
+  assert.match(output.parts[0].text, /"protectedDocs": 1/)
+})
+
+test("ContextOptimizerPlugin command stats reports cumulative pruning numbers", async () => {
+  const pluginInstance = await ContextOptimizerPlugin({
+    runOptimizer: async () => ({
+      ok: true,
+      optimizedContext: "stubbed optimized context",
+      initialSize: 42,
+      finalSize: 11,
+    }),
+    stats: {
+      totalSessions: 7,
+      totalPrunedChars: 1234,
+      totalOptimizations: 9,
+    },
+    client: {
+      tui: {
+        showToast: () => {},
+      },
+    },
+  })
+
+  const output = {}
+  await pluginInstance["command.execute.before"]({ command: "/context-optimizer stats", sessionID: "session-a" }, output)
+
+  assert.equal(output.noReply, true)
+  assert.match(output.parts[0].text, /cumulative pruning statistics/i)
+  assert.match(output.parts[0].text, /"totalSessions": 7/)
+  assert.match(output.parts[0].text, /"totalPrunedChars": 1234/)
+  assert.match(output.parts[0].text, /"totalOptimizations": 9/)
+})
+
+test("ContextOptimizerPlugin command compress runs one compression pass", async () => {
+  const calls = []
+  const pluginInstance = await ContextOptimizerPlugin({
+    runOptimizer: async (call) => {
+      calls.push(call)
+      return {
+        ok: true,
+        optimizedContext: "compressed body",
+        initialSize: 42,
+        finalSize: 11,
+      }
+    },
+    stats: {
+      totalSessions: 7,
+      totalPrunedChars: 1234,
+      totalOptimizations: 9,
+    },
+    client: {
+      tui: {
+        showToast: () => {},
+      },
+    },
+  })
+
+  const output = { context: ["alpha", "beta"] }
+  await pluginInstance["command.execute.before"]({ command: "/context-optimizer compress", arguments: "compress now", sessionID: "session-a" }, output)
+
+  assert.equal(output.noReply, true)
+  assert.match(output.parts[0].text, /compression run/i)
+  assert.equal(calls.length, 1)
+  assert.equal(calls[0].payload.query, "compress now")
+  assert.deepEqual(calls[0].payload.docs, ["alpha", "beta"])
 })
