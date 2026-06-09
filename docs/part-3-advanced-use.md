@@ -190,7 +190,7 @@ Also wire lsp_diagnostics to use it for Python files
 
 ## Web Tooling LSP
 
-Install and configure Biome, the performant toolchain for web projects. Biome includes an LSP server that provides diagnostics, hover info, and code actions for JavaScript, TypeScript, JSON, CSS, and more.
+Install and configure [Biome](https://github.com/biomejs/biome), the performant toolchain for web projects. Biome includes an LSP server that provides diagnostics, hover info, and code actions for JavaScript, TypeScript, JSON, CSS, and more.
 
 **Prompt for OpenCode:**
 ```
