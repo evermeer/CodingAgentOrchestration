@@ -352,6 +352,10 @@ export const ContextOptimizerPlugin = async (dependencies = {}) => {
     const cliPath = createCliPath(import.meta.url)
     const run = dependencies.runOptimizer || runOptimizer
     const tracker = createSessionWarningTracker()
+    writeLog(
+      import.meta.url,
+      `[context-optimizer] plugin loaded (path=${resolveLogPath(import.meta.url)})`,
+    )
     const optimizeContext = async (input, output) => {
       const toast = resolveToastClient(dependencies, input, output)
       const payload = buildPayload(input, output)
