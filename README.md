@@ -47,6 +47,9 @@ Suggested reading paths:
 2. [Part 2: A default setup](docs/part-2-default-setup.md)  
    Provides the practical setup path: installing OpenCode, adding context, configuring tools, installing skill packs, and adopting daily-use habits.
 
+   Instead you could also do a similar setup using this [Claude Code Installation](docs/claude-code-install.md) guide.
+
+
 3. [Part 3: Advanced Use](docs/part-3-advanced-use.md)  
    Covers optional advanced additions such as engineering skills, custom review workflows, SQL LSP support, Jira workflows, Azure DevOps, and Azure MCP integration.
 

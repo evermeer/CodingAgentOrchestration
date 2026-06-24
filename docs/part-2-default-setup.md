@@ -5,6 +5,9 @@
 
 This section gets you up and running with a working [OpenCode](https://github.com/anomalyco/opencode) environment. Before running each prompt, evaluate whether you actually need it. If you do not use Jira, for example, you do not need to install the Atlassian MCP.
 
+Instead you could also do a similar setup using this [Claude Code Installation](docs/claude-code-install.md) guide.
+
+
 To make the install prompts below more reproducible across machines, keep the same discipline every time: prefer user-scope installs over repo-local ones, print exact versions and install paths, list every config file changed, and verify the result with one concrete command or action before moving on.
 
 > [!NOTE]
