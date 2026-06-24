@@ -46,7 +46,7 @@ Plugins installed by me:
 - Azure DevOps MCP https://github.com/microsoft/azure-devops-mcp - follow repo instructions for Claude Code
 
 ## Custom skills
-Download the [custom-skills.zip](custom-skills.zip) extract the folders and put these into your ~/.claude/skills folder.
+Download the [custom-skills.zip](https://github.com/evermeer/CodingAgentOrchestration/raw/refs/heads/main/docs/custom-skils.zip) extract the folders and put these into your ~/.claude/skills folder.
 - evidence-validator some rule to make sure your LLM is not making up things.
 - karpathy-guidelines guidelines for improving the quality of your LLM responses.
 - code-review-expert compare the current branch to the develop branch and analyse the changes using the evidence-validator, karpathy-guidelinse and code-review skills. Do a functional compare against the Jira issue. Ask which findings to implement.
