@@ -30,7 +30,7 @@ Tried but not functioning yet:
 
 Plugins installed by me:
 - Design
-- Enginering
+- Engineering
 - Slack
 - Data
 - Customer Support
@@ -40,7 +40,7 @@ Plugins installed by me:
 - cc-safety-net from https://github.com/kenryu42/cc-safety-net - follow repo instructions for Claude Code
 - graphify from https://github.com/safishamsi/graphify - follow repo instructions for Claude Code
 - mempalace from https://github.com/MemPalace/mempalace - follow repo instructions for Claude Code
-- superposers https://github.com/obra/superpowers - follow repo instructions for Claude Code
+- superpowers https://github.com/obra/superpowers - follow repo instructions for Claude Code
 - gstack https://github.com/garrytan/gstack - follow repo instructions for Claude Code
 - .net skill pack https://github.com/dotnet/skills - follow repo instructions for Claude Code
 - Azure DevOps MCP https://github.com/microsoft/azure-devops-mcp - follow repo instructions for Claude Code
@@ -49,8 +49,8 @@ Plugins installed by me:
 Download the [custom-skills.zip](https://github.com/evermeer/CodingAgentOrchestration/raw/refs/heads/main/docs/custom-skils.zip) extract the folders and put these into your ~/.claude/skills folder.
 - evidence-validator some rule to make sure your LLM is not making up things.
 - karpathy-guidelines guidelines for improving the quality of your LLM responses.
-- code-review-expert compare the current branch to the develop branch and analyse the changes using the evidence-validator, karpathy-guidelinse and code-review skills. Do a functional compare against the Jira issue. Ask which findings to implement.
+- code-review-expert compare the current branch to the develop branch and analyse the changes using the evidence-validator, karpathy-guidelines and code-review skills. Do a functional compare against the Jira issue. Ask which findings to implement.
 - branch-review Specify a jira ticket and the branch that is made for that ticket will be evaluated in a worktree using the code-review-expert skill. Instead of asking what issues to implement it will only open the markdown with the found issues.
-- release-review same as the branc-review skill only that it will always compare the latest release branch to the release branch before that.
-- jira-refine Specify a jira ticket id and this skill will then analyse it togather with your repository content and add an improved description with questions added if there is something not clear.
+- release-review same as the branch-review skill only that it will always compare the latest release branch to the release branch before that.
+- jira-refine Specify a jira ticket id and this skill will then analyse it together with your repository content and add an improved description with questions added if there is something not clear.
 - jira-implement Specify a jira ticket id and a new branch will be created in a worktree and the ticket will be implemented.

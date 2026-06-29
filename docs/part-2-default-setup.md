@@ -343,6 +343,11 @@ Source: https://github.com/obra/superpowers.git
 
 ### [Agency Agents](https://github.com/msitarzewski/agency-agents) skills pack
 A complete AI agency at your fingertips - From frontend wizards to Reddit community ninjas, from whimsy injectors to reality checkers. Each agent is a specialized expert with personality, processes, and proven deliverables.
+
+
+> [!TIP]
+> Instead of using the prompt below, try out the (still beta) [skill manager app](https://agencyagents.app/) that works witn most CLI's
+
 **Prompt for OpenCode:**
 
 ```
