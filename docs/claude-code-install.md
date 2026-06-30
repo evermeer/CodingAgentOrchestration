@@ -2,7 +2,7 @@
 
 Due to changes in token usage, I also started trying Claude Code. Creating a setup comparable to the configuration in this OpenCode Guide repository is much easier with Claude Code. Below is a brief overview of the steps to achieve this.
 
-I did skip a number of skill packs because there was a lot of overlap. The ones skipped are the Agency, Product Management, and Minimalist Entrepreneur skills. 
+I did skip a number of skill packs because there was a lot of overlap. The ones skipped are Product Management, and Minimalist Entrepreneur skills. 
 I also didn’t install any of the LSPs yet, since I’m still investigating which ones are already available by default in Claude Code. 
 The Oh-my-OpenAgent and OpenCode-DCP plugins are also not necessary / not supported.
 
@@ -44,6 +44,8 @@ Plugins installed by me:
 - gstack https://github.com/garrytan/gstack - follow repo instructions for Claude Code
 - .net skill pack https://github.com/dotnet/skills - follow repo instructions for Claude Code
 - Azure DevOps MCP https://github.com/microsoft/azure-devops-mcp - follow repo instructions for Claude Code
+- Agency Agents https://agencyagents.app/ - install the app and from there all skills.
+- Ponytail https://github.com/DietrichGebert/ponytail - follow repo instructions for Claude Code
 
 ## Custom skills
 Download the [custom-skills.zip](https://github.com/evermeer/CodingAgentOrchestration/raw/refs/heads/main/docs/custom-skils.zip) extract the folders and put these into your ~/.claude/skills folder.
@@ -54,3 +56,26 @@ Download the [custom-skills.zip](https://github.com/evermeer/CodingAgentOrchestr
 - release-review same as the branch-review skill only that it will always compare the latest release branch to the release branch before that.
 - jira-refine Specify a jira ticket id and this skill will then analyse it together with your repository content and add an improved description with questions added if there is something not clear.
 - jira-implement Specify a jira ticket id and a new branch will be created in a worktree and the ticket will be implemented.
+
+## LSP's
+
+Installing the LSP's that I use
+
+**Prompt for Claude Code**
+
+```
+Install and configure LSPs for:
+
+- C#
+- Python
+- TypeScript/JavaScript
+- Bicep
+- YAML
+- SQL Server (T-SQL)
+
+Detect my operating system, install the appropriate language servers, verify they're working, and update my Claude Code configuration if needed.
+Afterwards show me:
+1. what was installed
+2. where it was installed
+3. how to verify each LSP is working
+```
