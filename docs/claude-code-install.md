@@ -3,7 +3,6 @@
 Due to changes in token usage, I also started trying Claude Code. Creating a setup comparable to the configuration in this OpenCode Guide repository is much easier with Claude Code. Below is a brief overview of the steps to achieve this.
 
 I did skip a number of skill packs because there was a lot of overlap. The ones skipped are Product Management, and Minimalist Entrepreneur skills. 
-I also didn’t install any of the LSPs yet, since I’m still investigating which ones are already available by default in Claude Code. 
 The Oh-my-OpenAgent and OpenCode-DCP plugins are also not necessary / not supported.
 
 ## The main software from Anthropic
@@ -40,6 +39,7 @@ Plugins installed by me:
 - cc-safety-net from https://github.com/kenryu42/cc-safety-net - follow repo instructions for Claude Code
 - graphify from https://github.com/safishamsi/graphify - follow repo instructions for Claude Code
 - mempalace from https://github.com/MemPalace/mempalace - follow repo instructions for Claude Code
+- context optimizer https://github.com/evermeer/context-optimizer - follow repo instructions for Claude Code
 - superpowers https://github.com/obra/superpowers - follow repo instructions for Claude Code
 - gstack https://github.com/garrytan/gstack - follow repo instructions for Claude Code
 - .net skill pack https://github.com/dotnet/skills - follow repo instructions for Claude Code

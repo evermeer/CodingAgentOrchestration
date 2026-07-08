@@ -122,7 +122,7 @@ Plugins and agent extensions shape how the agent behaves during its Goal → Pla
 
 The `oh-my-opencode` and `planning-with-files` add-ons mentioned below are good examples. They make the workflow more explicit and give you more control over planning and execution. Similar features are gradually being absorbed into the CLI itself, but these extensions still add real value today.
 
-For improving the context (adding relevant, removing irrelevant) we will install the plugins `graphify`, `mempalace` and the custom plugin `context-optimizer`
+For improving the context (adding relevant, removing irrelevant) we will install the plugins `graphify`, `mempalace` and `context-optimizer`
 
 ### MCP
 

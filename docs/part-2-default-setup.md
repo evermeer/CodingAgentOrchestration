@@ -204,19 +204,21 @@ Here is a short overview of the differences between MemPalace and Graphify:
 | Query style      | Semantic recall                        | Topological traversal                         |
 | Best for         | *Why we decided something*             | *How the system is structured*                |
 
-### Step 5.3: Context optimization plugin
+### Step 5.4: Context optimization plugin
 
-Install the [OpenCode DCP plugin](https://github.com/Opencode-DCP/opencode-dynamic-context-pruning) to let your agent automatically manage its conversation context and reduce token usage. The plugin prunes irrelevant or low-value parts of the conversation history while keeping the essential information, allowing the agent to focus on the most relevant context for each interaction.
+Install the [context optimizer](https://github.com/evermeer/context-optimizer) for better context compression (less original content will be send to the LLM and it will return a smaller compacted context with on average a better quality.
+
+The plugin will add 3 extra steps to your auto and manual compact. It will deduplicate, rerank and compress before asking the LLM to compact it. It removes irrelevant or low-value parts of the conversation history while keeping the essential information, allowing the agent to focus on the most relevant context for each interaction.
 
 **Run from your shell:**
 
 ```
-opencode plugin @tarquinen/opencode-dcp@latest --global
+npx @evermeer/context-optimizer install
 ```
 
-This installs the package and adds it to your global OpenCode config.
+This installs the package and adds it to your OpenCode (and Claude Code) config.
 
-Restart OpenCode and verify that the plugin is loaded by executing the `/DCP` command.
+Restart OpenCode and verify that the plugin is loaded by executing the `/context-optimizer` command.
 
 ## Step 6: Give Your Agent Tools
 

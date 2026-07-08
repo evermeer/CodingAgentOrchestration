@@ -392,7 +392,7 @@ Behavior:
    `git branch -r --sort=-committerdate | grep -v HEAD | grep -v '^  origin/develop$' | grep -v '^  origin/main$' | grep -v '^  origin/master$' | grep -v '^  origin/release/' | head -8`
    On Windows where `grep` is unavailable, use the PowerShell equivalent.
 2. Present the list as a numbered menu and let me pick one.
-3. Create a git worktree for the selected branch at a configurable root directory (default: `<repo-root>/../cr/<sanitized-branch>` so it stays out of the working repo). Use `git worktree add <path> <branch>`. If the worktree already exists, reuse it after `git fetch` + `git pull --ff-only`.
+3. Create a git worktree for the selected branch at a configurable root directory (default: `<repo-root>/../w/<sanitized-branch>` so it stays out of the working repo). Use `git worktree add <path> <branch>`. If the worktree already exists, reuse it after `git fetch` + `git pull --ff-only`.
 4. Run the global `code-review-expert` skill against THAT worktree only (cwd = worktree path).
 5. Skip the interactive "which items to fix" question. Instead, open the resulting `codereview-<branch>.md` in VS Code (`code <file>`). If `code` is not on PATH, fall back to the OS default opener and print the file path.
 
@@ -414,7 +414,7 @@ Goal: Create a global skill named `release-review` available in OpenCode, Visual
 
 Behavior:
 1. From the remote, find the two latest `release/*` branches sorted by committer date (latest = current, previous = base).
-2. Create a git worktree for the latest release branch at a configurable root directory (default: `<repo-root>/../cr/<sanitized-branch>`). Use `git worktree add <path> <branch>`. Reuse + fast-forward update if it already exists.
+2. Create a git worktree for the latest release branch at a configurable root directory (default: `<repo-root>/../w/<sanitized-branch>`). Use `git worktree add <path> <branch>`. Reuse + fast-forward update if it already exists.
 3. Run the global `code-review-expert` skill against THAT worktree only (cwd = worktree path), with the previous release branch passed as the base for the diff (override the default `develop` base).
 4. Skip the interactive "which items to fix" question. Instead, open the resulting `codereview-<branch>.md` in VS Code (`code <file>`). Fall back to the OS default opener if `code` is not on PATH.
 5. If only one release branch exists, stop and tell me; do not invent a base.
@@ -446,7 +446,8 @@ Behavior:
 5. Use the current repository context (see Agents.md) to add technical details and constraints to the story.
 6. Use the `test-scenarios` skill to turn acceptance criteria into concrete validation scenarios (Given / When / Then).
 7. Whenever something is ambiguous, add questions to the description.
-8. Update the Jira issue: APPEND (do not overwrite) the refined version under a bold header `**refined by AI:**` so the original text is preserved.
+8. Think through how to implement this issue and show the architecture, files we'll need, and implementation steps.
+9. Update the Jira issue: APPEND (do not overwrite) the refined version under a bold header `**refined by AI:**` so the original text is preserved.
 
 Implementation:
 - Install GLOBALLY (user-scope). YAML frontmatter `user-invocable: true`.
@@ -468,7 +469,7 @@ Behavior:
 2. Fetch full details via the Jira MCP.
 3. Branch + worktree:
    - Derive a branch name from the issue key + slugified summary (e.g. `feature/PROJ-123-short-summary`).
-   - Create a git worktree for that new branch at a configurable root directory (default: `<repo-root>/../cr/<branch>`). Do NOT hard-code an OS-specific absolute path. Use forward-slash joins and let the OS resolve.
+   - Create a git worktree for that new branch at a configurable root directory (default: `<repo-root>/../w/<branch>`). Do NOT hard-code an OS-specific absolute path. Use forward-slash joins and let the OS resolve.
 4. Implement the story inside the worktree.
 5. Use these skills for guidance and best practices:
    - agency/engineering/senior-developer
