@@ -9,7 +9,9 @@ The Oh-my-OpenAgent and OpenCode-DCP plugins are also not necessary / not suppor
 Go to https://claude.ai/downloads and download the Terminal, Desktop app and VS Code extension. (Maybe also the Chrome and Jetbrains extensions?)
 
 ## Connectors & Plugins
-In Claude Code go to Customize, Connectors and browse the library to install the connectors for all the systems that you use. Do the same for Plugins. (If you don't know if you will actively use them, then you could still install these but disable them so that they won't add extra processing time.
+In Claude Code go to Customize, Connectors and browse the library to install the connectors for all the systems that you use. Do the same for Plugins. (If you don't know if you will actively use them, then you could still install these but disable them so that they won't add extra processing time and token usage.
+
+An other great source for plugins is the [Claude Plugin Hub](https://www.claudepluginhub.com/)
 
 Connectors installed by me:
 - Atlassian Rovo
