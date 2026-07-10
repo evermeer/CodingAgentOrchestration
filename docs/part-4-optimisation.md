@@ -218,6 +218,8 @@ Parts 2 and 3 cover a practical [OpenCode](https://github.com/anomalyco/opencode
 - [Pieces](https://pieces.app) — long-term developer memory across IDEs, browsers and terminals; alternative angle on what MemPalace does.
 - [CodeGraph](https://github.com/colbymchenry/codegraph) — graph-based code context tool; more structured than Agents.md and more flexible than LSP for giving the agent a rich understanding of your codebase.
 - [Headroom](https://github.com/chopratejas/headroom) - Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 60-95% fewer tokens, same answers. Library, proxy, MCP server.
+- [COO](https://github.com/egorfedorov/claude-context-optimizer) - Stop adding irrelevant information to the context and keep your context clean. 
+- [Caveman](https://github.com/JuliusBrussee/caveman) -  Ask your agent to respond with a compact response.
 
 **External system MCPs**
 - [github-mcp-server](https://github.com/github/github-mcp-server) — official GitHub MCP for issues, PRs, code search and reviews from the agent.
@@ -232,6 +234,7 @@ Parts 2 and 3 cover a practical [OpenCode](https://github.com/anomalyco/opencode
 **Tools**
 - [PPT-Master](https://github.com/hugohe3/ppt-master) — lets your agent generate a natively editable PPTX from any document: real PowerPoint shapes with native animations, not images.
 - [CLI-Anything](https://github.com/HKUDS/CLI-Anything) — bridging the gap between AI agents and the world's software.
+- [CodeBurn](https://github.com/getagentseal/codeburn) - Will give you usage statistics for (almost all?) CLI's that you use.
 
 **Cost, routing, observability**
 - [ccusage](https://github.com/ryoppippi/ccusage) — token / cost dashboards for Claude-style CLIs; the same pattern is useful for monitoring OpenCode spend.
