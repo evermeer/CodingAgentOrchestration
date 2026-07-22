@@ -263,8 +263,6 @@ flowchart LR
 ```
 
 
-### Workflow walkthrough
-
 Below is a step-by-step walkthrough of the workflow diagram above. For each step you'll find **when** to reach for it, **how** to execute it, and a concrete **example**. The example is a single running scenario so you can see the whole flow end to end: *extracting the Billing functional area out of a monolithic solution into a separate Billing service.* You can run the complete flow or cherry-pick individual steps.
 
 #### 💡 Idea — Capture the requirement or opportunity
