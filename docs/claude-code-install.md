@@ -48,16 +48,7 @@ Plugins installed by me:
 - Azure DevOps MCP https://github.com/microsoft/azure-devops-mcp - follow repo instructions for Claude Code
 - Agency Agents https://agencyagents.app/ - install the app and from there all skills.
 - Ponytail https://github.com/DietrichGebert/ponytail - follow repo instructions for Claude Code
-
-## Custom skills
-Download the [custom-skills.zip](https://github.com/evermeer/CodingAgentOrchestration/raw/refs/heads/main/docs/custom-skils.zip) extract the folders and put these into your ~/.claude/skills folder.
-- evidence-validator some rule to make sure your LLM is not making up things.
-- karpathy-guidelines guidelines for improving the quality of your LLM responses.
-- code-review-expert compare the current branch to the develop branch and analyse the changes using the evidence-validator, karpathy-guidelines and code-review skills. Do a functional compare against the Jira issue. Ask which findings to implement.
-- branch-review Specify a jira ticket and the branch that is made for that ticket will be evaluated in a worktree using the code-review-expert skill. Instead of asking what issues to implement it will only open the markdown with the found issues.
-- release-review same as the branch-review skill only that it will always compare the latest release branch to the release branch before that.
-- jira-refine Specify a jira ticket id and this skill will then analyse it together with your repository content and add an improved description with questions added if there is something not clear.
-- jira-implement Specify a jira ticket id and a new branch will be created in a worktree and the ticket will be implemented.
+- Skills for real engineers https://github.com/mattpocock/skills - follow repo instructions for Claude Code
 
 ## LSP's
 
@@ -81,3 +72,14 @@ Afterwards show me:
 2. where it was installed
 3. how to verify each LSP is working
 ```
+
+## Custom skills
+When using superpoers and the mattpockock skills for engineers, then there is (almost) no need to install the custom skills below.
+Download the [custom-skills.zip](https://github.com/evermeer/CodingAgentOrchestration/raw/refs/heads/main/docs/custom-skils.zip) extract the folders and put these into your ~/.claude/skills folder.
+- evidence-validator some rule to make sure your LLM is not making up things.
+- karpathy-guidelines guidelines for improving the quality of your LLM responses.
+- code-review-expert compare the current branch to the develop branch and analyse the changes using the evidence-validator, karpathy-guidelines and code-review skills. Do a functional compare against the Jira issue. Ask which findings to implement.
+- branch-review Specify a jira ticket and the branch that is made for that ticket will be evaluated in a worktree using the code-review-expert skill. Instead of asking what issues to implement it will only open the markdown with the found issues.
+- release-review same as the branch-review skill only that it will always compare the latest release branch to the release branch before that.
+- jira-refine Specify a jira ticket id and this skill will then analyse it together with your repository content and add an improved description with questions added if there is something not clear.
+- jira-implement Specify a jira ticket id and a new branch will be created in a worktree and the ticket will be implemented.
