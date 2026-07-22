@@ -173,6 +173,13 @@ Besides the mentioned steps in the workflow below, the skill packs also have a l
 Here is a mindmap of what you can finde in them:
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': {
+  'primaryColor':'#2563eb',
+  'primaryTextColor':'#ffffff',
+  'primaryBorderColor':'#1e3a8a',
+  'lineColor':'#64748b',
+  'fontSize':'16px'
+}}}%%
 mindmap
   root((🧠 Claude Code Power Stack))
 
