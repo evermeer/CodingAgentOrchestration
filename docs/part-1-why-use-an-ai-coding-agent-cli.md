@@ -277,7 +277,9 @@ Below is a step-by-step walkthrough of the workflow diagram above. For each step
 ```text
 Here's a rough idea: billing logic is scattered across our monolith and slows
 down every release. We want to extract it into its own service. Restate the
-goal, list the assumptions and unknowns, and don't write any code yet.
+goal, list the assumptions and unknowns, and don't write any code yet. Ask me
+any clarifying questions you need until the goal and constraints are
+unambiguous before you summarize.
 ```
 
 #### 🧠 Superpowers · Brainstorming — Explore the problem space
@@ -293,7 +295,8 @@ goal, list the assumptions and unknowns, and don't write any code yet.
 Use the Superpowers brainstorming skill on extracting Billing from our monolith
 into a separate service. Propose several approaches (e.g. strangler-fig vs.
 big-bang), cover the shared customer table, sync vs. events, and the rollback
-story, with trade-offs for each.
+story, with trade-offs for each. Ask clarifying questions about our setup and
+constraints before proposing options if anything is unclear.
 ```
 
 #### 📝 Matt Skills · to-spec — Turn the idea into a spec
@@ -309,7 +312,8 @@ story, with trade-offs for each.
 Use the Matt Skills to-spec skill to turn the chosen strangler-fig approach into
 a spec for the Billing service: goal, scope, non-goals, exposed endpoints, data
 ownership (invoices and payments tables), the anti-corruption layer, and
-acceptance criteria.
+acceptance criteria. Ask clarifying questions and don't finalize the spec until
+any ambiguities are resolved.
 ```
 
 #### 🎫 Matt Skills · to-tickets — Decompose into deliverable tasks
@@ -324,7 +328,9 @@ acceptance criteria.
 ```text
 Use the Matt Skills to-tickets skill to break the Billing service spec into
 small, independently shippable tickets with dependencies and acceptance
-criteria, ordered so each can be built, tested, and merged on its own.
+criteria, ordered so each can be built, tested, and merged on its own. Ask
+clarifying questions about scope or dependencies before finalizing the
+breakdown.
 ```
 
 #### 👥 Agency Agents · Specialists — Validate the approach
@@ -338,8 +344,10 @@ criteria, ordered so each can be built, tested, and merged on its own.
 **Prompt:**
 ```text
 Review the Billing service spec and tickets with the Agency Agents
-backend-architect, security-engineer, and product-manager. Return each agent's
-concerns and recommendations so I can fold them back into the spec and tickets.
+backend-architect, security-engineer, and product-manager. Have each agent ask
+clarifying questions where context is missing before giving their concerns.
+Return each agent's concerns and recommendations so I can fold them back into
+the spec and tickets.
 ```
 
 #### 💻 Matt Skills · implement — Build incrementally
@@ -353,8 +361,10 @@ concerns and recommendations so I can fold them back into the spec and tickets.
 **Prompt:**
 ```text
 Use the Matt Skills implement skill on the "add the anti-corruption layer in the
-monolith" ticket. Work test-first, put it behind the billing feature flag, and
-make sure the existing billing tests still pass before stopping.
+monolith" ticket. Ask clarifying questions before writing code if the ticket's
+requirements or edge cases are ambiguous. Work test-first, put it behind the
+billing feature flag, and make sure the existing billing tests still pass before
+stopping.
 ```
 
 #### 🔍 Matt Skills · code-review — Review before verification
@@ -401,7 +411,8 @@ acceptance criterion before calling it done.
 Help me ship the Billing service: draft the phased rollout plan (feature flag
 from a small percentage of traffic to full), list the error-rate and latency
 metrics to watch, and outline the cleanup to remove the old monolith billing
-code once it's stable.
+code once it's stable. Ask clarifying questions about our environments and
+rollout constraints before drafting the plan.
 ```
 
 ---
