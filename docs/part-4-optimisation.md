@@ -220,6 +220,7 @@ Parts 2 and 3 cover a practical [OpenCode](https://github.com/anomalyco/opencode
 - [Headroom](https://github.com/chopratejas/headroom) - Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 60-95% fewer tokens, same answers. Library, proxy, MCP server.
 - [COO](https://github.com/egorfedorov/claude-context-optimizer) - Stop adding irrelevant information to the context and keep your context clean. 
 - [Caveman](https://github.com/JuliusBrussee/caveman) -  Ask your agent to respond with a compact response.
+- [context-mode](https://github.com/mksglu/context-mode) - Stop adding irrelevant information to the context and keep your context clean. 
 
 **External system MCPs**
 - [github-mcp-server](https://github.com/github/github-mcp-server) — official GitHub MCP for issues, PRs, code search and reviews from the agent.

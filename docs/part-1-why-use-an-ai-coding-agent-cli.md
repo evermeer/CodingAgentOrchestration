@@ -45,6 +45,7 @@ The more relevant context you give to LLMs, the better the outcome will be. But 
 - **Content context** — Construct an agents.md or use a tool that creates a graph of your data to give it a content context.
 - **External context** — Give your agent access to external systems (via MCP) to extend the content context.
 - **Intent context** — Add an agent session memory tool to give it an intent context.
+- **Irelevant context** - This is what you don't want in your context. It can influence the outcome with less optimal results. 
 
 This is usually where the biggest practical gains come from. Better models help, but better context often helps more.
 
@@ -158,6 +159,13 @@ Because the landscape moves so fast, model choice should be revisited regularly.
 Other benchmarks that does not seems to be up to date but still worth checking are [LLM Stats](https://llm-stats.com/), [SWE-bench](https://www.swebench.com/), [benchlm.ai](https://benchlm.ai/), [lm-arena](https://huggingface.co/spaces/lmarena-ai/arena-leaderboard), 
 
 If your tool supports routing, you do not need one perfect model. You need a reasonable model for planning, a fast model for execution, and a reliable model for verification.
+
+### Context optimisation
+You could add to your context so that your agent will have the right awnser faster using plugins like [Graphify](https://github.com/safishamsi/graphify) and [Mempalace](https://github.com/MemPalace/mempalace),
+Stop adding irrelevant information to the context and keep your context clean with [context-mode](https://github.com/mksglu/context-mode), 
+Dedupe, Rerank and Compress the context before sending it to the LLM with [context-optimizer](https://github.com/evermeer/context-optimizer)
+and ask your agent to resond with a compact response with [Caveman](https://github.com/JuliusBrussee/caveman)
+
 
 ---
 

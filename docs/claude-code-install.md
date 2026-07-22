@@ -17,11 +17,11 @@ Connectors installed by me:
 - Atlassian Rovo
 - Context 7
 - Exa
-- GitHub integration
-- Microsoft 365
+- GitHub integration (disabled)
+- Microsoft 365 (disabled)
 - Microsoft Learn
-- Notion
-- Slack
+- Notion (disabled)
+- Slack (disabled)
 - Azure MCP Server
 - Claude in Chrome
 - Filesystem
@@ -32,7 +32,6 @@ Tried but not functioning yet:
 Plugins installed by me:
 - Design
 - Engineering
-- Slack
 - Data
 - Customer Support
 - Enterprise Search
@@ -41,6 +40,7 @@ Plugins installed by me:
 - cc-safety-net from https://github.com/kenryu42/cc-safety-net - follow repo instructions for Claude Code
 - graphify from https://github.com/safishamsi/graphify - follow repo instructions for Claude Code
 - mempalace from https://github.com/MemPalace/mempalace - follow repo instructions for Claude Code
+- context-mode from https://github.com/mksglu/context-mode - follow repo instructions for Claude Code
 - context optimizer https://github.com/evermeer/context-optimizer - follow repo instructions for Claude Code
 - superpowers https://github.com/obra/superpowers - follow repo instructions for Claude Code
 - gstack https://github.com/garrytan/gstack - follow repo instructions for Claude Code
