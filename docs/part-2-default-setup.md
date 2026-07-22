@@ -330,7 +330,7 @@ You can use the complete prompt below to install all in one go, or copy and past
 
 ---
 
-### [Superpowers](https://github.com/obra/superpowers) skills pack
+### (How) [Superpowers](https://github.com/obra/superpowers) skills pack
 Superpowers is a complete software development methodology for your coding agents, built on top of a set of composable skills and some initial instructions that make sure your agent uses them.
 
 **Prompt for OpenCode:**
@@ -343,7 +343,22 @@ Source: https://github.com/obra/superpowers.git
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
-### [Agency Agents](https://github.com/msitarzewski/agency-agents) skills pack
+
+### (What) [Skills for real engineers](https://github.com/mattpocock/skills)
+A collection of skills for real engineers, including planning, refactoring, debugging, and more.
+
+**Prompt for OpenCode:**
+
+```
+Goal: Install the "skills for real engineers" skill pack globally for OpenCode, Visual Studio Copilot, and VS Code Copilot.
+Source: https://github.com/mattpocock/skills
+- Install GLOBALLY for the current user, NOT inside this repository.
+- Follow the instructions for each coding agent.
+- On any failure, print the exact error and proposed fix before retrying.
+```
+
+
+### (Who) [Agency Agents](https://github.com/msitarzewski/agency-agents) skills pack
 A complete AI agency at your fingertips - From frontend wizards to Reddit community ninjas, from whimsy injectors to reality checkers. Each agent is a specialized expert with personality, processes, and proven deliverables.
 
 
@@ -363,8 +378,11 @@ Source: https://github.com/msitarzewski/agency-agents
 - Apply the mapping consistently for every category, not only engineering.
 ```
 
-### [Knowledge Work](https://github.com/anthropics/knowledge-work-plugins) skills pack
+### (Where / Context) [Knowledge Work](https://github.com/anthropics/knowledge-work-plugins) skills pack
 A collection of skills for knowledge workers for your role, team, and company.
+
+If your role is developer only then you could skip this skill. But if you expect AI tasks for 
+business workflows, organizational roles, connected tools or enterprise processes then this skill pack can help.
 
 **Prompt for OpenCode:**
 

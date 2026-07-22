@@ -167,6 +167,106 @@ Dedupe, Rerank and Compress the context before sending it to the LLM with [conte
 and ask your agent to resond with a compact response with [Caveman](https://github.com/JuliusBrussee/caveman)
 
 
+
+## Your workflow
+
+I have 3 skill packs installed each aiming at a different area (What / How / Who) that only have limited overlap and work great togather in a daily workflow. 
+The skill packs are: [Superpowers](https://github.com/obra/superpowers), [Skills for real engineers](https://github.com/mattpocock/skills) and [Agency Agents](https://github.com/msitarzewski/agency-agents-app)
+
+Here is a diagram of how these skill packs work together in a daily workflow. You can use the complete flow or cherry pick individual steps.
+```mermaid
+flowchart LR
+
+    Idea[💡 Idea]
+        --> B["Superpowers<br/>Brainstorming"]
+
+    B --> S["Matt Skills<br/>to-spec"]
+
+    S --> T["Matt Skills<br/>to-tickets"]
+
+    T --> A1["Agency Agent<br/>Backend Architect"]
+    T --> A2["Agency Agent<br/>Security Engineer"]
+    T --> A3["Agency Agent<br/>Product Manager"]
+
+    A1 --> I["Matt Skills<br/>implement"]
+    A2 --> I
+    A3 --> I
+
+    I --> R["Matt Skills<br/>code-review"]
+
+    R --> V["Superpowers<br/>verification-before-completion"]
+
+    V --> Done[✅ Shipped]
+```
+
+The 3 skill packs only have limited overlap and work great together. 
+Besides the mentioned steps above, the skill packs also have a lot of other skills that you can use in your daily workflow. 
+Here is a mindmap of what you can finde in them:
+
+```mermaid
+mindmap
+  root((🧠 Claude Code Power Stack))
+
+    🔵 Superpowers
+      HOW to work
+        🧪 TDD
+        🐛 Systematic Debugging
+        ✅ Verification
+        📋 Planning
+        🤖 Parallel Agents
+
+    🟢 Matt Skills
+      WHAT to do
+        📝 Specs & PRDs
+        🎫 Tickets
+        🏗️ Architecture
+        🔍 Research
+        ♻️ Refactoring
+        🧪 QA & Reviews
+
+    🟡 Agency Agents
+      WHO does it
+        🏗️ Backend Architect
+        🔐 Security Engineer
+        📦 Product Manager
+        🎨 UX Designer
+        🤔 Reality Checker
+        🚀 DevOps Engineer
+
+    🔴 Knowledge Work Plugins
+      WHERE
+        💻 Engineering
+        📦 Product
+        💰 Sales
+        📣 Marketing
+        📊 Finance
+        ⚖️ Legal
+        👥 HR
+        🎧 Support
+```
+
+### Combined Workflows
+💡 Idea ->
+   Capture the requirement or opportunity
+
+📋 Plan ->
+   Refine requirements and create a technical approach
+
+🎫 Tickets ->
+   Decompose work into independently deliverable tasks
+
+👥 Specialists ->
+   Validate the approach with architect, security, product and UX perspectives
+
+💻 Implement ->
+   Build incrementally using TDD and code reviews
+
+✅ Verify ->
+   Prove correctness through testing, validation and challenge sessions
+
+🚢 Ship -> 
+   Release, monitor, learn and plan the next iteration
+
 ---
 
 > [!NOTE]

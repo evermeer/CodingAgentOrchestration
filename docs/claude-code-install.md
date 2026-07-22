@@ -30,25 +30,28 @@ Tried but not functioning yet:
 - Freshservice
 
 Plugins installed by me:
-- Design
 - Engineering
 - Data
-- Customer Support
-- Enterprise Search
-- Marketing
-- Product Management
 - cc-safety-net from https://github.com/kenryu42/cc-safety-net - follow repo instructions for Claude Code
 - graphify from https://github.com/safishamsi/graphify - follow repo instructions for Claude Code
 - mempalace from https://github.com/MemPalace/mempalace - follow repo instructions for Claude Code
 - context-mode from https://github.com/mksglu/context-mode - follow repo instructions for Claude Code
 - context optimizer https://github.com/evermeer/context-optimizer - follow repo instructions for Claude Code
 - superpowers https://github.com/obra/superpowers - follow repo instructions for Claude Code
+- Skills for real engineers https://github.com/mattpocock/skills - follow repo instructions for Claude Code
+- Agency Agents https://agencyagents.app/ - install the app and from there all skills. Code on github https://github.com/msitarzewski/agency-agents-app
 - gstack https://github.com/garrytan/gstack - follow repo instructions for Claude Code
 - .net skill pack https://github.com/dotnet/skills - follow repo instructions for Claude Code
 - Azure DevOps MCP https://github.com/microsoft/azure-devops-mcp - follow repo instructions for Claude Code
-- Agency Agents https://agencyagents.app/ - install the app and from there all skills.
 - Ponytail https://github.com/DietrichGebert/ponytail - follow repo instructions for Claude Code
-- Skills for real engineers https://github.com/mattpocock/skills - follow repo instructions for Claude Code
+
+Optional plugins that could be interesting:
+- Design
+- Customer Support
+- Enterprise Search
+- Marketing
+- Product Management
+
 
 ## LSP's
 
