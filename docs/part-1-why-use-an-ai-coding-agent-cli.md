@@ -166,41 +166,10 @@ Stop adding irrelevant information to the context and keep your context clean wi
 Dedupe, Rerank and Compress the context before sending it to the LLM with [context-optimizer](https://github.com/evermeer/context-optimizer)
 and ask your agent to resond with a compact response with [Caveman](https://github.com/JuliusBrussee/caveman)
 
+## Skill pack combination power
 
-
-## Your workflow
-
-I have 3 skill packs installed each aiming at a different area (What / How / Who) that only have limited overlap and work great togather in a daily workflow. 
-The skill packs are: [Superpowers](https://github.com/obra/superpowers), [Skills for real engineers](https://github.com/mattpocock/skills) and [Agency Agents](https://github.com/msitarzewski/agency-agents-app)
-
-Here is a diagram of how these skill packs work together in a daily workflow. You can use the complete flow or cherry pick individual steps.
-```mermaid
-flowchart LR
-
-    Idea[💡 Idea]
-        --> B["Superpowers<br/>Brainstorming"]
-
-    B --> S["Matt Skills<br/>to-spec"]
-
-    S --> T["Matt Skills<br/>to-tickets"]
-
-    T --> A1["Agency Agent<br/>Backend Architect"]
-    T --> A2["Agency Agent<br/>Security Engineer"]
-    T --> A3["Agency Agent<br/>Product Manager"]
-
-    A1 --> I["Matt Skills<br/>implement"]
-    A2 --> I
-    A3 --> I
-
-    I --> R["Matt Skills<br/>code-review"]
-
-    R --> V["Superpowers<br/>verification-before-completion"]
-
-    V --> Done[✅ Shipped]
-```
-
-The 3 skill packs only have limited overlap and work great together. 
-Besides the mentioned steps above, the skill packs also have a lot of other skills that you can use in your daily workflow. 
+The folowing 4 skill packs only have limited overlap and work great together. 
+Besides the mentioned steps in the workflow below, the skill packs also have a lot of other skills that you can use in your daily workflow. 
 Here is a mindmap of what you can finde in them:
 
 ```mermaid
@@ -245,27 +214,190 @@ mindmap
         🎧 Support
 ```
 
-### Combined Workflows
-💡 Idea ->
-   Capture the requirement or opportunity
+### Overlap between skill packs
 
-📋 Plan ->
-   Refine requirements and create a technical approach
+|                | Superpowers | Matt Skills | Agency Agents | Knowledge Work |
+| -------------- | ----------- | ----------- | ------------- | -------------- |
+| Superpowers    | -           | Medium      | Low           | Very Low       |
+| Matt Skills    | Medium      | -           | Low           | Low            |
+| Agency Agents  | Low         | Low         | -             | Medium         |
+| Knowledge Work | Very Low    | Low         | Medium        | -              |
 
-🎫 Tickets ->
-   Decompose work into independently deliverable tasks
 
-👥 Specialists ->
-   Validate the approach with architect, security, product and UX perspectives
+## Your workflow
 
-💻 Implement ->
-   Build incrementally using TDD and code reviews
+Above mentioned skill packs each aim at a different area (What / How / Who / Where) that only have limited overlap and work great togather in a daily workflow. 
+The skill packs are: [Superpowers](https://github.com/obra/superpowers), [Skills for real engineers](https://github.com/mattpocock/skills), [Agency Agents](https://github.com/msitarzewski/agency-agents-app) and [Knowledge Work](https://github.com/anthropics/knowledge-work-plugins)
 
-✅ Verify ->
-   Prove correctness through testing, validation and challenge sessions
+Here is a diagram of how these skill packs work together in a daily workflow. You can use the complete flow or cherry pick individual steps.
+```mermaid
+flowchart LR
 
-🚢 Ship -> 
-   Release, monitor, learn and plan the next iteration
+    Idea[💡 Idea]
+        --> B["🧠 Superpowers<br/>Brainstorming"]
+
+    B --> S["📝 Matt Skills<br/>to-spec"]
+
+    S --> T["🎫 Matt Skills<br/>to-tickets"]
+
+    T --> A1["🏗️ Agency Agent<br/>Backend Architect"]
+    T --> A2["🔐 Agency Agent<br/>Security Engineer"]
+    T --> A3["📦 Agency Agent<br/>Product Manager"]
+
+    A1 --> I["💻 Matt Skills<br/>implement"]
+    A2 --> I
+    A3 --> I
+
+    I --> R["🔍 Matt Skills<br/>code-review"]
+
+    R --> V["✅ Superpowers<br/>verification-before-completion"]
+
+    V --> Done[🚢 Shipped]
+```
+
+
+### Workflow walkthrough
+
+Below is a step-by-step walkthrough of the workflow diagram above. For each step you'll find **when** to reach for it, **how** to execute it, and a concrete **example**. The example is a single running scenario so you can see the whole flow end to end: *extracting the Billing functional area out of a monolithic solution into a separate Billing service.* You can run the complete flow or cherry-pick individual steps.
+
+#### 💡 Idea — Capture the requirement or opportunity
+
+**When:** At the very start, when you have a problem, opportunity, or rough requirement but no defined scope yet. This is the moment before you commit to a solution.
+
+**How:** Capture the idea in plain language — paste the Jira ticket, a Slack thread, or a one-line note into the agent. Don't ask for code yet; the goal is only to record the intent and the "why" so later steps have something to refine.
+
+**Example:** You notice that billing logic is scattered across the monolith and slows down every release. You capture it as: *"Billing is tightly coupled to the monolith. We want to extract it into its own service so it can be deployed, scaled, and owned independently."*
+
+**Prompt:**
+```text
+Here's a rough idea: billing logic is scattered across our monolith and slows
+down every release. We want to extract it into its own service. Restate the
+goal, list the assumptions and unknowns, and don't write any code yet.
+```
+
+#### 🧠 Superpowers · Brainstorming — Explore the problem space
+
+**When:** After capturing the idea, while the approach is still open. Use it when there are multiple viable directions or unknowns you want surfaced before committing.
+
+**How:** Ask the Superpowers *brainstorming* skill to restate the problem, list assumptions, identify unknowns, and propose several options with trade-offs. Push back on its suggestions and let it challenge yours — the output is a shared understanding, not code.
+
+**Example:** The brainstorm surfaces options for the extraction: strangler-fig pattern vs. a big-bang rewrite, how to handle the shared customer table, whether to keep a synchronous call or move to events, and what the rollback story looks like. You settle on an incremental strangler-fig approach with an anti-corruption layer.
+
+**Prompt:**
+```text
+Use the Superpowers brainstorming skill on extracting Billing from our monolith
+into a separate service. Propose several approaches (e.g. strangler-fig vs.
+big-bang), cover the shared customer table, sync vs. events, and the rollback
+story, with trade-offs for each.
+```
+
+#### 📝 Matt Skills · to-spec — Turn the idea into a spec
+
+**When:** Once you've chosen a direction and need to make it precise and reviewable before breaking it into work.
+
+**How:** Run the *to-spec* skill to convert the brainstorm into a structured spec/PRD: goal, scope, non-goals, constraints, interfaces, data ownership, and acceptance criteria. Review it and correct anything the agent assumed.
+
+**Example:** The spec defines the new Billing service boundary: which endpoints it exposes, that it owns the `invoices` and `payments` tables, that the monolith talks to it through an anti-corruption layer, and the acceptance criteria (existing billing flows keep working, no data loss, feature-flagged cutover).
+
+**Prompt:**
+```text
+Use the Matt Skills to-spec skill to turn the chosen strangler-fig approach into
+a spec for the Billing service: goal, scope, non-goals, exposed endpoints, data
+ownership (invoices and payments tables), the anti-corruption layer, and
+acceptance criteria.
+```
+
+#### 🎫 Matt Skills · to-tickets — Decompose into deliverable tasks
+
+**When:** After the spec is agreed, when the work is too large to implement in one pass and needs to be split into independently shippable pieces.
+
+**How:** Run the *to-tickets* skill to break the spec into small, ordered tickets with clear dependencies and acceptance criteria. Sequence them so each can be built, tested, and merged on its own.
+
+**Example:** The spec becomes tickets such as: (1) scaffold the Billing service, (2) move the billing domain model, (3) add the anti-corruption layer in the monolith, (4) migrate the `invoices`/`payments` tables, (5) route billing calls through a feature flag, (6) remove the old code path.
+
+**Prompt:**
+```text
+Use the Matt Skills to-tickets skill to break the Billing service spec into
+small, independently shippable tickets with dependencies and acceptance
+criteria, ordered so each can be built, tested, and merged on its own.
+```
+
+#### 👥 Agency Agents · Specialists — Validate the approach
+
+**When:** Before implementation, when the change touches architecture, security, or product concerns and you want expert perspectives to catch problems early.
+
+**How:** Route the spec and tickets through the relevant Agency Agents — *Backend Architect*, *Security Engineer*, *Product Manager* (and UX where relevant). Each reviews from its angle and returns concerns and recommendations that feed back into the spec or tickets.
+
+**Example:** The **Backend Architect** flags that the shared customer table needs a clear owner and suggests eventual consistency for read models. The **Security Engineer** requires service-to-service authentication and that payment data stays encrypted in transit and at rest. The **Product Manager** confirms the cutover must be invisible to customers and asks for a phased rollout.
+
+**Prompt:**
+```text
+Review the Billing service spec and tickets with the Agency Agents
+backend-architect, security-engineer, and product-manager. Return each agent's
+concerns and recommendations so I can fold them back into the spec and tickets.
+```
+
+#### 💻 Matt Skills · implement — Build incrementally
+
+**When:** Once tickets are validated and ready. Use it per ticket, not for the whole epic at once.
+
+**How:** Run the *implement* skill on one ticket at a time, ideally test-first. Let the agent plan, write tests, implement, and run them, then review the diff before moving to the next ticket.
+
+**Example:** For the anti-corruption-layer ticket, the agent writes tests describing how the monolith should call the Billing service, implements the adapter behind the feature flag, and confirms the existing billing tests still pass before you move on to the data migration ticket.
+
+**Prompt:**
+```text
+Use the Matt Skills implement skill on the "add the anti-corruption layer in the
+monolith" ticket. Work test-first, put it behind the billing feature flag, and
+make sure the existing billing tests still pass before stopping.
+```
+
+#### 🔍 Matt Skills · code-review — Review before verification
+
+**When:** After a ticket (or a batch of related tickets) is implemented, before you declare it done.
+
+**How:** Run the *code-review* skill against the branch/diff. It checks for correctness, security, performance, and convention issues, and proposes concrete fixes. Address the findings, then re-review if needed.
+
+**Example:** The review notices the anti-corruption layer swallows a downstream timeout instead of surfacing it, and that a new endpoint is missing authorization. You fix both and re-run the review until it's clean.
+
+**Prompt:**
+```text
+Use the Matt Skills code-review skill on the anti-corruption-layer branch. Check
+correctness, security, performance, and conventions, and list concrete fixes
+(e.g. error handling and authorization on the new endpoints).
+```
+
+#### ✅ Superpowers · verification-before-completion — Prove it's done
+
+**When:** As the final gate before shipping, when the code passes review but you still need to prove the behaviour is correct and complete.
+
+**How:** Run the Superpowers *verification-before-completion* skill to validate against the acceptance criteria: run the full test suite, exercise the real flows, and challenge the assumption that it's finished. Only proceed when the evidence backs it up.
+
+**Example:** Verification runs the end-to-end billing scenarios through the new service with the feature flag on, confirms invoices and payments match the monolith's previous behaviour, checks that rollback (flag off) still works, and validates no data was lost during migration.
+
+**Prompt:**
+```text
+Use the Superpowers verification-before-completion skill on the Billing
+extraction. Run the full test suite, exercise the end-to-end billing flows with
+the feature flag on and off, confirm no data loss on migration, and verify every
+acceptance criterion before calling it done.
+```
+
+#### 🚢 Shipped — Release, monitor, learn
+
+**When:** After verification passes and the acceptance criteria are met.
+
+**How:** Release the change (typically behind the feature flag first), monitor it in production, capture what you learned, and feed the next iteration back into the 💡 Idea step.
+
+**Example:** You enable the Billing service for a small percentage of traffic, watch error rates and latency, then roll it out fully and delete the old monolith billing code. The lessons learned (e.g. the shared-table ownership pain) become the next idea to tackle.
+
+**Prompt:**
+```text
+Help me ship the Billing service: draft the phased rollout plan (feature flag
+from a small percentage of traffic to full), list the error-rate and latency
+metrics to watch, and outline the cleanup to remove the old monolith billing
+code once it's stable.
+```
 
 ---
 
