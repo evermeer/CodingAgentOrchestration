@@ -415,6 +415,73 @@ code once it's stable. Ask clarifying questions about our environments and
 rollout constraints before drafting the plan.
 ```
 
+## Optional workflow steps
+
+The steps above form the core end-to-end flow. The steps below are optional add-ons you can slot in wherever they help. They are not part of every run — reach for them when the situation calls for it. Keep the ones that fit your workflow and ignore the rest.
+
+#### 🔥 Matt's · /grill-me — Stress-test your thinking
+
+**When:** Before committing to an idea, spec, or plan, when you want your assumptions challenged rather than confirmed. Best used right after the 💡 Idea or 📝 to-spec step, or before a big architectural decision.
+
+**How:** Run Matt's *grill-me* skill and let it interrogate your reasoning with tough, Socratic questions — edge cases, hidden assumptions, failure modes, and "what would have to be true" checks. Answer honestly and fold the gaps it exposes back into your spec or plan.
+
+**Example:** Before extracting Billing, grill-me pushes on questions like *"What happens to in-flight invoices during cutover?"*, *"How do you roll back once the monolith stops owning the payments table?"*, and *"What's your consistency guarantee for the shared customer data?"* — surfacing two gaps you hadn't scoped.
+
+**Prompt:**
+```text
+Use Matt's grill-me skill on my plan to extract Billing into a separate
+service. Challenge my assumptions, probe the edge cases and failure modes
+(cutover, rollback, shared data consistency), and tell me what would have to be
+true for this to work. Don't let me off the hook easily.
+```
+
+#### 🏛️ custom . engineering-council — Multi-perspective engineering review
+
+**When:** For non-trivial decisions — a bug, feature, PR, architecture choice, or implementation plan — where a single viewpoint isn't enough and you want several independent engineering perspectives before you decide.
+
+**How:** Run the (custom) *engineering-council* skill on the issue or plan. It analyses the problem through multiple independent engineering lenses and then reconciles them into a single unified recommendation, so you get both the diversity of opinions and a clear call to action.
+
+**Example:** You feed the council your strangler-fig extraction plan. One perspective favours events for decoupling, another warns about the operational cost of a message broker, a third prioritises a fast reversible cutover. The council weighs the trade-offs and recommends starting synchronous behind the anti-corruption layer, with events as a later step.
+
+**Prompt:**
+```text
+Use the engineering-council skill on my plan to extract Billing from the
+monolith. Analyse it from multiple independent engineering perspectives
+(architecture, security, performance, skeptical, ...), then reconcile them into a
+single unified recommendation with the key trade-offs called out.
+```
+
+#### 🐛 Superpowers · Debugging — Find the real root cause
+
+**When:** Mid-implementation, when something breaks and the cause isn't obvious. Use it instead of guessing or patching symptoms.
+
+**How:** Run the Superpowers *debugging* / root-cause skill. It reproduces the failure, isolates the smallest failing case, forms and tests hypotheses, and traces the problem to its actual source before proposing a fix.
+
+**Example:** The anti-corruption layer intermittently drops a payment update. Instead of adding retries blindly, the skill traces it to a race between the feature-flag check and the cache invalidation, and fixes the ordering.
+
+**Prompt:**
+```text
+Use the Superpowers debugging skill on the intermittent dropped-payment bug in
+the anti-corruption layer. Reproduce it, isolate the smallest failing case, form
+and test hypotheses, and trace it to the real root cause before proposing a fix.
+```
+
+#### 📚 Documentation update — Capture what changed
+
+**When:** After a ticket or feature ships, when the change affects APIs, runbooks, onboarding, or architecture docs that others rely on.
+
+**How:** Ask the agent to update the relevant documentation from the shipped diff — READMEs, API references, ADRs, and runbooks — so the docs match reality while the context is still fresh.
+
+**Example:** After the Billing cutover you regenerate the service README, add an ADR recording the strangler-fig decision, and update the on-call runbook with the new rollback (flag-off) procedure.
+
+**Prompt:**
+```text
+Update the documentation for the newly extracted Billing service based on the
+merged changes: refresh the service README and API reference, add an ADR for the
+strangler-fig decision, and update the on-call runbook with the feature-flag
+rollback procedure.
+```
+
 ---
 
 > [!NOTE]
