@@ -260,6 +260,16 @@ flowchart LR
     R --> V["✅ Superpowers<br/>verification-before-completion"]
 
     V --> Done[🚢 Shipped]
+
+
+    %% invisible spacer row: pushes the optional-tools row (O1–O4) down ~one box height
+    SPACER["&nbsp;<br/>&nbsp;"]
+    style SPACER fill:transparent,stroke:transparent,color:transparent
+
+    O1["🔥 Superpowers<br/>/grill-me"]
+    O1 ~~~ O2["🏛️ engineering-council"]
+    O2 ~~~ O3["🐛 Superpowers<br/>Debugging"]
+    O3 ~~~ O4["📚 Documentation<br/>update"]
 ```
 
 
