@@ -1,7 +1,8 @@
-# Part 3: Advanced Use
+# Part 4: Advanced Use
 
 > [!NOTE]
-> This part assumes you have completed, or at least reviewed, [Part 2: A default setup](part-2-default-setup.md). Use these sections selectively; not every developer needs every advanced integration. After that, continue with [Part 4: Optimisation](part-4-optimisation.md) if you want OpenCode to simplify overlapping orchestration layers.
+> Previous: [Part 3: A default setup](part-3-default-setup.md)  
+> This part assumes you have completed, or at least reviewed, [Part 3: A default setup](part-3-default-setup.md). Use these sections selectively; not every developer needs every advanced integration. After that, continue with [Part 5: Optimisation](part-5-optimisation.md) if you want OpenCode to simplify overlapping orchestration layers.
 
 This part covers three categories of extensions you can add to OpenCode:
 
@@ -18,7 +19,7 @@ For better reproducibility, expect every installation prompt in this part to pro
 First evaluate each of these extensions and decide which ones are useful for your workflow. Then run the corresponding prompts to install them.
 
 ### [Planning with Files](https://github.com/OthmanAdi/planning-with-files) plugin
-A plugin that transforms your workflow to use persistent markdown files for planning, progress tracking, and knowledge storage. The Oh-my-OpenAgent (installed in [Part 2](part-2-default-setup.md)) also has a planning skill for plan execution — that one is sufficient for medium-size projects. Planning with Files scales better for larger efforts (tested up to 60K lines of code).
+The Oh-my-OpenAgent (installed in [Part 3](part-3-default-setup.md)) also has a planning skill
 
 **Expected outcome:** After installation, when you ask OpenCode to plan a multi-step task it will create and maintain `task_plan.md`, `findings.md`, and `progress.md` in your repo root.
 
@@ -520,4 +521,5 @@ Treat this table as the minimum maintenance checklist for the advanced setup in 
 ---
 
 > [!NOTE]
-> Continue with [Part 4: Optimisation](part-4-optimisation.md) to simplify and verify the orchestration layers you have added.
+> Previous: [Part 3: A default setup](part-3-default-setup.md)  
+> Continue with [Part 5: Optimisation](part-5-optimisation.md) to simplify and verify the orchestration layers you have added.

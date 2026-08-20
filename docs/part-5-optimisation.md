@@ -1,7 +1,8 @@
-# Part 4: Optimisation
+# Part 5: Optimisation
 
 > [!NOTE]
-> Complete [Part 2 (Default setup)](part-2-default-setup.md) first. If you added skills, LSP, or MCP servers from [Part 3 (Advanced use)](part-3-advanced-use.md), those will be preserved during optimisation.
+> Previous: [Part 4: Advanced Use](part-4-advanced-use.md)  
+> Complete [Part 3 (Default setup)](part-3-default-setup.md) first. If you added skills, LSP, or MCP servers from [Part 4 (Advanced use)](part-4-advanced-use.md), those will be preserved during optimisation.
 
 ## Improved loop control
 
@@ -246,4 +247,9 @@ Other great resources for OpenCode are
 [Awesome OpenCode](https://github.com/awesome-opencode/awesome-opencode)
 and
 [OpenCode cafe (Community-driven marketplace)](https://www.opencode.cafe/)
+
+---
+
+> [!NOTE]
+> Previous: [Part 4: Advanced Use](part-4-advanced-use.md)
 

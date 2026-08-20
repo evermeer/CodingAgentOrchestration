@@ -1,7 +1,8 @@
-# Part 2: A Default Setup
+# Part 3: A Default Setup
 
 > [!NOTE]
-> This part turns the concepts from [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md) into a practical setup. After finishing this default setup, use [Part 3: Advanced Use](part-3-advanced-use.md) for optional skills, custom workflows, and integrations, and then use [Part 4: Self optimisation](part-4-optimisation.md) to let OpenCode optimize itself and remove any remaining orchestration overlap.
+> Previous: [Part 2: How to Use an AI Coding Agent](part-2-how-to-use-an-ai-coding-agent.md)  
+> This part turns the concepts from [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md) into a practical setup. After finishing this default setup, use [Part 4: Advanced Use](part-4-advanced-use.md) for optional skills, custom workflows, and integrations, and then use [Part 5: Self optimisation](part-5-optimisation.md) to let OpenCode optimize itself and remove any remaining orchestration overlap.
 
 This section gets you up and running with a working [OpenCode](https://github.com/anomalyco/opencode) environment. Before running each prompt, evaluate whether you actually need it. If you do not use Jira, for example, you do not need to install the Atlassian MCP.
 
@@ -24,7 +25,7 @@ To make the install prompts below more reproducible across machines, keep the sa
 | **GitHub Copilot account** | For model access — but almost any LLM provider will do |
 
 > [!WARNING]
-> I have had some issues where the agent would get stuck in a loop and not recognize a "done" or "continue" signal. If that happens, restart OpenCode, use `/session` to reconnect to the aborted session, and type `continue`. This can happen when the loop flow is not deterministic. If it happens more often, then see [Part 4: Optimisation](part-4-optimisation.md) for instructions that would make it more deterministic.
+If it happens more often, then see [Part 5: Optimisation](part-5-optimisation.md) for instructions that would make it more deterministic.
 
 ## Step 1: Install the OpenCode CLI
 
@@ -454,4 +455,5 @@ Source: https://github.com/garrytan/gstack
 ---
 
 > [!NOTE]
-> Continue with [Part 3: Advanced Use](part-3-advanced-use.md) for optional skills, custom workflows, and integrations.
+> Previous: [Part 2: How to Use an AI Coding Agent](part-2-how-to-use-an-ai-coding-agent.md)  
+> Continue with [Part 4: Advanced Use](part-4-advanced-use.md) for optional skills, custom workflows, and integrations.
