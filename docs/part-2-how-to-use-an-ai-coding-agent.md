@@ -112,21 +112,32 @@ flowchart LR
 
 Below is a step-by-step walkthrough of the workflow diagram above. For each step you'll find **when** to reach for it, **how** to execute it, and a concrete **example**. The example is a single running scenario so you can see the whole flow end to end: *extracting the Billing functional area out of a monolithic solution into a separate Billing service.* You can run the complete flow or cherry-pick individual steps.
 
+In the sample prompts i reference markown files, but you can use any other format you prefer (Jira ticket, Slack thread, etc.).
+
+After each prompt you should review the output and ask clarifying questions or ask for changes.
+
+I used this workflow to creat the game Quadrim (available on iOS and Android soon).
+It's a strategy game (3d 4 in a row) with multiple opponents, ELO rating and saving points for unlocking opponents, apps store products.
+The total took me about 4 weeks (spare time, evenings and weekends) from idea to app stores.
+It's about 30K pure lines of code and 15K of markdown files plus 15k of data and asset files.
+
 #### 💡 Idea — Capture the requirement or opportunity
 
 **When:** At the very start, when you have a problem, opportunity, or rough requirement but no defined scope yet. This is the moment before you commit to a solution.
 
-**How:** Capture the idea in plain language — paste the Jira ticket, a Slack thread, or a one-line note into the agent. Don't ask for code yet; the goal is only to record the intent and the "why" so later steps have something to refine.
+**How:** Capture the idea in plain language. Don't ask for code yet; the goal is only to record the intent and the "why" so later steps have something to refine. Put that idea in a markdown file in jour repository at doc/idea-v0.md
 
 **Example:** You notice that billing logic is scattered across the monolith and slows down every release. You capture it as: *"Billing is tightly coupled to the monolith. We want to extract it into its own service so it can be deployed, scaled, and owned independently."*
 
 **Prompt:**
 ```text
-Here's a rough idea: billing logic is scattered across our monolith and slows
-down every release. We want to extract it into its own service. Restate the
+Here's a rough idea in the file doc/idea-v0.md. Restate the
 goal, list the assumptions and unknowns, and don't write any code yet. Ask me
 any clarifying questions you need until the goal and constraints are
-unambiguous before you summarize.
+unambiguous before you summarize. The goal is to have a clear and unambiguous 
+understanding of the idea and its requirements before starting to write code.
+Put all decisions in the file doc/idea-v0-decisions.md and put the result in 
+the file doc/idea-v1.md
 ```
 
 #### 🧠 Superpowers · Brainstorming — Explore the problem space
@@ -139,11 +150,11 @@ unambiguous before you summarize.
 
 **Prompt:**
 ```text
-Use the Superpowers brainstorming skill on extracting Billing from our monolith
-into a separate service. Propose several approaches (e.g. strangler-fig vs.
-big-bang), cover the shared customer table, sync vs. events, and the rollback
-story, with trade-offs for each. Ask clarifying questions about our setup and
+Use the Superpowers brainstorming skill on the created file doc/idea-v1.md. 
+Propose several approaches. Ask clarifying questions about the setup, functionality, design and
 constraints before proposing options if anything is unclear.
+Put the results in the file doc/idea-v1-brainstorming.md
+Add all decisions to the file doc/idea-v1-decisions.md
 ```
 
 #### 📝 Matt Skills · to-spec — Turn the idea into a spec
@@ -154,13 +165,18 @@ constraints before proposing options if anything is unclear.
 
 **Example:** The spec defines the new Billing service boundary: which endpoints it exposes, that it owns the `invoices` and `payments` tables, that the monolith talks to it through an anti-corruption layer, and the acceptance criteria (existing billing flows keep working, no data loss, feature-flagged cutover).
 
+Since the brainstorming proposed multiple approaches, for this idea we should follow the recommended strategy A from the brainstorming document.
+
 **Prompt:**
 ```text
-Use the Matt Skills to-spec skill to turn the chosen strangler-fig approach into
-a spec for the Billing service: goal, scope, non-goals, exposed endpoints, data
-ownership (invoices and payments tables), the anti-corruption layer, and
+Use the Matt Skills to-spec skill to turn the doc/idea-v1.md plus the 
+doc/idea-v1-brainstorming.md and doc/idea-v1-decisions.md
+into a spec for the idea: goal, scope, non-goals, exposed endpoints, data and
 acceptance criteria. Ask clarifying questions and don't finalize the spec until
-any ambiguities are resolved.
+any ambiguities are resolved. Put the result in the file doc/idea-v1-spec.md
+Add all decisions to the file doc/idea-v1-decisions.md
+
+Follow recomended strategy A from the brainstorming document.
 ```
 
 #### 🎫 Matt Skills · to-tickets — Decompose into deliverable tasks
@@ -173,11 +189,14 @@ any ambiguities are resolved.
 
 **Prompt:**
 ```text
-Use the Matt Skills to-tickets skill to break the Billing service spec into
+Use the Matt Skills to-tickets skill to break the doc/idea-v1-spec.md into
 small, independently shippable tickets with dependencies and acceptance
 criteria, ordered so each can be built, tested, and merged on its own. Ask
 clarifying questions about scope or dependencies before finalizing the
-breakdown.
+breakdown. Store all tickets as a markdown file in the ./doc/tickets folder, 
+with a name that starts with the ticket number and a dash, followed by a short 
+description of the ticket. For example, 001-setup-project.md. Put the result in 
+the ./doc/tickets folder. Add all decisions to the file doc/idea-v1-decisions.md
 ```
 
 #### 👥 Agency Agents · Specialists — Validate the approach
@@ -190,12 +209,17 @@ breakdown.
 
 **Prompt:**
 ```text
-Review the Billing service spec and tickets with the Agency Agents
+Review the doc/idea-v1-spec.md and the tickets in the ./doc/tickets folder with the Agency Agents
 backend-architect, security-engineer, and product-manager. Have each agent ask
 clarifying questions where context is missing before giving their concerns.
 Return each agent's concerns and recommendations so I can fold them back into
-the spec and tickets.
+the spec and tickets. write the concerns and recommendations in the file doc/idea-v1-spec-review.md
+Add all decisions to the file doc/idea-v1-decisions.md
 ```
+
+Don't forget to review the output and ask clarifying questions or ask for changes.
+
+If you have changed a lot, then ask for a new review.
 
 #### 💻 Matt Skills · implement — Build incrementally
 
@@ -207,11 +231,11 @@ the spec and tickets.
 
 **Prompt:**
 ```text
-Use the Matt Skills implement skill on the "add the anti-corruption layer in the
-monolith" ticket. Ask clarifying questions before writing code if the ticket's
-requirements or edge cases are ambiguous. Work test-first, put it behind the
-billing feature flag, and make sure the existing billing tests still pass before
-stopping.
+Now that the spec and tickets are finalized, start implementing the idea according to the tickets in the ./doc/tickets folder.
+The goal is to have a working first version of the idea that can be tested.
+Ask clarifying questions if anything is unclear and add the decisions to the file doc/idea-v1-decisions.md
+After each ticket run the skill code-review-expert 
+Commit and push the code to the main branch after each ticket is completed and reviewed.
 ```
 
 #### 🔍 Matt Skills · code-review — Review before verification
@@ -224,7 +248,7 @@ stopping.
 
 **Prompt:**
 ```text
-Use the Matt Skills code-review skill on the anti-corruption-layer branch. Check
+Use the Matt Skills code-review skill on the idea. Check
 correctness, security, performance, and conventions, and list concrete fixes
 (e.g. error handling and authorization on the new endpoints).
 ```
@@ -239,9 +263,9 @@ correctness, security, performance, and conventions, and list concrete fixes
 
 **Prompt:**
 ```text
-Use the Superpowers verification-before-completion skill on the Billing
-extraction. Run the full test suite, exercise the end-to-end billing flows with
-the feature flag on and off, confirm no data loss on migration, and verify every
+Use the Superpowers verification-before-completion skill on the idea. 
+Run the full test suite, exercise the end-to-end flows, 
+confirm no data loss on migration, and verify every
 acceptance criterion before calling it done.
 ```
 
@@ -255,7 +279,7 @@ acceptance criterion before calling it done.
 
 **Prompt:**
 ```text
-Help me ship the Billing service: draft the phased rollout plan (feature flag
+Help me ship the idea: draft the phased rollout plan (feature flag
 from a small percentage of traffic to full), list the error-rate and latency
 metrics to watch, and outline the cleanup to remove the old monolith billing
 code once it's stable. Ask clarifying questions about our environments and
@@ -276,8 +300,8 @@ The steps above form the core end-to-end flow. The steps below are optional add-
 
 **Prompt:**
 ```text
-Use Matt's grill-me skill on my plan to extract Billing into a separate
-service. Challenge my assumptions, probe the edge cases and failure modes
+Use Matt's grill-me skill on my idea. 
+Challenge my assumptions, probe the edge cases and failure modes
 (cutover, rollback, shared data consistency), and tell me what would have to be
 true for this to work. Don't let me off the hook easily.
 ```
@@ -292,10 +316,10 @@ true for this to work. Don't let me off the hook easily.
 
 **Prompt:**
 ```text
-Use the engineering-council skill on my plan to extract Billing from the
-monolith. Analyse it from multiple independent engineering perspectives
-(architecture, security, performance, skeptical, ...), then reconcile them into a
-single unified recommendation with the key trade-offs called out.
+Use the engineering-council skill on my idea. 
+Analyse it from multiple independent engineering perspectives
+(architecture, security, performance, skeptical, ...), then reconcile 
+them into a single unified recommendation with the key trade-offs called out.
 ```
 
 #### 🐛 Superpowers · Debugging — Find the real root cause
