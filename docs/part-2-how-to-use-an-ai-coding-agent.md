@@ -116,10 +116,11 @@ In the sample prompts i reference markown files, but you can use any other forma
 
 After each prompt you should review the output and ask clarifying questions or ask for changes.
 
-I used this workflow to creat the game Quadrim (available on iOS and Android soon).
-It's a strategy game (3d 4 in a row) with multiple opponents, ELO rating and saving points for unlocking opponents, apps store products.
-The total took me about 4 weeks (spare time, evenings and weekends) from idea to app stores.
-It's about 30K pure lines of code and 15K of markdown files plus 15k of data and asset files.
+> [!NOTE]
+> I used this workflow to creat the game [Quadrim](https://evict.nl/quadrim) (available [on iOS](https://apps.apple.com/nl/app/quadrim/id6804034367) and Android (soon)).
+> It's a strategy game (3d 4 in a row) with multiple opponents, ELO rating and saving points for unlocking opponents, apps store products.
+> The total took me about 4 weeks (spare time, evenings and weekends) from idea to app stores.
+> It's about 30K pure lines of code and 15K of markdown files plus 15k of data and asset files.
 
 #### 💡 Idea — Capture the requirement or opportunity
 
