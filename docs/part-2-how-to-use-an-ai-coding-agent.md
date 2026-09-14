@@ -3,6 +3,10 @@
 > [!NOTE]
 > This part builds on [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md). It shows how the skill packs complement each other and how to run them as a daily workflow. When you are ready to install everything, continue with [Part 3: A default setup](part-3-default-setup.md).
 
+There are many ways to use an AI coding agent. You can use it as a single tool for a specific task, or you can combine multiple skill packs into a daily workflow that covers the full software development lifecycle.
+Below i will describe a complete workflow that will go from idea to shipped code for a medium to large sized project.
+The minimum requirement for running (most parts of) that workflow is the installation of 4 skill packs.
+
 ## Skill pack combination power
 
 The folowing 4 skill packs only have limited overlap and work great together. 
@@ -120,7 +124,7 @@ After each prompt you should review the output and ask clarifying questions or a
 > I used this workflow to creat the game [Quadrim](https://evict.nl/quadrim) (available [on iOS](https://apps.apple.com/nl/app/quadrim/id6804034367) and Android (soon)).
 > It's a strategy game (3d 4 in a row) with multiple opponents, ELO rating and saving points for unlocking opponents, apps store products.
 > The total took me about 4 weeks (spare time, evenings and weekends) from idea to app stores.
-> It's about 30K pure lines of code and 15K of markdown files plus 15k of data and asset files.
+> It's about 40K pure lines of code and 15K lines of markdown files plus 15k lines of data and asset files.
 
 #### 💡 Idea — Capture the requirement or opportunity
 
