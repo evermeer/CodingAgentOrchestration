@@ -230,7 +230,7 @@ Alternatives if you don't want to buy a Mac right away: rent a Mac in the cloud 
 
 ## 4. Installing and configuring Claude Code
 
-*A rewritten version of [Installation, setup and configuration of Claude Code](https://github.com/evermeer/CodingAgentOrchestration/blob/main/docs/claude-code-install-mobile.md), with extra explanation.*
+*A beginner-friendly version of the [Claude Code installation guide](https://github.com/evermeer/CodingAgentOrchestration/blob/main/docs/claude-code-install.md), with extra explanation.*
 
 **Claude Code** is Anthropic's AI coding agent. It can read your project, write code, run commands (like `flutter doctor` or building your app) and follow the workflow from section 2. You need a paid Claude subscription (Pro or Max) to use it.
 
