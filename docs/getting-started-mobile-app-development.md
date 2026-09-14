@@ -1,4 +1,4 @@
-1# Getting Started: Building Mobile Apps with an AI Coding Agent
+# Getting Started: Building Mobile Apps with an AI Coding Agent
 
 > [!NOTE]
 > This document is written for people who are **not (yet) software developers** but want to build a mobile app with the help of an AI coding agent such as Claude Code. It summarises the ideas from [Part 1](https://github.com/evermeer/CodingAgentOrchestration/blob/main/docs/part-1-why-use-an-ai-coding-agent-cli.md) and [Part 2](https://github.com/evermeer/CodingAgentOrchestration/blob/main/docs/part-2-how-to-use-an-ai-coding-agent.md) of the guide [Coding Agent Orchestration](https://github.com/evermeer/CodingAgentOrchestration) in plain language, and then walks you through everything you need to get started: the tools on your computer, Claude Code itself, the Firebase backend services and the app store accounts.
@@ -16,7 +16,7 @@
 
 ## 1. What is an AI coding agent and why use one?
 
-*A non-technical summary of [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md)*
+*A non-technical summary of [Part 1: Why Use an AI Coding Agent CLI?](https://github.com/evermeer/CodingAgentOrchestration/blob/main/docs/part-1-why-use-an-ai-coding-agent-cli.md)*
 
 ### From chatbot to digital colleague
 
@@ -96,7 +96,7 @@ The quality of what the agent produces depends on several "layers" you can impro
 
 ## 2. How to work with an AI coding agent
 
-*A non-technical summary of [Part 2: How to Use an AI Coding Agent](part-2-how-to-use-an-ai-coding-agent.md)*
+*A non-technical summary of [Part 2: How to Use an AI Coding Agent](https://github.com/evermeer/CodingAgentOrchestration/blob/main/docs/part-2-how-to-use-an-ai-coding-agent.md)*
 
 ### Four skill packs that complement each other
 
@@ -230,7 +230,7 @@ Alternatives if you don't want to buy a Mac right away: rent a Mac in the cloud 
 
 ## 4. Installing and configuring Claude Code
 
-*A rewritten version of [Installation, setup and configuration of Claude Code](claude-code-install-mobile.md), with extra explanation.*
+*A rewritten version of [Installation, setup and configuration of Claude Code](https://github.com/evermeer/CodingAgentOrchestration/blob/main/docs/claude-code-install-mobile.md), with extra explanation.*
 
 **Claude Code** is Anthropic's AI coding agent. It can read your project, write code, run commands (like `flutter doctor` or building your app) and follow the workflow from section 2. You need a paid Claude subscription (Pro or Max) to use it.
 
@@ -369,4 +369,4 @@ Both stores take a commission on in-app purchases and paid apps: normally **30%*
 ---
 
 > [!NOTE]
-> Want to dive deeper? Continue with the full guide: [Part 1](part-1-why-use-an-ai-coding-agent-cli.md), [Part 2](part-2-how-to-use-an-ai-coding-agent.md) and the [Claude Code installation guide](claude-code-install.md).
+> Want to dive deeper? Continue with the full guide: [Part 1](https://github.com/evermeer/CodingAgentOrchestration/blob/main/docs/part-1-why-use-an-ai-coding-agent-cli.md), [Part 2](https://github.com/evermeer/CodingAgentOrchestration/blob/main/docs/part-2-how-to-use-an-ai-coding-agent.md) and the [Claude Code installation guide](https://github.com/evermeer/CodingAgentOrchestration/blob/main/docs/claude-code-install.md).
