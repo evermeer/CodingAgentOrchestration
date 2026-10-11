@@ -70,8 +70,8 @@ A CLI agent is not automatically the best choice. It is often the wrong tool whe
 - the task is a tiny edit in one file that you can do faster directly in the IDE
 - the cost of reviewing the agent's output is higher than writing the change yourself
 - the task involves sensitive production systems that you do not want an agent touching
-- the problem is still too ambiguous for autonomous execution
-- you do not yet have enough repo context, tests, or guardrails to make autonomous changes safe
+- the problem is still too ambiguous for autonomous execution (then let it plan and ask questions first)
+- you do not yet have enough repo context, tests, or guardrails to make autonomous changes safe (then let it investigate, plan and ask questions first)
 
 In those situations, inline assistance or a normal chat workflow is usually the better option.
 
@@ -123,7 +123,7 @@ Plugins and agent extensions shape how the agent behaves during its Goal → Pla
 
 The `oh-my-opencode` and `planning-with-files` add-ons mentioned below are good examples. They make the workflow more explicit and give you more control over planning and execution. Similar features are gradually being absorbed into the CLI itself, but these extensions still add real value today.
 
-For improving the context (adding relevant, removing irrelevant) we will install the plugins `graphify`, `mempalace` and `context-optimizer`
+For improving the context (adding relevant, removing irrelevant) we will install the plugins `graphify` and `mempalace`
 
 ### MCP
 
@@ -162,9 +162,7 @@ If your tool supports routing, you do not need one perfect model. You need a rea
 
 ### Context optimisation
 You could add to your context so that your agent will have the right awnser faster using plugins like [Graphify](https://github.com/safishamsi/graphify) and [Mempalace](https://github.com/MemPalace/mempalace),
-Stop adding irrelevant information to the context and keep your context clean with [context-mode](https://github.com/mksglu/context-mode), 
-Dedupe, Rerank and Compress the context before sending it to the LLM with [context-optimizer](https://github.com/evermeer/context-optimizer)
-and ask your agent to resond with a compact response with [Caveman](https://github.com/JuliusBrussee/caveman)
+Stop adding irrelevant information to the context and keep your context clean with [context-mode](https://github.com/mksglu/context-mode) and ask your agent to resond with a compact response with [Caveman](https://github.com/JuliusBrussee/caveman)
 
 ---
 

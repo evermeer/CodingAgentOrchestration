@@ -36,7 +36,6 @@ Plugins installed by me:
 - graphify from https://github.com/safishamsi/graphify - follow repo instructions for Claude Code
 - mempalace from https://github.com/MemPalace/mempalace - follow repo instructions for Claude Code
 - context-mode from https://github.com/mksglu/context-mode - follow repo instructions for Claude Code
-- context optimizer https://github.com/evermeer/context-optimizer - follow repo instructions for Claude Code
 - superpowers https://github.com/obra/superpowers - follow repo instructions for Claude Code
 - Skills for real engineers https://github.com/mattpocock/skills - follow repo instructions for Claude Code
 - Agency Agents https://agencyagents.app/ - install the app and from there all skills. Code on github https://github.com/msitarzewski/agency-agents-app

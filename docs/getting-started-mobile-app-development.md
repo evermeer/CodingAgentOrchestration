@@ -283,7 +283,6 @@ For the plugins that come from GitHub, open the link and follow the instructions
 | [**graphify**](https://github.com/safishamsi/graphify) | Builds a "map" of your project so Claude understands how everything is connected. |
 | [**mempalace**](https://github.com/MemPalace/mempalace) | Gives Claude a long-term memory across sessions. |
 | [**context-mode**](https://github.com/mksglu/context-mode) | Keeps Claude's working memory clean by not loading large outputs into the conversation. |
-| [**context-optimizer**](https://github.com/evermeer/context-optimizer) | Removes duplicate and irrelevant information before it is sent to the AI — faster and cheaper. |
 | [**Superpowers**](https://github.com/obra/superpowers) | The *how* skill pack from section 2: brainstorming, planning, debugging, verification. |
 | [**Skills for real engineers**](https://github.com/mattpocock/skills) | Matt's *what* skill pack from section 2: specifications, tickets, reviews. |
 | [**Agency Agents**](https://agencyagents.app/) | The *who* pack from section 2: virtual specialists. Install the app and add the skills from there ([source code](https://github.com/msitarzewski/agency-agents-app)). |
