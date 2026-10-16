@@ -45,7 +45,7 @@ The more relevant context you give to LLMs, the better the outcome will be. But 
 - **Content context** — Construct an agents.md or use a tool that creates a graph of your data to give it a content context.
 - **External context** — Give your agent access to external systems (via MCP) to extend the content context.
 - **Intent context** — Add an agent session memory tool to give it an intent context.
-- **Irelevant context** - This is what you don't want in your context. It can influence the outcome with less optimal results. 
+- **Irrelevant context** — This is what you don't want in your context. It can influence the outcome with less optimal results. 
 
 This is usually where the biggest practical gains come from. Better models help, but better context often helps more.
 
@@ -115,13 +115,13 @@ As a rule, the less obvious the task is, the more useful it is to ask for restat
 
 Language Server Protocol support improves how well the agent understands your codebase. LSPs provide structural information such as symbols, definitions, references, diagnostics, and type information, which is much more useful than plain text search. That means the agent can navigate code more accurately and make changes with better awareness of how pieces fit together.
 
-Many LSPs are bundled by default for common languages such as C# and TypeScript. The instructions below add one for MS SQL as well. In general, the more complete your LSP support is, the better your agent can inspect the code, follow dependencies, and avoid low-confidence edits.
+Many LSPs are bundled by default for common languages such as C# and TypeScript. [Part 4, section 4.2](part-4-advanced-use.md#42-install-language-servers-lsps) adds one for MS SQL as well. In general, the more complete your LSP support is, the better your agent can inspect the code, follow dependencies, and avoid low-confidence edits.
 
 ### Agent / Plugin
 
 Plugins and agent extensions shape how the agent behaves during its Goal → Plan → Act → Reflect loop. They use event hooks to run scripts or code at specific moments, and they can be enabled by default, triggered through a skill, or exposed as a selectable agent profile. This gives you a way to steer not only what the agent knows, but also how it works.
 
-The `oh-my-opencode` and `planning-with-files` add-ons mentioned below are good examples. They make the workflow more explicit and give you more control over planning and execution. Similar features are gradually being absorbed into the CLI itself, but these extensions still add real value today.
+The `oh-my-opencode` ([Part 3](part-3-default-setup.md)) and `planning-with-files` ([Part 4](part-4-advanced-use.md#41-install-software-engineering-skill-packs)) add-ons are good examples. They make the workflow more explicit and give you more control over planning and execution. Similar features are gradually being absorbed into the CLI itself, but these extensions still add real value today.
 
 For improving the context (adding relevant, removing irrelevant) we will install the plugins `graphify` and `mempalace`
 
@@ -137,7 +137,7 @@ Used badly, MCP just gives the agent more ways to make mistakes. That is why ver
 
 Repository-level settings give the agent durable context about how your project works. Running `/init` generates an `Agents.md` file that you can customize with architecture notes, conventions, workflows, and other repo-specific knowledge. This helps the agent make better decisions without needing you to repeat the same instructions in every session.
 
-It is also worth linking Visual Studio's GitHub Copilot to the same `Agents.md`, so the knowledge is reused both inside the IDE and in your CLI agent. If you commit that file, the whole team shares one source of truth. A richer alternative is a graph-based context tool such as Graphify (see Step 4.2).
+It is also worth linking Visual Studio's GitHub Copilot to the same `Agents.md`, so the knowledge is reused both inside the IDE and in your CLI agent. If you commit that file, the whole team shares one source of truth. A richer alternative is a graph-based context tool such as Graphify (see [Part 3, Step 5.2](part-3-default-setup.md#step-52-advanced-knowledge-tool-for-your-repository-or-documents)).
 
 ### Skills
 
@@ -149,20 +149,20 @@ Unlike a one-off prompt, a skill can encode a workflow pattern. Some skills can 
 
 Tools extend what the agent can actually do. A tool might automate documentation conversion, generate a PowerPoint deck, run a specialized command-line workflow, or perform another concrete task that is awkward to express through prompting alone. In other words, tools give the agent execution capabilities instead of just reasoning capabilities.
 
-These tools often work best when paired with a companion skill or MCP server, so the agent not only has access to the capability but also understands when and how to use it. Examples in the instructions below include MarkItDown, PPT-Master, and CLI-Anything.
+These tools often work best when paired with a companion skill or MCP server, so the agent not only has access to the capability but also understands when and how to use it. Examples in this guide include MarkItDown, PPT-Master, and CLI-Anything.
 
 ### LLM
 
 The underlying model still matters. Different LLMs vary in reasoning depth, coding speed, tool use, context handling, and reliability, so it is worth choosing the right model for the task instead of treating them as interchangeable. As of writing, Anthropic's *Claude Opus / Sonnet* family tends to lead on reasoning and OpenAI's *GPT-5* family tends to lead on coding throughput, but this changes quickly.
 
 Because the landscape moves so fast, model choice should be revisited regularly. Follow benchmarks such as [livebench](https://livebench.ai/#/?highunseenbias=true), and [Artificial Analysis](https://artificialanalysis.ai/leaderboards/models) to see when something better lands.
-Other benchmarks that does not seems to be up to date but still worth checking are [LLM Stats](https://llm-stats.com/), [SWE-bench](https://www.swebench.com/), [benchlm.ai](https://benchlm.ai/), [lm-arena](https://huggingface.co/spaces/lmarena-ai/arena-leaderboard), 
+Other benchmarks that do not seem to be up to date but are still worth checking are [LLM Stats](https://llm-stats.com/), [SWE-bench](https://www.swebench.com/), [benchlm.ai](https://benchlm.ai/), and [lm-arena](https://huggingface.co/spaces/lmarena-ai/arena-leaderboard).
 
 If your tool supports routing, you do not need one perfect model. You need a reasonable model for planning, a fast model for execution, and a reliable model for verification.
 
 ### Context optimisation
-You could add to your context so that your agent will have the right awnser faster using plugins like [Graphify](https://github.com/safishamsi/graphify) and [Mempalace](https://github.com/MemPalace/mempalace),
-Stop adding irrelevant information to the context and keep your context clean with [context-mode](https://github.com/mksglu/context-mode) and ask your agent to resond with a compact response with [Caveman](https://github.com/JuliusBrussee/caveman)
+You could add to your context so that your agent will have the right answer faster using plugins like [Graphify](https://github.com/safishamsi/graphify) and [MemPalace](https://github.com/MemPalace/mempalace).
+Stop adding irrelevant information to the context and keep your context clean with [context-mode](https://github.com/mksglu/context-mode), and ask your agent to respond with a compact response with [Caveman](https://github.com/JuliusBrussee/caveman).
 
 ---
 

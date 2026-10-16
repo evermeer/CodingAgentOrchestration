@@ -4,14 +4,14 @@
 > This part builds on [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md). It shows how the skill packs complement each other and how to run them as a daily workflow. When you are ready to install everything, continue with [Part 3: A default setup](part-3-default-setup.md).
 
 There are many ways to use an AI coding agent. You can use it as a single tool for a specific task, or you can combine multiple skill packs into a daily workflow that covers the full software development lifecycle.
-Below i will describe a complete workflow that will go from idea to shipped code for a medium to large sized project.
+Below I will describe a complete workflow that will go from idea to shipped code for a medium to large sized project.
 The minimum requirement for running (most parts of) that workflow is the installation of 4 skill packs.
 
 ## Skill pack combination power
 
-The folowing 4 skill packs only have limited overlap and work great together. 
+The following 4 skill packs only have limited overlap and work great together. 
 Besides the mentioned steps in the workflow below, the skill packs also have a lot of other skills that you can use in your daily workflow. 
-Here is a mindmap of what you can finde in them:
+Here is a mindmap of what you can find in them:
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': {
@@ -74,7 +74,7 @@ mindmap
 
 ## Your workflow
 
-Above mentioned skill packs each aim at a different area (What / How / Who / Where) that only have limited overlap and work great togather in a daily workflow. 
+Above mentioned skill packs each aim at a different area (What / How / Who / Where) that only have limited overlap and work great together in a daily workflow. 
 The skill packs are: [Superpowers](https://github.com/obra/superpowers), [Skills for real engineers](https://github.com/mattpocock/skills), [Agency Agents](https://github.com/msitarzewski/agency-agents-app) and [Knowledge Work](https://github.com/anthropics/knowledge-work-plugins)
 
 Here is a diagram of how these skill packs work together in a daily workflow. You can use the complete flow or cherry pick individual steps.
@@ -107,7 +107,7 @@ flowchart LR
     SPACER["&nbsp;<br/>&nbsp;"]
     style SPACER fill:transparent,stroke:transparent,color:transparent
 
-    O1["🔥 Superpowers<br/>/grill-me"]
+    O1["🔥 Matt Skills<br/>/grill-me"]
     O1 ~~~ O2["🏛️ engineering-council"]
     O2 ~~~ O3["🐛 Superpowers<br/>Debugging"]
     O3 ~~~ O4["📚 Documentation<br/>update"]
@@ -116,21 +116,21 @@ flowchart LR
 
 Below is a step-by-step walkthrough of the workflow diagram above. For each step you'll find **when** to reach for it, **how** to execute it, and a concrete **example**. The example is a single running scenario so you can see the whole flow end to end: *extracting the Billing functional area out of a monolithic solution into a separate Billing service.* You can run the complete flow or cherry-pick individual steps.
 
-In the sample prompts i reference markown files, but you can use any other format you prefer (Jira ticket, Slack thread, etc.).
+In the sample prompts I reference markdown files, but you can use any other format you prefer (Jira ticket, Slack thread, etc.).
 
 After each prompt you should review the output and ask clarifying questions or ask for changes.
 
 > [!NOTE]
-> I used this workflow to creat the game [Quadrim](https://evict.nl/quadrim) (available [on iOS](https://apps.apple.com/nl/app/quadrim/id6804034367) and Android (soon)).
-> It's a strategy game (3d 4 in a row) with multiple opponents, ELO rating and saving points for unlocking opponents, apps store products.
+> I used this workflow to create the game [Quadrim](https://evict.nl/quadrim) (available [on iOS](https://apps.apple.com/nl/app/quadrim/id6804034367) and Android (soon)).
+> It's a strategy game (3D four-in-a-row) with multiple opponents, Elo rating, points for unlocking opponents, and app store products.
 > The total took me about 4 weeks (spare time, evenings and weekends) from idea to app stores.
-> It's about 40K pure lines of code and 15K lines of markdown files plus 15k lines of data and asset files.
+> It's about 40K pure lines of code and 15K lines of markdown files plus 15K lines of data and asset files.
 
 #### 💡 Idea — Capture the requirement or opportunity
 
 **When:** At the very start, when you have a problem, opportunity, or rough requirement but no defined scope yet. This is the moment before you commit to a solution.
 
-**How:** Capture the idea in plain language. Don't ask for code yet; the goal is only to record the intent and the "why" so later steps have something to refine. Put that idea in a markdown file in jour repository at doc/idea-v0.md
+**How:** Capture the idea in plain language. Don't ask for code yet; the goal is only to record the intent and the "why" so later steps have something to refine. Put that idea in a markdown file in your repository at doc/idea-v0.md.
 
 **Example:** You notice that billing logic is scattered across the monolith and slows down every release. You capture it as: *"Billing is tightly coupled to the monolith. We want to extract it into its own service so it can be deployed, scaled, and owned independently."*
 
@@ -181,7 +181,7 @@ acceptance criteria. Ask clarifying questions and don't finalize the spec until
 any ambiguities are resolved. Put the result in the file doc/idea-v1-spec.md
 Add all decisions to the file doc/idea-v1-decisions.md
 
-Follow recomended strategy A from the brainstorming document.
+Follow recommended strategy A from the brainstorming document.
 ```
 
 #### 🎫 Matt Skills · to-tickets — Decompose into deliverable tasks
@@ -218,7 +218,7 @@ Review the doc/idea-v1-spec.md and the tickets in the ./doc/tickets folder with 
 backend-architect, security-engineer, and product-manager. Have each agent ask
 clarifying questions where context is missing before giving their concerns.
 Return each agent's concerns and recommendations so I can fold them back into
-the spec and tickets. write the concerns and recommendations in the file doc/idea-v1-spec-review.md
+the spec and tickets. Write the concerns and recommendations in the file doc/idea-v1-spec-review.md
 Add all decisions to the file doc/idea-v1-decisions.md
 ```
 
@@ -311,7 +311,7 @@ Challenge my assumptions, probe the edge cases and failure modes
 true for this to work. Don't let me off the hook easily.
 ```
 
-#### 🏛️ custom . engineering-council — Multi-perspective engineering review
+#### 🏛️ Custom · engineering-council — Multi-perspective engineering review
 
 **When:** For non-trivial decisions — a bug, feature, PR, architecture choice, or implementation plan — where a single viewpoint isn't enough and you want several independent engineering perspectives before you decide.
 

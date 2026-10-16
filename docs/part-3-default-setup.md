@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > Previous: [Part 2: How to Use an AI Coding Agent](part-2-how-to-use-an-ai-coding-agent.md)  
-> This part turns the concepts from [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md) into a practical setup. After finishing this default setup, use [Part 4: Advanced Use](part-4-advanced-use.md) for optional skills, custom workflows, and integrations, and then use [Part 5: Self optimisation](part-5-optimisation.md) to let OpenCode optimize itself and remove any remaining orchestration overlap.
+> This part turns the concepts from [Part 1: Why Use an AI Coding Agent CLI?](part-1-why-use-an-ai-coding-agent-cli.md) into a practical setup. After finishing this default setup, use [Part 4: Advanced Use](part-4-advanced-use.md) for optional skills, custom workflows, and integrations, and then use [Part 5: Optimisation](part-5-optimisation.md) to let OpenCode optimize itself and remove any remaining orchestration overlap.
 
 This section gets you up and running with a working [OpenCode](https://github.com/anomalyco/opencode) environment. Before running each prompt, evaluate whether you actually need it. If you do not use Jira, for example, you do not need to install the Atlassian MCP.
 
@@ -25,7 +25,7 @@ To make the install prompts below more reproducible across machines, keep the sa
 | **GitHub Copilot account** | For model access — but almost any LLM provider will do |
 
 > [!WARNING]
-If it happens more often, then see [Part 5: Optimisation](part-5-optimisation.md) for instructions that would make it more deterministic.
+> Your agent may sometimes get stuck in a loop. If it happens more often, then see [Part 5: Optimisation](part-5-optimisation.md) for instructions that would make it more deterministic.
 
 ## Step 1: Install the OpenCode CLI
 
@@ -81,7 +81,7 @@ Instructions:
 
 ## Step 4: Extra Agent Power
 
-### 4.1 Install and Configure [Oh-My-OpenAgent](https://github.com/code-yeongyu/oh-my-openagent)
+### Step 4.1 Install and Configure [Oh-My-OpenAgent](https://github.com/code-yeongyu/oh-my-openagent)
 
 [Oh-My-OpenAgent](https://github.com/code-yeongyu/oh-my-openagent) is the most impactful plugin for OpenCode. It gives you: intent parsing, classification / reranking, priority rules, fallback & recovery logic (an improved agent loop) and model routing.
 
@@ -348,7 +348,7 @@ A complete AI agency at your fingertips - From frontend wizards to Reddit commun
 
 
 > [!TIP]
-> Instead of using the prompt below, try out the (still beta) [skill manager app](https://agencyagents.app/) that works witn most CLI's
+> Instead of using the prompt below, try out the (still beta) [skill manager app](https://agencyagents.app/) that works with most CLIs
 
 **Prompt for OpenCode:**
 
@@ -393,7 +393,7 @@ Source: https://github.com/phuryn/pm-skills
 ```
 
 ### [The Minimalist Entrepreneur](https://github.com/slavingia/skills) Skills pack
-A collection of skills based on the book "The Minimalist Entrepreneur" by Sahil Laving
+A collection of skills based on the book "The Minimalist Entrepreneur" by Sahil Lavingia.
 
 **Prompt for OpenCode:**
 
@@ -405,13 +405,13 @@ Source: https://github.com/slavingia/skills
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
-### [Gary Tang gstack](https://github.com/garrytan/gstack) Skills pack
-A collection of skills based on Gary Tang's gstack framework. A virtual engineering team — a CEO who rethinks the product, an eng manager who locks architecture, a designer who catches AI slop, a reviewer who finds production bugs, a QA lead who opens a real browser, a security officer who runs OWASP + STRIDE audits, and a release engineer who ships the PR.
+### [Garry Tan gstack](https://github.com/garrytan/gstack) Skills pack
+A collection of skills based on Garry Tan's gstack framework. A virtual engineering team — a CEO who rethinks the product, an eng manager who locks architecture, a designer who catches AI slop, a reviewer who finds production bugs, a QA lead who opens a real browser, a security officer who runs OWASP + STRIDE audits, and a release engineer who ships the PR.
 
 **Prompt for OpenCode:**
 
 ```
-Goal: Install the "Gary Tang gstack" skill pack globally for OpenCode, Visual Studio Copilot, and VS Code Copilot.
+Goal: Install the "Garry Tan gstack" skill pack globally for OpenCode, Visual Studio Copilot, and VS Code Copilot.
 Source: https://github.com/garrytan/gstack
 - Install GLOBALLY for the current user, NOT inside this repository.
 - Follow the instructions for each coding agent.
@@ -431,7 +431,7 @@ Source: https://github.com/garrytan/gstack
 - **Read the diff** — Always review what the agent changed before committing. Treat it like a junior developer's PR.
 - **Write down recurring corrections** — When you keep correcting the same thing, move it into `Agents.md` (or a skill) so the agent learns it permanently.
 
-### More Tips (After Installing the Advanced Use Add-ons)
+### More Tips (After Installing the [Advanced Use](part-4-advanced-use.md#44-create-custom-software-engineering-skills) Add-ons)
 - **Automatic code reviews** — Use `/code-review-expert` to review your current branch against `develop`. No manual input needed; it will ask which improvements to apply.
 - **Planning** — Create one or more markdown files with functional specs and ask OpenCode to build a plan from them using `planning-with-files`, then ask it to execute the plan step-by-step.
 - **Worktrees for parallel agents** — Use `git worktree` (see the `branch-review` skill) so multiple agents can work on different branches simultaneously without stepping on each other.

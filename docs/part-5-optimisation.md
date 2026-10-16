@@ -128,7 +128,7 @@ You must ALWAYS return:
 
 ## A quick health check and tune-up
 
-Over time your OpenCode configuration accumulates layers — skill packs, custom agents, routing rules, pipeline definitions. Some of these overlap or conflict. This part provides a prompt that you paste into OpenCode to let it audit and simplify its own orchestration.
+Over time your OpenCode configuration accumulates layers — skill packs, custom agents, routing rules, pipeline definitions. Some of these overlap or conflict. This section provides a prompt that you paste into OpenCode to let it audit and simplify its own orchestration.
 
 **Prompt for OpenCode:**
 
@@ -206,7 +206,7 @@ And if you are spending too much on loops, you can adjust the routing to use che
 
 ## Tools To Watch
 
-Parts 2 and 3 cover a practical [OpenCode](https://github.com/anomalyco/opencode) setup with a curated set of add-ons, but the landscape is evolving quickly. These are tools that are still on my radar and may be worth evaluating later:
+Parts 3 and 4 cover a practical [OpenCode](https://github.com/anomalyco/opencode) setup with a curated set of add-ons, but the landscape is evolving quickly. These are tools that are still on my radar and may be worth evaluating later:
 
 **Agent / orchestration**
 - [serena](https://github.com/oraios/serena) — semantic code retrieval, editing and refactoring tools (LSP-aware), often dramatically reduces token usage on large repos.
@@ -220,7 +220,7 @@ Parts 2 and 3 cover a practical [OpenCode](https://github.com/anomalyco/opencode
 - [CodeGraph](https://github.com/colbymchenry/codegraph) — graph-based code context tool; more structured than Agents.md and more flexible than LSP for giving the agent a rich understanding of your codebase.
 - [Headroom](https://github.com/chopratejas/headroom) - Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 60-95% fewer tokens, same answers. Library, proxy, MCP server.
 - [COO](https://github.com/egorfedorov/claude-context-optimizer) - Stop adding irrelevant information to the context and keep your context clean. 
-- [Caveman](https://github.com/JuliusBrussee/caveman) -  Ask your agent to respond with a compact response.
+- [Caveman](https://github.com/JuliusBrussee/caveman) - Ask your agent to respond with a compact response.
 - [context-mode](https://github.com/mksglu/context-mode) - Stop adding irrelevant information to the context and keep your context clean. 
 
 **External system MCPs**
@@ -231,12 +231,12 @@ Parts 2 and 3 cover a practical [OpenCode](https://github.com/anomalyco/opencode
 - [slack-mcp](https://github.com/korotovsky/slack-mcp-server) — read and send messages to Slack channels from your agent.
 - [filesystem / desktop-commander MCPs](https://github.com/wonderwhy-er/DesktopCommanderMCP) — give the agent controlled shell + filesystem access outside the repo (e.g. for ops scripts).
 - [sequential-thinking MCP](https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking) — gives the model an explicit scratchpad for multi-step reasoning; helps on hard refactors.
-- [Chrome DevTools MCP](https://github.com/ChromeDevTools/chrome-devtools-mcp) — gives the agent access to the Chrome DevTools Protocol for debugging, profiling, and inspecting web apps
+- [Chrome DevTools MCP](https://github.com/ChromeDevTools/chrome-devtools-mcp) — gives the agent access to the Chrome DevTools Protocol for debugging, profiling, and inspecting web apps.
 
 **Tools**
 - [PPT-Master](https://github.com/hugohe3/ppt-master) — lets your agent generate a natively editable PPTX from any document: real PowerPoint shapes with native animations, not images.
 - [CLI-Anything](https://github.com/HKUDS/CLI-Anything) — bridging the gap between AI agents and the world's software.
-- [CodeBurn](https://github.com/getagentseal/codeburn) - Will give you usage statistics for (almost all?) CLI's that you use.
+- [CodeBurn](https://github.com/getagentseal/codeburn) - Will give you usage statistics for (almost all?) CLIs that you use.
 
 **Cost, routing, observability**
 - [ccusage](https://github.com/ryoppippi/ccusage) — token / cost dashboards for Claude-style CLIs; the same pattern is useful for monitoring OpenCode spend.

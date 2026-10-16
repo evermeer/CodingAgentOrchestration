@@ -6,20 +6,22 @@
 
 This part covers three categories of extensions you can add to OpenCode:
 
-- **Skills** (3.1–3.2): Installable capabilities for planning, code review, design, and role-specific workflows (PO, architect, designer, and more). When you prompt OpenCode, it automatically selects the right skill for the job.
-- **Language Server Protocols** (3.3): Give OpenCode real-time access to compiler diagnostics, type information, and code navigation.
-- **MCP integrations** (3.4–3.5): Connect OpenCode to external services like Jira, Azure DevOps, and Azure cloud resources.
+- **Skills** (4.1 and 4.4): Installable capabilities for planning, code review, design, and role-specific workflows (PO, architect, designer, and more). When you prompt OpenCode, it automatically selects the right skill for the job.
+- **Language Server Protocols** (4.2): Give OpenCode real-time access to compiler diagnostics, type information, and code navigation.
+- **MCP integrations** (4.3): Connect OpenCode to external services like Jira, Azure DevOps, and Azure cloud resources.
+
+Section 4.5 lists how to keep all of these up to date.
 
 Each block below is an independent prompt you can paste into OpenCode. Pick the ones that match your workflow — you do not need all of them.
 
 For better reproducibility, expect every installation prompt in this part to produce four things: the exact version installed, the install location, the config files changed, and one concrete verification result. If a prompt does not naturally force those outputs, add them when you run it.
 
-## 3.1 Install Software Engineering (and DevOps) Extensions
+## 4.1 Install Software Engineering Skill Packs
 
 First evaluate each of these extensions and decide which ones are useful for your workflow. Then run the corresponding prompts to install them.
 
 ### [Planning with Files](https://github.com/OthmanAdi/planning-with-files) plugin
-The Oh-my-OpenAgent (installed in [Part 3](part-3-default-setup.md)) also has a planning skill
+The Oh-my-OpenAgent (installed in [Part 3](part-3-default-setup.md)) also has a planning skill.
 
 **Expected outcome:** After installation, when you ask OpenCode to plan a multi-step task it will create and maintain `task_plan.md`, `findings.md`, and `progress.md` in your repo root.
 
@@ -44,40 +46,6 @@ Goal: Install the official Microsoft .NET skill pack globally.
 Documentation and installation instructions can be found at https://github.com/dotnet/skills 
 Install GLOBALLY (user-scope), available in OpenCode, Visual Studio Copilot, and VS Code Copilot.
 Print the installed version, install location, and config files changed.
-```
-
-### [Atlassian (Jira) MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/)
-
-Install the [Atlassian (Jira) MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/) to give your agent the ability to read and write Jira tickets.
-This is useful for generating tickets from code reviews, linking code changes to existing tickets, and asking the agent to refine, implement, or update tickets based on code changes.
-
-> Be aware that the prompt below may still need improvement. Authentication required manual tweaking during the first attempt, so validate the result.
-
-**Prompt for OpenCode:**
-
-```
-Goal: Install the Atlassian Jira MCP server globally for OpenCode, Visual Studio Copilot, and VS Code Copilot, authenticated via a personal API token (not interactive OAuth), and bind a board to this repository.
-
-Instructions:
-1. Follow the latest instructions at:
-   https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/
-2. Register the MCP in the GLOBAL config of:
-   - OpenCode
-   - Visual Studio GitHub Copilot
-   - VS Code GitHub Copilot
-   so it is available in every session and every repository. Do not write secrets into a per-repo file that could be committed.
-3. Open this URL in my default browser so I can create a token:
-   https://id.atlassian.com/manage-profile/security/api-tokens
-4. Then ask me for:
-   - my Atlassian account email
-   - my Atlassian base URL (e.g. https://<workspace>.atlassian.net)
-   - the API token I just created
-   and use that for the configuration of the MCP.
-5. Print the final MCP registration details, the config files changed, and the install or endpoint information used.
-6. After auth works, query Jira for the boards I have access to, present a numbered list, let me pick one, and persist that board id PER REPOSITORY (e.g. in a local, git-ignored config file) so opening this folder auto-selects it. Do not store the token in this per-repo file.
-7. On any failure, print the exact API response and the proposed fix before retrying.
-8. Verify by listing the most recent 5 issues from the selected board.
-9. If the above did not work without manual steps, then show me what prompt I should have used to get it right so that it could be reproduced on another machine.
 ```
 
 ### [Open Design](https://github.com/nexu-io/open-design) skills pack
@@ -128,6 +96,8 @@ CONSTRAINTS:
 - On any failure, print the exact error and proposed fix before retrying.
 ```
 
+## 4.2 Install Language Servers (LSPs)
+
 ### SQL Server T-SQL LSP
 Install and configure the official Microsoft SQL Server T-SQL language service globally for OpenCode.
 
@@ -177,19 +147,19 @@ Instructions:
 ```
 
 
-## Python LSP
+### Python LSP
 
-Install and configure the Static Type Checker [basepyright](https://github.com/DetachHead/basedpyright) for Python.
+Install and configure the static type checker [basedpyright](https://github.com/DetachHead/basedpyright) for Python.
 
 **Prompt for OpenCode:**
 ```
 Goal: Install and configure basedpyright for OpenCode, so any `.py` file in any repository gets hover, completion, and diagnostics.
 
-I would like to global install LSP tool basedpyright so that i can use it here
-Also wire lsp_diagnostics to use it for Python files
+I would like to globally install the LSP tool basedpyright so that I can use it here.
+Also wire lsp_diagnostics to use it for Python files.
 ```
 
-## Web Tooling LSP
+### Web Tooling LSP
 
 Install and configure [Biome](https://github.com/biomejs/biome), the performant toolchain for web projects. Biome includes an LSP server that provides diagnostics, hover info, and code actions for JavaScript, TypeScript, JSON, CSS, and more.
 
@@ -197,8 +167,46 @@ Install and configure [Biome](https://github.com/biomejs/biome), the performant 
 ```
 Goal: Install and configure Biome for OpenCode, so any web project file in any repository gets hover, completion, and diagnostics.
 
-I would like to global install LSP tool biome so that i can use it here
-Also wire lsp_diagnostics to use it for web project files
+I would like to globally install the LSP tool Biome so that I can use it here.
+Also wire lsp_diagnostics to use it for web project files.
+```
+
+**Verify**: Open a `.sql` file in OpenCode — you should get hover info and diagnostics.
+
+## 4.3 Install MCP Integrations
+
+### [Atlassian (Jira) MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/)
+
+Install the [Atlassian (Jira) MCP server](https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/) to give your agent the ability to read and write Jira tickets.
+This is useful for generating tickets from code reviews, linking code changes to existing tickets, and asking the agent to refine, implement, or update tickets based on code changes.
+
+> Be aware that the prompt below may still need improvement. Authentication required manual tweaking during the first attempt, so validate the result.
+
+**Prompt for OpenCode:**
+
+```
+Goal: Install the Atlassian Jira MCP server globally for OpenCode, Visual Studio Copilot, and VS Code Copilot, authenticated via a personal API token (not interactive OAuth), and bind a board to this repository.
+
+Instructions:
+1. Follow the latest instructions at:
+   https://support.atlassian.com/atlassian-rovo-mcp-server/docs/getting-started-with-the-atlassian-remote-mcp-server/
+2. Register the MCP in the GLOBAL config of:
+   - OpenCode
+   - Visual Studio GitHub Copilot
+   - VS Code GitHub Copilot
+   so it is available in every session and every repository. Do not write secrets into a per-repo file that could be committed.
+3. Open this URL in my default browser so I can create a token:
+   https://id.atlassian.com/manage-profile/security/api-tokens
+4. Then ask me for:
+   - my Atlassian account email
+   - my Atlassian base URL (e.g. https://<workspace>.atlassian.net)
+   - the API token I just created
+   and use that for the configuration of the MCP.
+5. Print the final MCP registration details, the config files changed, and the install or endpoint information used.
+6. After auth works, query Jira for the boards I have access to, present a numbered list, let me pick one, and persist that board id PER REPOSITORY (e.g. in a local, git-ignored config file) so opening this folder auto-selects it. Do not store the token in this per-repo file.
+7. On any failure, print the exact API response and the proposed fix before retrying.
+8. Verify by listing the most recent 5 issues from the selected board.
+9. If the above did not work without manual steps, then show me what prompt I should have used to get it right so that it could be reproduced on another machine.
 ```
 
 ### [Azure DevOps MCP server](https://github.com/microsoft/azure-devops-mcp)
@@ -251,11 +259,10 @@ Instructions:
 ```
 
 **Verify**:
-- **SQL LSP**: Open a `.sql` file in OpenCode — you should get hover info and diagnostics.
-- **Azure DevOps MCP**: Create a build error in a PR and ask OpenCode: Fix the azure devops build error in my current pull request for this branch.
-- **Azure MCP**: Ask OpenCode: List all Azure App services.
+- **Azure DevOps MCP**: Create a build error in a PR and ask OpenCode: Fix the Azure DevOps build error in my current pull request for this branch.
+- **Azure MCP**: Ask OpenCode: List all Azure App Services.
 
-## 3.2 Create (Custom) Software Engineering Skills
+## 4.4 Create (Custom) Software Engineering Skills
 
 These skills add code review, planning, branching workflows, and development guidelines tailored for software engineers.
 
@@ -338,7 +345,7 @@ Implementation:
 
 ### Interactive Code Review Follow-up
 
-An extension to the `code-review-expert` skill that adds an interactive follow-up step,
+An extension to the `code-review-expert` skill that adds an interactive follow-up step.
 
 **Prompt for OpenCode:**
 
@@ -356,7 +363,7 @@ Instructions:
 4. Print the diff of the skill file on completion.
 ```
 
-### Functional validation added to the code review workflow.
+### Functional Validation in the Code Review Workflow
 
 An extension to the `code-review-expert` skill that adds a functional validation step where it checks the Jira user story for functional requirements.
 
@@ -427,7 +434,7 @@ Implementation:
 ```
 
 ### Jira Refine
-A skill that helps you refine Jira user stories by fetching them, restating them in the agent and adding it back into the Jira user story.
+A skill that helps you refine Jira user stories by fetching them, letting the agent restate and enrich them, and adding the result back into the Jira user story.
 
 **Prompt for OpenCode:**
 ```
@@ -497,7 +504,7 @@ Implementation:
 
 
 
-## Keeping Things Up to Date
+## 4.5 Keeping Things Up to Date
 
 Treat this table as the minimum maintenance checklist for the advanced setup in this part. If a skill pack, LSP, or MCP integration starts behaving strangely after a tool update, stale installs are one of the first things worth ruling out.
 
