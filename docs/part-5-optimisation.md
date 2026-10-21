@@ -4,6 +4,15 @@
 > Previous: [Part 4: Advanced Use](part-4-advanced-use.md)  
 > Complete [Part 3 (Default setup)](part-3-default-setup.md) first. If you added skills, LSP, or MCP servers from [Part 4 (Advanced use)](part-4-advanced-use.md), those will be preserved during optimisation.
 
+## Improving your Agents.md
+
+The best way to tune your Agents.md file is by asking to analyse your sessions history. You could do this every month.
+```
+Could you analyze the sessions for these repositories from the past month and provide suggestions for 
+improvements to the Agents.md files, so that future sessions can be executed more easily, 
+more quickly, and with better results?
+```
+
 ## Improved loop control
 
 It could happen that your agent does not respond well to continue or stop messages, causing your agent to stay in a loop.
