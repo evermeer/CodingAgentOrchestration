@@ -7,6 +7,16 @@ There are many ways to use an AI coding agent. You can use it as a single tool f
 Below I will describe a complete workflow that will go from idea to shipped code for a medium to large sized project.
 The minimum requirement for running (most parts of) that workflow is the installation of 4 skill packs.
 
+## Why this one’s worth a look
+
+Plan before you build. The flow runs idea to spec (to-spec) to tickets (to-ticket) to implementation, so the agent executes small, independent, well-defined tasks instead of one sprawling prompt. The upfront fine-tuning is where the quality comes from.
+
+Review through four lenses. Before any code, specs and tickets get reviewed as a senior engineer, architect, security officer, and product manager would, catching problems from angles a single pass misses.
+
+Force the questions out early. Every pre-build prompt carries one instruction: ask clarifying questions until all ambiguities are resolved. Cheaper to resolve in the plan than mid-implementation.
+
+TDD plus a closing review. Code is built test-first, then self-reviewed, with major and critical findings resolved before the ticket is done. The whole thing (prompts included) is open source to copy.’
+
 ## Skill pack combination power
 
 The following 4 skill packs only have limited overlap and work great together. 
