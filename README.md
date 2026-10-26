@@ -16,6 +16,7 @@ If you want the shortest path through the material: read Part 1 for the mental m
 
 > [!NOTE]
 > This is an opinionated selection of tools and instructions based on personal experience. The AI tooling ecosystem changes quickly, so treat this as a starting point and adapt it to your own workflow.
+> This setup and workflow was used to build the opensource iOS and Android game [Quadrim](https://github.com/evermeer/Quadrim) in 8 days.
 
 [MIT License](LICENSE)
 
