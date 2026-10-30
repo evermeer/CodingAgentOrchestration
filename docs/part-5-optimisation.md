@@ -13,7 +13,7 @@ improvements to the Agents.md files, so that future sessions can be executed mor
 more quickly, and with better results?
 ```
 
-## Let you agent get personal
+## Let your agent get personal
 
 ####  Break Your Context Out of the Black Box
 
