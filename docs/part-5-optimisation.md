@@ -13,6 +13,21 @@ improvements to the Agents.md files, so that future sessions can be executed mor
 more quickly, and with better results?
 ```
 
+## Let you agent get personal
+
+####  Break Your Context Out of the Black Box
+
+Owning your own second brain doesn't require a new app or any technical skills. It comes down to two steps: Collect and Carry.
+```
+Based on everything we've ever talked about, write an "About Me" document about me. Use these headers: What I'm working on right now, 
+The projects that matter to me, including their locations and frequently used tools, How I like you to talk to me, Things to avoid. 
+Only include things you actually know from our conversations. If you're unsure about something, ask me about it instead of guessing.
+Export that About Me document to a Markdown file C:\D\AboutMe.md.
+Make sure this documentis updated every Friday morning at 11am, using the pre-existing format.
+I would like to include this document in the context for all future sessions, so that you can better understand me and my preferences.
+```
+
+
 ## Improved loop control
 
 It could happen that your agent does not respond well to continue or stop messages, causing your agent to stay in a loop.
