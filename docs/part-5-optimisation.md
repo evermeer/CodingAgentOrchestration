@@ -6,12 +6,22 @@
 
 ## Improving your Agents.md
 
-The best way to tune your Agents.md file is by asking to analyse your sessions history. You could do this every month.
+Ask your agent to analyse your sessions history. You could do this every month.
 ```
 Could you analyze the sessions for these repositories from the past month and provide suggestions for 
 improvements to the Agents.md files, so that future sessions can be executed more easily, 
 more quickly, and with better results?
 ```
+
+Ask your agent to review the last six months of pull requests. You could repeat that every month.
+
+```
+I would like to improve my Agents.md so that future work is of better quality. Create a file 
+AgentsSugestions.md that list possible changes that you sugest. For this review all PR's from 
+the last 6 months. Examine the comments and look if it was followed up. Only add sugestions to 
+AgentsSugestions.md if you think there is a change it will help future work.
+```
+
 
 ## Let your agent get personal
 
