@@ -275,7 +275,18 @@ Parts 3 and 4 cover a practical [OpenCode](https://github.com/anomalyco/opencode
 **Cost, routing, observability**
 - [ccusage](https://github.com/ryoppippi/ccusage) — token / cost dashboards for Claude-style CLIs; the same pattern is useful for monitoring OpenCode spend.
 
-And there are many more. On GitHub I maintain a list of interesting AI tools: [My list of AI tools](https://github.com/stars/evermeer/lists/ai).
+And there are many more. On GitHub I maintain a couple of list of interesting AI tools: .
+
+- [Coding agents & CLIs](https://github.com/stars/evermeer/lists/ai-coding-agents-clis) : coding agents, harnesses and CLIs built for agents
+- [Agent orchestration](https://github.com/stars/evermeer/lists/ai-agent-orchestration) : running fleets of agents in parallel or remotely, agent teams
+- [Personal assistants](https://github.com/stars/evermeer/lists/ai-personal-assistants) : OpenClaw family, always-on autonomous assistants and their sandboxes
+- [Engineering skills](https://github.com/stars/evermeer/lists/ai-engineering-skills) : skills and workflow packs that change how a coding agent works
+- [Design & documents](https://github.com/stars/evermeer/lists/ai-design-documents) : UI taste, slides, diagrams and Office files
+- [Memory & context](https://github.com/stars/evermeer/lists/ai-memory-context) : persistent memory, code knowledge graphs and token saving
+- [Security](https://github.com/stars/evermeer/lists/ai-security) : pentesting agents, security skills and agent guardrails
+- [LLM platforms & models](https://github.com/stars/evermeer/lists/ai-llm-platforms-models) : frameworks, workflow platforms, observability, local inference
+- [Research & domain skills](https://github.com/stars/evermeer/lists/ai-research-domain-skills) : research, science, business and other non-coding skills
+- [Directories & learning](https://github.com/stars/evermeer/lists/ai-directories-learning) : awesome lists, plugin directories, courses and talks
 
 Other great resources for OpenCode are
 [Awesome OpenCode](https://github.com/awesome-opencode/awesome-opencode)
